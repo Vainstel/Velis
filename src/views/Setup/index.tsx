@@ -1,11 +1,11 @@
-import React, { useState } from "react"
-import { useSetAtom } from "jotai"
-import { defaultInterface } from "../../atoms/interfaceState"
-import { useTranslation } from "react-i18next"
-import { useNavigate, useLocation } from "react-router-dom"
+import React, {useState} from "react"
+import {useSetAtom} from "jotai"
+import {defaultInterface} from "../../atoms/interfaceState"
+import {useTranslation} from "react-i18next"
+import {useLocation, useNavigate} from "react-router-dom"
 import ModelConfigForm from "./ModelConfigForm"
-import { showToastAtom } from "../../atoms/toastState"
-import { ModelProvider } from "../../../types/model"
+import {showToastAtom} from "../../atoms/toastState"
+import {ModelProvider} from "../../../types/model"
 import "../../styles/components/_Setup.scss"
 import Button from "../../components/Button"
 
@@ -20,10 +20,18 @@ const Setup = () => {
   const handleSubmit = async (data: any) => {
     try {
       if (data.success) {
+        // Mark setup as completed
+        if (window.ipcRenderer) {
+          await window.ipcRenderer.markSetupCompleted()
+        }
+
         showToast({
           message: t("setup.saveSuccess"),
           type: "success"
         })
+
+        // Navigate to home after setup is complete
+        setTimeout(() => navigate("/"), 500)
       }
     } catch (error) {
       console.error("Failed to save config:", error)

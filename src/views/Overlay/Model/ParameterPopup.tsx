@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { useSetAtom } from "jotai"
+import {useEffect, useState} from "react"
+import {useTranslation} from "react-i18next"
+import {useSetAtom} from "jotai"
 import PopupConfirm from "../../../components/PopupConfirm"
 import WrappedTextarea from "../../../components/WrappedTextarea"
-import { showToastAtom } from "../../../atoms/toastState"
+import {showToastAtom} from "../../../atoms/toastState"
 
 const ParameterPopup = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation()

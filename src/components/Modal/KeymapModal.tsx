@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo } from "react"
-import { isKeymapClickedAtom, keymapModalVisibleAtom } from "../../atoms/modalState"
+import React, {useCallback, useMemo} from "react"
+import {isKeymapClickedAtom, keymapModalVisibleAtom} from "../../atoms/modalState"
 import PopupConfirm from "../PopupConfirm"
-import { useTranslation } from "react-i18next"
-import { rawKeymapAtom } from "../../atoms/hotkeyState"
-import { useAtom, useAtomValue } from "jotai"
+import {useTranslation} from "react-i18next"
+import {rawKeymapAtom} from "../../atoms/hotkeyState"
+import {useAtom, useAtomValue} from "jotai"
 
 
 const KeymapModal = () => {

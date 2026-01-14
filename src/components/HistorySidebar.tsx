@@ -1,23 +1,22 @@
-import React, { useState, useCallback, useEffect, useRef } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { closeAllSidebarsAtom, sidebarVisibleAtom } from "../atoms/sidebarState"
-import { ChatHistoryItem, historiesAtom, loadHistoriesAtom } from "../atoms/historyState"
+import React, {useCallback, useEffect, useRef, useState} from "react"
+import {useLocation, useNavigate} from "react-router-dom"
+import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {closeAllSidebarsAtom, sidebarVisibleAtom} from "../atoms/sidebarState"
+import {ChatHistoryItem, historiesAtom, loadHistoriesAtom} from "../atoms/historyState"
 import Header from "./Header"
-import { useTranslation } from "react-i18next"
-import { showToastAtom } from "../atoms/toastState"
+import {useTranslation} from "react-i18next"
+import {showToastAtom} from "../atoms/toastState"
 import Tooltip from "./Tooltip"
-import { closeAllOverlaysAtom, openOverlayAtom, overlaysAtom, OverlayType } from "../atoms/layerState"
-import { useSidebarLayer } from "../hooks/useLayer"
+import {closeAllOverlaysAtom, openOverlayAtom, overlaysAtom, OverlayType} from "../atoms/layerState"
+import {useSidebarLayer} from "../hooks/useLayer"
 import useHotkeyEvent from "../hooks/useHotkeyEvent"
-import { chatStreamingStatusMapAtom, currentChatIdAtom, deleteChatAtom } from "../atoms/chatState"
+import {chatStreamingStatusMapAtom, currentChatIdAtom, deleteChatAtom, draftMessagesAtom} from "../atoms/chatState"
 import PopupConfirm from "./PopupConfirm"
 import Dropdown from "./DropDown"
-import { isLoggedInOAPAtom, OAPLevelAtom, oapUserAtom } from "../atoms/oapState"
 import Button from "./Button"
-import { settingTabAtom } from "../atoms/globalState"
-import { ClickOutside } from "./ClickOutside"
-import { openRenameModalAtom } from "../atoms/modalState"
+import {settingTabAtom} from "../atoms/globalState"
+import {ClickOutside} from "./ClickOutside"
+import {openRenameModalAtom} from "../atoms/modalState"
 
 interface Props {
   onNewChat?: () => void
@@ -74,13 +73,11 @@ const HistorySidebar = ({ onNewChat }: Props) => {
   const [isVisible, setVisible] = useSidebarLayer(sidebarVisibleAtom)
   const [currentChatId, setCurrentChatId] = useAtom(currentChatIdAtom)
   const containerRef = useRef<HTMLDivElement>(null)
-  const isLoggedInOAP = useAtomValue(isLoggedInOAPAtom)
-  const oapUser = useAtomValue(oapUserAtom)
-  const oapLevel = useAtomValue(OAPLevelAtom)
   const closeAllSidebars = useSetAtom(closeAllSidebarsAtom)
   const openRenameModal = useSetAtom(openRenameModalAtom)
   const settingTab = useAtomValue(settingTabAtom)
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
+  const draftMessages = useAtomValue(draftMessagesAtom)
   const chatStreamingStatusMap = useAtomValue(chatStreamingStatusMapAtom)
   const deleteChat = useSetAtom(deleteChatAtom)
   const overlays = useAtomValue(overlaysAtom)
@@ -239,6 +236,12 @@ const HistorySidebar = ({ onNewChat }: Props) => {
                 >
                   <div>
                     <span>+ {t("chat.newChat")}</span>
+                    {draftMessages["__new_chat__"] && (draftMessages["__new_chat__"].message !== "" || draftMessages["__new_chat__"].files.length > 0) && (
+                      <svg className="draft-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 13.6689V19.0003H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M2.99991 13.5986L12.5235 4.12082C13.9997 2.65181 16.3929 2.65181 17.869 4.12082V4.12082C19.3452 5.58983 19.3452 7.97157 17.869 9.44058L8.34542 18.9183" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
                   </div>
                 </Button>
             </Tooltip>
@@ -266,6 +269,7 @@ const HistorySidebar = ({ onNewChat }: Props) => {
                       currentChatId={currentChatId}
                       loadChat={loadChat}
                       isChatStreaming={chatStreamingStatusMap.get(chat.id) ?? false}
+                      hasDraft={draftMessages[chat.id] && (draftMessages[chat.id].message !== "" || draftMessages[chat.id].files.length > 0)}
                       onStarChat={(chat) => handleStarChat(chat, "starred")}
                       onConfirmRename={confirmRename}
                       onConfirmDelete={confirmDelete}
@@ -284,6 +288,7 @@ const HistorySidebar = ({ onNewChat }: Props) => {
                 currentChatId={currentChatId}
                 loadChat={loadChat}
                 isChatStreaming={chatStreamingStatusMap.get(chat.id) ?? false}
+                hasDraft={draftMessages[chat.id] && (draftMessages[chat.id].message !== "" || draftMessages[chat.id].files.length > 0)}
                 onStarChat={(chat) => handleStarChat(chat, "normal")}
                 onConfirmRename={confirmRename}
                 onConfirmDelete={confirmDelete}
@@ -292,64 +297,20 @@ const HistorySidebar = ({ onNewChat }: Props) => {
             ))}
           </div>
           <div className="sidebar-footer" onClick={handleTools}>
-            {isLoggedInOAP && (
-              <div className="sidebar-footer-btn">
-                <div className="sidemenu-btn">
-                  <div className="oap-user-info">
-                    {oapUser?.picture ?
-                      <img className="oap-avatar" src={oapUser?.picture} onError={() => {
-                        return (
-                          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#e0f2fe"></stop>
-                                <stop offset="100%" stopColor="#bfdbfe"></stop>
-                              </linearGradient>
-                            </defs>
-                            <rect width="80" height="80" fill="url(#gradient)"></rect>
-                            <circle cx="40" cy="30" r="16" fill="#94a3b8"></circle>
-                            <circle cx="40" cy="90" r="40" fill="#94a3b8"></circle>
-                          </svg>
-                        )
-                      }} />
-                      :
-                      <svg className="oap-avatar" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#e0f2fe"></stop>
-                            <stop offset="100%" stopColor="#bfdbfe"></stop>
-                          </linearGradient>
-                        </defs>
-                        <rect width="80" height="80" fill="url(#gradient)"></rect>
-                        <circle cx="40" cy="30" r="16" fill="#94a3b8"></circle>
-                        <circle cx="40" cy="90" r="40" fill="#94a3b8"></circle>
-                      </svg>
-                    }
-                    <div className="oap-username">{oapUser?.username}</div>
-                  </div>
-                  <span className="oap-level">{oapLevel}</span>
+            <div className="sidebar-footer-btn">
+              <div className="sidemenu-btn">
+                <div className="user-info">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 22 22" fill="none">
+                    <path d="M11 15C13.2091 15 15 13.2091 15 11C15 8.79086 13.2091 7 11 7C8.79086 7 7 8.79086 7 11C7 13.2091 8.79086 15 11 15Z" stroke="currentColor" strokeWidth="2" strokeMiterlimit="10"/>
+                    <path d="M13.5404 2.49103L12.4441 3.94267C11.3699 3.71161 10.2572 3.72873 9.19062 3.99275L8.04466 2.58391C6.85499 2.99056 5.76529 3.64532 4.84772 4.50483L5.55365 6.17806C4.82035 6.99581 4.28318 7.97002 3.98299 9.02659L2.19116 9.31422C1.94616 10.5476 1.96542 11.8188 2.24768 13.0442L4.05324 13.2691C4.38773 14.3157 4.96116 15.27 5.72815 16.0567L5.07906 17.7564C6.02859 18.5807 7.14198 19.1945 8.34591 19.5574L9.44108 18.1104C10.5154 18.3413 11.6283 18.3245 12.6951 18.0613L13.8405 19.4692C15.0302 19.0626 16.12 18.4079 17.0375 17.5483L16.3321 15.876C17.0654 15.0576 17.6027 14.0829 17.9031 13.0259L19.6949 12.7382C19.9396 11.5049 19.9203 10.2337 19.6384 9.00827L17.8291 8.77918C17.4946 7.73265 16.9211 6.77831 16.1541 5.99166L16.8023 4.29248C15.8544 3.46841 14.7427 2.85442 13.5404 2.49103Z" stroke="currentColor" strokeWidth="2" strokeMiterlimit="10"/>
+                  </svg>
+                  {t("sidebar.manageAndSettings")}
                 </div>
                 <svg className={`sidemenu-arrow ${isSettingOpen ? "open" : ""}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" width="16" height="16">
                   <path fill="currentColor" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 9H7l4 4.5L15 9Z"></path>
                 </svg>
               </div>
-            )}
-            {!isLoggedInOAP && (
-              <div className="sidebar-footer-btn">
-                <div className="sidemenu-btn">
-                  <div className="oap-user-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 22 22" fill="none">
-                      <path d="M11 15C13.2091 15 15 13.2091 15 11C15 8.79086 13.2091 7 11 7C8.79086 7 7 8.79086 7 11C7 13.2091 8.79086 15 11 15Z" stroke="currentColor" strokeWidth="2" strokeMiterlimit="10"/>
-                      <path d="M13.5404 2.49103L12.4441 3.94267C11.3699 3.71161 10.2572 3.72873 9.19062 3.99275L8.04466 2.58391C6.85499 2.99056 5.76529 3.64532 4.84772 4.50483L5.55365 6.17806C4.82035 6.99581 4.28318 7.97002 3.98299 9.02659L2.19116 9.31422C1.94616 10.5476 1.96542 11.8188 2.24768 13.0442L4.05324 13.2691C4.38773 14.3157 4.96116 15.27 5.72815 16.0567L5.07906 17.7564C6.02859 18.5807 7.14198 19.1945 8.34591 19.5574L9.44108 18.1104C10.5154 18.3413 11.6283 18.3245 12.6951 18.0613L13.8405 19.4692C15.0302 19.0626 16.12 18.4079 17.0375 17.5483L16.3321 15.876C17.0654 15.0576 17.6027 14.0829 17.9031 13.0259L19.6949 12.7382C19.9396 11.5049 19.9203 10.2337 19.6384 9.00827L17.8291 8.77918C17.4946 7.73265 16.9211 6.77831 16.1541 5.99166L16.8023 4.29248C15.8544 3.46841 14.7427 2.85442 13.5404 2.49103Z" stroke="currentColor" strokeWidth="2" strokeMiterlimit="10"/>
-                    </svg>
-                    {t("sidebar.manageAndSettings")}
-                  </div>
-                  <svg className={`sidemenu-arrow ${isSettingOpen ? "open" : ""}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" width="16" height="16">
-                    <path fill="currentColor" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 9H7l4 4.5L15 9Z"></path>
-                  </svg>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </ClickOutside>
@@ -375,13 +336,14 @@ interface ChatHistoryItemProps {
   currentChatId: string
   loadChat: (id: string) => void
   isChatStreaming: boolean
+  hasDraft: boolean
   onStarChat: (chat: ChatHistoryItem) => void
   onConfirmRename: (chat: ChatHistoryItem) => void
   onConfirmDelete: (chat: ChatHistoryItem) => void
   toggleSubmenu: (isSubmenuOpen: boolean) => void
 }
 
-const ChatHistoryListItem = ({ chat, type, currentChatId, loadChat, isChatStreaming, onStarChat, onConfirmRename, onConfirmDelete, toggleSubmenu }: ChatHistoryItemProps) => {
+const ChatHistoryListItem = ({ chat, type, currentChatId, loadChat, isChatStreaming, hasDraft, onStarChat, onConfirmRename, onConfirmDelete, toggleSubmenu }: ChatHistoryItemProps) => {
   const { t } = useTranslation()
 
   return (
@@ -470,6 +432,12 @@ const ChatHistoryListItem = ({ chat, type, currentChatId, loadChat, isChatStream
       {isChatStreaming &&
         <div className="history-item-loading"></div>
       }
+      {!isChatStreaming && hasDraft && (
+        <svg className="draft-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M3 13.6689V19.0003H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M2.99991 13.5986L12.5235 4.12082C13.9997 2.65181 16.3929 2.65181 17.869 4.12082V4.12082C19.3452 5.58983 19.3452 7.97157 17.869 9.44058L8.34542 18.9183" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
     </div>
   )
 }

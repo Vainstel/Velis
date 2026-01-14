@@ -1,15 +1,15 @@
-import React, { useRef, useEffect, useCallback, useState } from "react"
-import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter"
-import { tomorrow, darcula } from "react-syntax-highlighter/dist/esm/styles/prism"
-import { themeAtom } from "../../atoms/themeState"
-import { useAtom, useAtomValue } from "jotai"
-import { codeStreamingAtom } from "../../atoms/codeStreaming"
-import { useTranslation } from "react-i18next"
+import React, {useCallback, useEffect, useRef, useState} from "react"
+import {PrismAsyncLight as SyntaxHighlighter} from "react-syntax-highlighter"
+import {darcula, tomorrow} from "react-syntax-highlighter/dist/esm/styles/prism"
+import {themeAtom} from "../../atoms/themeState"
+import {useAtom, useAtomValue} from "jotai"
+import {codeStreamingAtom} from "../../atoms/codeStreaming"
+import {useTranslation} from "react-i18next"
 import CodePreview from "./CodePreview"
-import { useLayer } from "../../hooks/useLayer"
-import { isChatStreamingAtom } from "../../atoms/chatState"
+import {useLayer} from "../../hooks/useLayer"
+import {isChatStreamingAtom} from "../../atoms/chatState"
 import Tooltip from "../../components/Tooltip"
-import { sidebarVisibleAtom } from "../../atoms/sidebarState"
+import {sidebarVisibleAtom} from "../../atoms/sidebarState"
 
 type TabType = "code" | "preview"
 
@@ -26,7 +26,6 @@ const CodeModal = () => {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<TabType>("code")
   const isChatStreaming = useAtomValue(isChatStreamingAtom)
-  const [hasScrolledUp, setHasScrolledUp] = useState(false)
 
   const [streamingCode, updateStreamingCode] = useAtom(codeStreamingAtom)
   const code = streamingCode?.code || ""
@@ -43,32 +42,23 @@ const CodeModal = () => {
   })
 
   const scrollCodeToBottom = useCallback(() => {
-    setTimeout(() => {
-      if (codeModalRef.current) {
-        codeModalRef.current.scrollTop = codeModalRef.current.scrollHeight
+    if (codeModalRef.current) {
+      const pre = codeModalRef.current.querySelector("pre")
+      if (pre) {
+        pre.scrollTop = pre.scrollHeight
       }
-    }, 0)
-  }, [])
-
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget
-    const isAtBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 10
-    setHasScrolledUp(!isAtBottom)
+    }
   }, [])
 
   const closeCodeModal = () => {
     updateStreamingCode({ code: "", language: "" })
-    setHasScrolledUp(false)
     closeLayer()
   }
 
   useEffect(() => {
-    if (!hasScrolledUp) {
-      scrollCodeToBottom()
-    }
+    scrollCodeToBottom()
     setActiveTab("code")
-  }, [streamingCode, hasScrolledUp])
-
+  }, [streamingCode])
 
   useEffect(() => {
     if (!isChatStreaming && streamingCode?.code) {
@@ -166,7 +156,7 @@ const CodeModal = () => {
             </Tooltip>
           </div>
         </div>
-        <div className="code-modal-body" ref={codeModalRef} onScroll={handleScroll}>
+        <div className="code-modal-body" ref={codeModalRef}>
           {activeTab === "code" && (
             <SyntaxHighlighter
               language={streamingCode?.language.toLowerCase() || ""}

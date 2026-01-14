@@ -1,16 +1,5 @@
 use std::{path::PathBuf, sync::LazyLock};
 
-#[cfg(target_os = "windows")]
-pub const DEF_MCP_BIN_NAME: &str = "dive-mcp.exe";
-#[cfg(target_os = "linux")]
-pub const DEF_MCP_BIN_NAME: &str = "dive-mcp";
-#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-pub const DEF_MCP_BIN_NAME: &str = "dive-mcp-x86_64";
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-pub const DEF_MCP_BIN_NAME: &str = "dive-mcp-aarch64";
-
-pub const OAP_ROOT_URL: &str = "https://oaphub.ai";
-
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg(not(target_os = "windows"))]
@@ -33,16 +22,17 @@ pub static CLIENT_ID: LazyLock<&'static str> = LazyLock::new(|| {
 pub static PROJECT_DIRS: LazyLock<Dirs> = LazyLock::new(|| {
     let home = dirs::home_dir().unwrap();
     Dirs {
-        root: home.join(".dive"),
-        cache: home.join(".dive/host_cache"),
-        bus: home.join(".dive/host_cache/bus"),
-        log: home.join(".dive/log"),
-        bin: home.join(".dive/bin"),
+        root: home.join(".velis"),
+        cache: home.join(".velis/host_cache"),
+        bus: home.join(".velis/host_cache/bus"),
+        log: home.join(".velis/log"),
+        bin: home.join(".velis/bin"),
+        script: home.join(".velis/scripts"),
 
         #[cfg(debug_assertions)]
         config: std::env::current_dir().unwrap().join("../.config"),
         #[cfg(not(debug_assertions))]
-        config: home.join(".dive/config"),
+        config: home.join(".velis/config"),
     }
 });
 
@@ -54,4 +44,5 @@ pub struct Dirs {
     pub bus: PathBuf,
     pub log: PathBuf,
     pub bin: PathBuf,
+    pub script: PathBuf,
 }

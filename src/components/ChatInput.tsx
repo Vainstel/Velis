@@ -1,24 +1,31 @@
 import "../styles/components/_ChatInput.scss"
 
-import React, { useState, useRef, useEffect, useCallback } from "react"
-import { useTranslation } from "react-i18next"
+import React, {useCallback, useEffect, useRef, useState} from "react"
+import {useTranslation} from "react-i18next"
 import Tooltip from "./Tooltip"
 import useHotkeyEvent from "../hooks/useHotkeyEvent"
 import Textarea from "./WrappedTextarea"
-import { currentChatIdAtom, draftMessagesAtom, lastMessageAtom, type FilePreview } from "../atoms/chatState"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { activeConfigAtom, configAtom, configDictAtom, currentModelSupportToolsAtom, isConfigActiveAtom, writeRawConfigAtom } from "../atoms/configState"
-import { loadToolsAtom, toolsAtom, type Tool, type SubTool } from "../atoms/toolState"
-import { useNavigate } from "react-router-dom"
-import { showToastAtom } from "../atoms/toastState"
-import { getTermFromModelConfig, queryGroup, queryModel, updateGroup, updateModel } from "../helper/model"
-import { modelSettingsAtom } from "../atoms/modelState"
-import { fileToBase64, getFileFromImageUrl } from "../util"
-import { isLoggedInOAPAtom } from "../atoms/oapState"
+import {currentChatIdAtom, draftMessagesAtom, type FilePreview, lastMessageAtom} from "../atoms/chatState"
+import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {
+    activeConfigAtom,
+    configAtom,
+    configDictAtom,
+    currentModelSupportToolsAtom,
+    isConfigActiveAtom,
+    writeRawConfigAtom
+} from "../atoms/configState"
+import {loadToolsAtom, type SubTool, type Tool, toolsAtom} from "../atoms/toolState"
+import {useNavigate} from "react-router-dom"
+import {showToastAtom} from "../atoms/toastState"
+import {getTermFromModelConfig, queryGroup, queryModel, updateGroup, updateModel} from "../helper/model"
+import {modelSettingsAtom} from "../atoms/modelState"
+import {fileToBase64, getFileFromImageUrl} from "../util"
 import Button from "./Button"
-import { invokeIPC, isTauri } from "../ipc"
+import {invokeIPC, isTauri} from "../ipc"
 import ToolDropDown from "./ToolDropDown"
-import { historiesAtom } from "../atoms/historyState"
+import {historiesAtom} from "../atoms/historyState"
+import {commandsAtom, loadCommandsAtom, type Command} from "../atoms/commandState"
 
 interface Props {
   page: "welcome" | "chat"
@@ -51,7 +58,6 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
   const activeConfig = useAtomValue(activeConfigAtom)
   const [isDragging, setIsDragging] = useState(false)
   const loadTools = useSetAtom(loadToolsAtom)
-  const isLoggedInOAP = useAtomValue(isLoggedInOAPAtom)
   const config = useAtomValue(configAtom)
   const configList = useAtomValue(configDictAtom)
   const saveAllConfig = useSetAtom(writeRawConfigAtom)
@@ -61,6 +67,8 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
   const currentChatId = useAtomValue(currentChatIdAtom)
   const histories = useAtomValue(historiesAtom)
   const tools = useAtomValue(toolsAtom)
+  const commands = useAtomValue(commandsAtom)
+  const loadCommands = useSetAtom(loadCommandsAtom)
 
   // Tool mention states
   const [showToolMenu, setShowToolMenu] = useState(false)
@@ -69,6 +77,14 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
   const [selectedToolIndex, setSelectedToolIndex] = useState(0)
   const [mentionStartPos, setMentionStartPos] = useState(0)
   const toolMenuRef = useRef<HTMLDivElement>(null)
+
+  // Slash command states
+  const [showCommandMenu, setShowCommandMenu] = useState(false)
+  const [commandMenuPosition, setCommandMenuPosition] = useState({ top: 0, left: 0 })
+  const [commandSearchQuery, setCommandSearchQuery] = useState("")
+  const [selectedCommandIndex, setSelectedCommandIndex] = useState(0)
+  const [commandStartPos, setCommandStartPos] = useState(0)
+  const commandMenuRef = useRef<HTMLDivElement>(null)
 
   // Calculate chat key for draft storage
   const chatKey = page === "welcome" ? "__new_chat__" : currentChatId || "__new_chat__"
@@ -83,7 +99,8 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
 
   useEffect(() => {
     loadTools()
-  }, [isLoggedInOAP])
+    loadCommands()
+  }, [])
 
   // Load draft message and files when chatKey changes
   useEffect(() => {
@@ -303,7 +320,24 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
     }
   }, [showToolMenu])
 
-  // Scroll selected item into view
+  // Handle click outside command menu
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (commandMenuRef.current && !commandMenuRef.current.contains(e.target as Node) &&
+          textareaRef.current && !textareaRef.current.contains(e.target as Node)) {
+        setShowCommandMenu(false)
+      }
+    }
+
+    if (showCommandMenu) {
+      document.addEventListener("mousedown", handleClickOutside)
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside)
+      }
+    }
+  }, [showCommandMenu])
+
+  // Scroll selected item into view (tool menu)
   useEffect(() => {
     if (showToolMenu && toolMenuRef.current) {
       const selectedItem = toolMenuRef.current.querySelector(".tool-mention-item.selected")
@@ -315,6 +349,19 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
       }
     }
   }, [selectedToolIndex, showToolMenu])
+
+  // Scroll selected item into view (command menu)
+  useEffect(() => {
+    if (showCommandMenu && commandMenuRef.current) {
+      const selectedItem = commandMenuRef.current.querySelector(".command-mention-item.selected")
+      if (selectedItem) {
+        selectedItem.scrollIntoView({
+          block: "nearest",
+          behavior: "smooth"
+        })
+      }
+    }
+  }, [selectedCommandIndex, showCommandMenu])
 
   // Update menu position when message changes and menu is visible
   useEffect(() => {
@@ -511,6 +558,34 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
     )
   }, [toolSearchQuery, getToolOptions])
 
+  // Get filtered command options
+  const getFilteredCommandOptions = useCallback(() => {
+    if (!commandSearchQuery) {
+      return commands
+    }
+
+    const query = commandSearchQuery.toLowerCase()
+    return commands.filter((command) => {
+      const nameMatch = command.name.toLowerCase().includes(query)
+      const descMatch = command.description?.toLowerCase().includes(query)
+      return nameMatch || descMatch
+    }).sort((a, b) => {
+      const aName = a.name.toLowerCase()
+      const bName = b.name.toLowerCase()
+
+      // Exact match first
+      if (aName === query) return -1
+      if (bName === query) return 1
+
+      // StartsWith next
+      if (aName.startsWith(query) && !bName.startsWith(query)) return -1
+      if (bName.startsWith(query) && !aName.startsWith(query)) return 1
+
+      // Contains last
+      return 0
+    })
+  }, [commandSearchQuery, commands])
+
   // Calculate cursor position in pixels
   const getCursorPosition = useCallback(() => {
     if (!textareaRef.current) {
@@ -573,57 +648,108 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
 
     setMessage(newValue)
 
-    // Check if @ symbol was just typed
     const textBeforeCursor = newValue.substring(0, cursorPos)
-    const lastAtIndex = textBeforeCursor.lastIndexOf("@")
 
-    if (lastAtIndex !== -1) {
-      // Check if there's a space before @ or it's at the start
-      const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : " "
-      const isValidMention = charBeforeAt === " " || charBeforeAt === "\n" || lastAtIndex === 0
+    // Check for slash command (/) - must be at start or after space/newline
+    const lastSlashIndex = textBeforeCursor.lastIndexOf("/")
+    if (lastSlashIndex !== -1) {
+      const charBeforeSlash = lastSlashIndex > 0 ? textBeforeCursor[lastSlashIndex - 1] : " "
+      const isValidSlash = charBeforeSlash === " " || charBeforeSlash === "\n" || lastSlashIndex === 0
 
-      if (isValidMention) {
-        const searchText = textBeforeCursor.substring(lastAtIndex + 1)
+      if (isValidSlash) {
+        const searchText = textBeforeCursor.substring(lastSlashIndex + 1)
 
-        // Show menu if @ is followed by no space or only alphanumeric/slash characters
-        if (!searchText.includes(" ") && !searchText.includes("\n")) {
-          // Check if there are any available tools before showing menu
-          const availableOptions = getToolOptions()
-          if (availableOptions.length === 0) {
-            setShowToolMenu(false)
+        // Show menu if / is followed by no space or only alphanumeric/hyphen characters
+        if (!searchText.includes(" ") && !searchText.includes("\n") && /^[a-zA-Z0-9-]*$/.test(searchText)) {
+          // Check if there are any available commands before showing menu
+          if (commands.length === 0) {
+            setShowCommandMenu(false)
+          } else {
+            setCommandSearchQuery(searchText)
+            setCommandStartPos(lastSlashIndex)
+            setShowCommandMenu(true)
+            setSelectedCommandIndex(0)
+
+            // Calculate position for the menu at cursor position
+            if (textareaRef.current) {
+              const cursorPosition = getCursorPosition()
+              const lineHeight = parseInt(window.getComputedStyle(textareaRef.current).lineHeight) || 20
+              const menuMaxHeight = 240
+              const windowHeight = window.innerHeight
+
+              const spaceBelow = windowHeight - (cursorPosition.top + lineHeight)
+              const showAbove = spaceBelow < menuMaxHeight && cursorPosition.top > menuMaxHeight
+
+              setCommandMenuPosition({
+                top: showAbove ? cursorPosition.top - menuMaxHeight : cursorPosition.top + lineHeight,
+                left: cursorPosition.left
+              })
+            }
+            // Don't check for @ mentions when slash menu is open
             return
           }
-
-          setToolSearchQuery(searchText)
-          setMentionStartPos(lastAtIndex)
-          setShowToolMenu(true)
-          setSelectedToolIndex(0)
-
-          // Calculate position for the menu at cursor position
-          if (textareaRef.current) {
-            const cursorPosition = getCursorPosition()
-            const lineHeight = parseInt(window.getComputedStyle(textareaRef.current).lineHeight) || 20
-            const menuMaxHeight = 240 // Max height from CSS
-            const windowHeight = window.innerHeight
-
-            // Calculate space below cursor
-            const spaceBelow = windowHeight - (cursorPosition.top + lineHeight)
-
-            // If not enough space below, show menu above cursor
-            const showAbove = spaceBelow < menuMaxHeight && cursorPosition.top > menuMaxHeight
-
-            setToolMenuPosition({
-              top: showAbove ? cursorPosition.top - menuMaxHeight : cursorPosition.top + lineHeight,
-              left: cursorPosition.left
-            })
-          }
-          return
+        } else {
+          setShowCommandMenu(false)
         }
+      } else {
+        setShowCommandMenu(false)
       }
+    } else {
+      setShowCommandMenu(false)
     }
 
-    // Hide menu if no valid @ mention found
-    setShowToolMenu(false)
+    // Check if @ symbol was just typed (only if slash menu is not shown)
+    if (!showCommandMenu) {
+      const lastAtIndex = textBeforeCursor.lastIndexOf("@")
+
+      if (lastAtIndex !== -1) {
+        // Check if there's a space before @ or it's at the start
+        const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : " "
+        const isValidMention = charBeforeAt === " " || charBeforeAt === "\n" || lastAtIndex === 0
+
+        if (isValidMention) {
+          const searchText = textBeforeCursor.substring(lastAtIndex + 1)
+
+          // Show menu if @ is followed by no space or only alphanumeric/slash characters
+          if (!searchText.includes(" ") && !searchText.includes("\n")) {
+            // Check if there are any available tools before showing menu
+            const availableOptions = getToolOptions()
+            if (availableOptions.length === 0) {
+              setShowToolMenu(false)
+              return
+            }
+
+            setToolSearchQuery(searchText)
+            setMentionStartPos(lastAtIndex)
+            setShowToolMenu(true)
+            setSelectedToolIndex(0)
+
+            // Calculate position for the menu at cursor position
+            if (textareaRef.current) {
+              const cursorPosition = getCursorPosition()
+              const lineHeight = parseInt(window.getComputedStyle(textareaRef.current).lineHeight) || 20
+              const menuMaxHeight = 240 // Max height from CSS
+              const windowHeight = window.innerHeight
+
+              // Calculate space below cursor
+              const spaceBelow = windowHeight - (cursorPosition.top + lineHeight)
+
+              // If not enough space below, show menu above cursor
+              const showAbove = spaceBelow < menuMaxHeight && cursorPosition.top > menuMaxHeight
+
+              setToolMenuPosition({
+                top: showAbove ? cursorPosition.top - menuMaxHeight : cursorPosition.top + lineHeight,
+                left: cursorPosition.left
+              })
+            }
+            return
+          }
+        }
+      }
+
+      // Hide menu if no valid @ mention found
+      setShowToolMenu(false)
+    }
   }
 
   // Handle tool selection
@@ -645,6 +771,26 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
       }
     }, 0)
   }, [message, mentionStartPos, toolSearchQuery])
+
+  // Handle command selection
+  const selectCommand = useCallback((command: Command) => {
+    const beforeCommand = message.substring(0, commandStartPos)
+    const afterCommand = message.substring(commandStartPos + commandSearchQuery.length + 1) // +1 for /
+    const newMessage = beforeCommand + command.template + afterCommand
+
+    setMessage(newMessage)
+    setShowCommandMenu(false)
+    setCommandSearchQuery("")
+
+    // Focus back to textarea and set cursor position at the end of inserted template
+    setTimeout(() => {
+      if (textareaRef.current) {
+        const newCursorPos = beforeCommand.length + command.template.length
+        textareaRef.current.focus()
+        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos)
+      }
+    }, 0)
+  }, [message, commandStartPos, commandSearchQuery])
 
   const saveMessageToHistory = (msg: string) => {
     if (!msg.trim()) {
@@ -721,6 +867,47 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
   }
 
   const onKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Handle command menu navigation
+    if (showCommandMenu) {
+      const filteredCommands = getFilteredCommandOptions()
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault()
+        setSelectedCommandIndex((prev) =>
+          prev < filteredCommands.length - 1 ? prev + 1 : prev
+        )
+        return
+      }
+
+      if (e.key === "ArrowUp") {
+        e.preventDefault()
+        setSelectedCommandIndex((prev) => prev > 0 ? prev - 1 : 0)
+        return
+      }
+
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault()
+        if (filteredCommands[selectedCommandIndex]) {
+          selectCommand(filteredCommands[selectedCommandIndex])
+        }
+        return
+      }
+
+      if (e.key === "Tab") {
+        e.preventDefault()
+        if (filteredCommands[selectedCommandIndex]) {
+          selectCommand(filteredCommands[selectedCommandIndex])
+        }
+        return
+      }
+
+      if (e.key === "Escape") {
+        e.preventDefault()
+        setShowCommandMenu(false)
+        return
+      }
+    }
+
     // Handle tool menu navigation
     if (showToolMenu) {
       const filteredOptions = getFilteredToolOptions()
@@ -739,7 +926,7 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
         return
       }
 
-      if (e.key === "Enter" && !e.shiftKey && !e.altKey) {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault()
         if (filteredOptions[selectedToolIndex]) {
           selectTool(filteredOptions[selectedToolIndex].value)
@@ -812,19 +999,6 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
     }
 
     if ((e.key !== "Enter" && e.key !== "Escape") || e.shiftKey || isComposing.current) {
-      return
-    }
-
-    if (e.key === "Enter" && e.altKey) {
-      e.preventDefault()
-      const textarea = e.currentTarget
-      const start = textarea.selectionStart
-      const end = textarea.selectionEnd
-      const newMessage = message.substring(0, start) + "\n" + message.substring(end)
-      setMessage(newMessage)
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + 1
-      }, 0)
       return
     }
 
@@ -970,6 +1144,37 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
                     onMouseEnter={() => setSelectedToolIndex(index)}
                   >
                     <div className="tool-mention-label">{option.label}</div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+          {showCommandMenu && (() => {
+            const filteredCommands = getFilteredCommandOptions()
+            if (filteredCommands.length === 0) {
+              return null
+            }
+            return (
+              <div
+                ref={commandMenuRef}
+                className="command-mention-menu"
+                style={{
+                  position: "fixed",
+                  top: `${commandMenuPosition.top}px`,
+                  left: `${commandMenuPosition.left}px`,
+                }}
+              >
+                {filteredCommands.map((command, index) => (
+                  <div
+                    key={command.id}
+                    className={`command-mention-item ${index === selectedCommandIndex ? "selected" : ""}`}
+                    onClick={() => selectCommand(command)}
+                    onMouseEnter={() => setSelectedCommandIndex(index)}
+                  >
+                    <div className="command-mention-name">/{command.name}</div>
+                    {command.description && (
+                      <div className="command-mention-desc">{command.description}</div>
+                    )}
                   </div>
                 ))}
               </div>

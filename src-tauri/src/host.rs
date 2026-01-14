@@ -4,14 +4,13 @@ use std::{
 };
 
 use anyhow::Result;
-use serde_json::json;
 
 use tokio::{
     fs::{create_dir_all, File},
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader, BufWriter},
 };
 
-use crate::{process::command::Command, shared::{DEF_MCP_BIN_NAME, VERSION}};
+use crate::process::command::Command;
 
 pub const COMMAND_ALIAS_FILE: &str = "command_alias.json";
 pub const CUSTOM_RULES_FILE: &str = "customrules";
@@ -19,8 +18,6 @@ pub const MCP_CONFIG_FILE: &str = "mcp_config.json";
 pub const MODEL_CONFIG_FILE: &str = "model_config.json";
 pub const HTTPD_CONFIG_FILE: &str = "dive_httpd.json";
 pub const PLUGIN_CONFIG_FILE: &str = "plugin_config.json";
-
-pub const DEF_MCP_SERVER_NAME: &str = "__SYSTEM_DIVE_SERVER__";
 
 #[derive(Clone, Debug, Default)]
 pub struct McpHost {
@@ -51,23 +48,15 @@ pub struct HostProcess {
     child_process: Option<std::process::Child>,
     file_path: PathBuf,
     host_dir: PathBuf,
-    def_mcp_bin_path: PathBuf,
 }
 
 impl HostProcess {
-    pub fn new(host_dir: PathBuf, prebuilt_dir: PathBuf) -> Self {
-        let def_mcp_bin_path = if cfg!(debug_assertions) {
-            std::env::current_dir().unwrap().join("../target/release").join(DEF_MCP_BIN_NAME)
-        } else {
-            prebuilt_dir.join(DEF_MCP_BIN_NAME)
-        };
-
+    pub fn new(host_dir: PathBuf) -> Self {
         let file_path = crate::shared::PROJECT_DIRS.bus.clone();
         Self {
             child_process: None,
             file_path,
             host_dir,
-            def_mcp_bin_path,
         }
     }
 
@@ -108,10 +97,11 @@ impl HostProcess {
         create_dir_all(&dirs.root).await?;
         create_dir_all(&dirs.config).await?;
         create_dir_all(&dirs.cache).await?;
+        create_dir_all(&dirs.script).await?;
 
         log::info!("initing host config");
         log::info!("config: {}", dirs.config.to_string_lossy());
-        self.init_host_config(&dirs.config, &dirs.config).await?;
+        Self::init_host_config(&self, &dirs.config, &dirs.config).await?;
         Ok(())
     }
 
@@ -132,9 +122,8 @@ impl HostProcess {
             .arg("INFO")
             .envs(std::env::vars())
             .env("PATH", crate::util::get_system_path().await)
-            .env("DIVE_CONFIG_DIR", dirs.config)
+            .env("VELIS_CONFIG_DIR", dirs.config)
             .env("RESOURCE_DIR", dirs.cache)
-            .env("DIVE_USER_AGENT", format!("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Dive/{} (+https://github.com/OpenAgentPlatform/Dive)", VERSION))
             .current_dir(dunce::simplified(cwd))
             .stderr(Stdio::piped())
             .stdout(Stdio::piped());
@@ -185,10 +174,15 @@ impl HostProcess {
         let bin_dir = crate::shared::PROJECT_DIRS.bin.clone();
         let nodejs_bin = bin_dir.join("nodejs");
         let alias_content = if cfg!(target_os = "windows") {
-            json!({
-                "npx": dunce::simplified(&nodejs_bin.join("npx.cmd")).to_string_lossy(),
-                "npm": dunce::simplified(&nodejs_bin.join("npm.cmd")).to_string_lossy()
-            }).to_string()
+            format!(
+                r#"{{ "npx": "{}", "npm": "{}" }}"#,
+                dunce::simplified(&nodejs_bin.join("npx.cmd"))
+                    .to_string_lossy()
+                    .replace('\\', "\\\\"),
+                dunce::simplified(&nodejs_bin.join("npm.cmd"))
+                    .to_string_lossy()
+                    .replace('\\', "\\\\"),
+            )
         } else {
             "{}".to_string()
         };
@@ -199,102 +193,46 @@ impl HostProcess {
         .await?;
 
         create_file_if_not_exists(&config_dir.join(CUSTOM_RULES_FILE), b"").await?;
-
-        let def_mcp_bin_path = dunce::simplified(&self.def_mcp_bin_path).to_string_lossy();
-        let mcp_config = if self.def_mcp_bin_path.exists() {
-            json!({
-                "mcpServers": {
-                    DEF_MCP_SERVER_NAME: {
-                        "transport": "stdio",
-                        "enabled": true,
-                        "command": def_mcp_bin_path
-                    }
-                }
-            })
-        } else {
-            json!({ "mcpServers": {} })
-        };
-        create_file_if_not_exists(
-            &config_dir.join(MCP_CONFIG_FILE),
-            mcp_config.to_string().as_bytes()
-        )
-        .await?;
-
-        let model_config = json!({
-            "activeProvider": "none",
-            "enableTools": true,
-            "disableDiveSystemPrompt": false
-        });
+        create_file_if_not_exists(&config_dir.join(MCP_CONFIG_FILE), b"{\"mcpServers\":{}}")
+            .await?;
         create_file_if_not_exists(
             &config_dir.join(MODEL_CONFIG_FILE),
-            model_config.to_string().as_bytes(),
+            b"{\"activeProvider\":\"none\",\"enableTools\":true,\"disableDiveSystemPrompt\":false}",
         )
         .await?;
 
-        let plugin_config = json!([
-            {
-                "name": "oap-platform",
-                "module": "dive_mcp_host.oap_plugin",
-                "config": {},
-                "ctx_manager": "dive_mcp_host.oap_plugin.OAPPlugin",
-                "static_callbacks": "dive_mcp_host.oap_plugin.get_static_callbacks"
-            }
-        ]);
         create_file_if_not_exists(
             &config_dir.join(PLUGIN_CONFIG_FILE),
-            plugin_config.to_string().as_bytes(),
+            b"[]",
         )
         .await?;
 
-        let db_path = dunce::simplified(db_dir).to_string_lossy();
-        let db_uri = format!("sqlite:///{}/db.sqlite", db_path);
-        let httpd_config = json!({
-            "db": {
-                "uri": &db_uri,
-                "pool_size": 5,
-                "pool_recycle": 60,
-                "max_overflow": 10,
-                "echo": false,
-                "pool_pre_ping": true,
-                "migrate": true
-            },
-            "checkpointer": {
-                "uri": &db_uri
-            }
-        });
+        let db_path = dunce::simplified(db_dir)
+            .to_string_lossy()
+            .replace('\\', "\\\\");
         create_file_if_not_exists(
             &config_dir.join(HTTPD_CONFIG_FILE),
-            httpd_config.to_string().as_bytes(),
+            format!(
+                "{{
+    \"db\": {{
+        \"uri\": \"sqlite:///{}/db.sqlite\",
+        \"pool_size\": 5,
+        \"pool_recycle\": 60,
+        \"max_overflow\": 10,
+        \"echo\": false,
+        \"pool_pre_ping\": true,
+        \"migrate\": true
+        }},
+    \"checkpointer\": {{
+        \"uri\": \"sqlite:///{}/db.sqlite\"
+    }}
+}}",
+                &db_path, &db_path,
+            )
+            .trim()
+            .as_bytes(),
         )
         .await?;
-
-        // Check if DEF_MCP_SERVER_NAME exists in mcp_config.json, add it if missing
-        if !self.def_mcp_bin_path.exists() {
-            log::warn!("defulat mcp server not found");
-            return Ok(())
-        }
-
-        let mcp_config_path = config_dir.join(MCP_CONFIG_FILE);
-        if mcp_config_path.exists() {
-            let content = tokio::fs::read_to_string(&mcp_config_path).await?;
-            if let Ok(mut config) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(servers) = config.get_mut("mcpServers").and_then(|s| s.as_object_mut()) {
-                    if !servers.contains_key(DEF_MCP_SERVER_NAME) {
-                        servers.insert(
-                            DEF_MCP_SERVER_NAME.to_string(),
-                            json!({
-                                "transport": "stdio",
-                                "enabled": true,
-                                "command": def_mcp_bin_path
-                            })
-                        );
-                        tokio::fs::write(&mcp_config_path, config.to_string()).await?;
-                        log::info!("added {} to mcp_config.json", DEF_MCP_SERVER_NAME);
-                    }
-                }
-            }
-        }
-
         Ok(())
     }
 

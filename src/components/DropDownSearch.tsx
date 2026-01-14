@@ -1,8 +1,8 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
-import React, { forwardRef, useEffect, useRef, useState } from "react"
+import React, {forwardRef, useEffect, useRef, useState} from "react"
 import Input from "./Input"
 import Button from "./Button"
-import { useTranslation } from "react-i18next"
+import {useTranslation} from "react-i18next"
 
 export type DropDownOptionType = {
   label: string | React.ReactNode

@@ -1,15 +1,22 @@
-import { enabledToolsAtom, loadingToolsAtom, loadMcpConfigAtom, loadToolsAtom, MCPConfig, mcpConfigAtom, Tool, toolsAtom } from "../atoms/toolState"
+import {
+  enabledToolsAtom,
+  loadingToolsAtom,
+  loadMcpConfigAtom,
+  loadToolsAtom,
+  MCPConfig,
+  mcpConfigAtom,
+  Tool,
+  toolsAtom
+} from "../atoms/toolState"
 import Button from "./Button"
-import DropDownSearch, { DropDownOptionType, DropDownProps } from "./DropDownSearch"
-import { useTranslation } from "react-i18next"
+import DropDownSearch, {DropDownOptionType, DropDownProps} from "./DropDownSearch"
+import {useTranslation} from "react-i18next"
 import Switch from "./Switch"
-import { useEffect, useMemo, useRef, useState } from "react"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { loadOapToolsAtom, oapToolsAtom } from "../atoms/oapState"
-import { showToastAtom } from "../atoms/toastState"
-import { openOverlayAtom } from "../atoms/layerState"
-import { imgPrefix } from "../ipc"
-import { checkCommandExist } from "../ipc/util"
+import {useEffect, useMemo, useRef, useState} from "react"
+import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {showToastAtom} from "../atoms/toastState"
+import {openOverlayAtom} from "../atoms/layerState"
+import {checkCommandExist} from "../ipc/util"
 import Tooltip from "./Tooltip"
 
 const ToolDropDown: React.FC = () => {
@@ -18,14 +25,12 @@ const ToolDropDown: React.FC = () => {
   const openOverlay = useSetAtom(openOverlayAtom)
   const [tools] = useAtom(toolsAtom)
   const enabledTools = useAtomValue(enabledToolsAtom)
-  const [oapTools] = useAtom(oapToolsAtom)
   const [sortedTools, setSortedTools] = useState<Tool[]>(tools)
   const [mcpConfig, setMcpConfig] = useAtom(mcpConfigAtom)
   const loadMcpConfig = useSetAtom(loadMcpConfigAtom)
   const mcpConfigRef = useRef<{mcpServers: MCPConfig} | null>(null)
   const [loadingTools, setLoadingTools] = useAtom(loadingToolsAtom)
   const loadTools = useSetAtom(loadToolsAtom)
-  const loadOapTools = useSetAtom(loadOapToolsAtom)
   const [isResort, setIsResort] = useState(true)
   const [searchText, setSearchText] = useState("")
   const [currentMenuKey, setCurrentMenuKey] = useState<string | null>("root")
@@ -38,7 +43,6 @@ const ToolDropDown: React.FC = () => {
         await loadMcpConfig()
         mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
         await loadTools()
-        await loadOapTools()
       }
     })()
   }, [loadingTools])
@@ -196,7 +200,6 @@ const ToolDropDown: React.FC = () => {
           setMcpConfig(mcpConfigRef.current ?? { mcpServers: {} })
           handleUpdateConfigResponse(data, true, tool.name)
         }
-        await loadTools()
         setLoadingTools({})
       }
     } catch (error) {
@@ -412,14 +415,9 @@ const ToolDropDown: React.FC = () => {
     }
   }
 
-  const isOapTool = (toolName: string) => {
-    return oapTools?.find(oapTool => oapTool.name === toolName) ? true : false
-  }
-
   const toolSort = (a: Tool, b: Tool) => {
     const aTool = a.name
     const bTool = b.name
-    const aIsOap = oapTools?.find(oapTool => oapTool.name === aTool)
     const aEnabled = tools.find(tool => tool.name === aTool)?.enabled
     const bEnabled = tools.find(tool => tool.name === bTool)?.enabled
     if (isResort) {
@@ -427,7 +425,7 @@ const ToolDropDown: React.FC = () => {
         return -1
       if (!aEnabled && bEnabled)
         return 1
-      return aIsOap ? -1 : 1
+      return 0
     } else {
       const aIndex = sortedTools.findIndex(tool => tool.name === aTool)
       const bIndex = sortedTools.findIndex(tool => tool.name === bTool)
@@ -445,9 +443,7 @@ const ToolDropDown: React.FC = () => {
         ...tool,
         enabled: toolLoading ? toolLoading.enabled : tool.enabled,
         disabled: Boolean(tool?.error),
-        type: (isOapTool(tool.name) ? "oap" : "custom") as "oap" | "custom",
-        plan: isOapTool(tool.name) ? oapTools?.find(oapTool => oapTool.name === tool.name)?.plan : undefined,
-        oapId: isOapTool(tool.name) ? oapTools?.find(oapTool => oapTool.name === tool.name)?.id : undefined,
+        type: "custom" as "custom",
         commandExists: commandExistsMap[tool.name] ?? true,
         command: mcpConfig?.mcpServers?.[tool.name]?.command,
         tools: tool.tools?.map(subTool => {
@@ -462,7 +458,7 @@ const ToolDropDown: React.FC = () => {
     })
     setSortedTools(newSortedTools)
     setIsResort(false)
-  }, [tools, oapTools, isResort, commandExistsMap])
+  }, [tools, isResort, commandExistsMap])
 
   const toolsDropdownOptions = useMemo(() => {
     const options: DropDownProps["options"] = {
@@ -497,10 +493,6 @@ const ToolDropDown: React.FC = () => {
     }
 
     sortedTools.forEach(tool => {
-      // if (tool.name == "__SYSTEM_DIVE_SERVER__") {
-      //   return
-      // }
-
       let subOptions: DropDownOptionType[] = []
       if(tool.error) {
         subOptions = [
@@ -521,7 +513,7 @@ const ToolDropDown: React.FC = () => {
               <div className="chat-input-tools-option-toggle-all">
                 {(tool.tools?.some(t => t.enabled) && tool.enabled) ? t("chat.tools.disableAll") : t("chat.tools.enableAll")}
               </div>,
-            onClick: () => {
+            onClick: (e) => {
               toggleAllSubTools(tool.name, (tool.tools?.some(t => t.enabled) && tool.enabled) ? "deactive" : "active")
             },
             autoClose: false,
@@ -535,12 +527,9 @@ const ToolDropDown: React.FC = () => {
                 <div className="chat-input-tools-option-left">
                   <div className="chat-input-tools-option-icon sub-tool">
                     {tool.icon ? tool.icon :
-                      isOapTool(tool.name) ?
-                        <img src={`${imgPrefix}logo_oap.png`} alt="info" />
-                      :
-                        <svg width="22" height="22" viewBox="0 0 24 24">
-                          <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
-                        </svg>
+                      <svg width="22" height="22" viewBox="0 0 24 24">
+                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
+                      </svg>
                     }
                   </div>
                   <div className="chat-input-tools-option-label">
@@ -598,12 +587,9 @@ const ToolDropDown: React.FC = () => {
             <div className="chat-input-tools-option-left">
               <div className="chat-input-tools-option-icon">
                 {tool.icon ? tool.icon :
-                  isOapTool(tool.name) ?
-                    <img src={`${imgPrefix}logo_oap.png`} alt="info" />
-                  :
-                    <svg width="22" height="22" viewBox="0 0 24 24">
-                      <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
-                    </svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24">
+                    <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
+                  </svg>
                 }
               </div>
               <div className="chat-input-tools-option-label">
@@ -671,12 +657,9 @@ const ToolDropDown: React.FC = () => {
               <div className="chat-input-tools-option-left">
                 <div className="chat-input-tools-option-icon sub-tool">
                   {tool.icon ? tool.icon :
-                    isOapTool(tool.name) ?
-                      <img src={`${imgPrefix}logo_oap.png`} alt="info" />
-                    :
-                      <svg width="22" height="22" viewBox="0 0 24 24">
-                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
-                      </svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24">
+                      <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
+                    </svg>
                   }
                 </div>
                 <div className="chat-input-tools-option-label">
@@ -748,11 +731,8 @@ const ToolDropDown: React.FC = () => {
           if(Object.keys(loadingTools).length === 0) {
             await loadMcpConfig()
             mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
-            await loadOapTools()
             await loadTools()
           }
-          // await loadOapTools()
-          // await loadTools()
           setIsResort(true)
           setCurrentMenuKey("root")
         }}

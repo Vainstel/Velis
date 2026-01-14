@@ -1,7 +1,7 @@
-import { useEffect } from "react"
-import { Behavior, useLayer } from "../hooks/useLayer"
-import PopupWindow, { PopupStylePorps } from "./PopupWindow"
-import { useTranslation } from "react-i18next"
+import {useEffect} from "react"
+import {Behavior, useLayer} from "../hooks/useLayer"
+import PopupWindow, {PopupStylePorps} from "./PopupWindow"
+import {useTranslation} from "react-i18next"
 import Tooltip from "./Tooltip"
 import Button from "./Button"
 

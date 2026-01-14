@@ -1,9 +1,9 @@
-import { useAtom } from "jotai"
-import { ModelConfig, modelVerifyListAtom, verifyModelWithConfig } from "../../../atoms/configState"
-import { useRef } from "react"
-import { BaseModel, LLMGroup, ModelVerifyStatus } from "../../../../types/model"
-import { getVerifyKey } from "../../../helper/verify"
-import { intoModelConfig } from "../../../helper/model"
+import {useAtom} from "jotai"
+import {ModelConfig, modelVerifyListAtom, verifyModelWithConfig} from "../../../atoms/configState"
+import {useRef} from "react"
+import {BaseModel, LLMGroup, ModelVerifyStatus} from "../../../../types/model"
+import {getVerifyKey} from "../../../helper/verify"
+import {intoModelConfig} from "../../../helper/model"
 
 export interface ModelVerifyDetail {
   name: string

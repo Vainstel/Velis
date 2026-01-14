@@ -3,7 +3,6 @@ export type BaseProvider =
   "ollama" |
   "anthropic" |
   "mistralai" |
-  "oap" |
   "openai_compatible" |
   "google-genai" |
   "openrouter" |
@@ -12,8 +11,7 @@ export type BaseProvider =
   "grok" |
   "nvdia" |
   "perplexity" |
-  "azure_openai" |
-  "cerebras"
+  "azure_openai"
 
 export type ModelVerifyStatus = "ignore" | "success" | "successInPrompt" | "unSupportTool" | "unSupportModel" | "unVerified" | "error" | "verifying" | "abort"
 
@@ -29,7 +27,6 @@ export interface BaseModel<E = Record<string, any>> {
   isCustomModel?: boolean
   verifyStatus?: ModelVerifyStatus
   enableTools?: boolean
-  expired?: boolean
 }
 
 export interface BaseConfigInModel {

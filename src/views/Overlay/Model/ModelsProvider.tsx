@@ -1,12 +1,20 @@
-import { ReactNode, createContext, useCallback, useContext, useRef } from "react"
-import { BaseModel, LLMGroup, ModelProvider } from "../../../../types/model"
-import { defaultBaseModel, defaultModelGroup, fieldsToLLMGroup, getGroupTerm, getModelTerm, intoRawModelConfigWithQuery, queryGroup } from "../../../helper/model"
-import { modelGroupsAtom, modelSettingsAtom } from "../../../atoms/modelState"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { fetchModels as _fetchModels } from "../../../ipc/llm"
-import { getVerifyKey } from "../../../helper/verify"
+import {createContext, ReactNode, useCallback, useContext, useRef} from "react"
+import {BaseModel, LLMGroup, ModelProvider} from "../../../../types/model"
+import {
+  defaultBaseModel,
+  defaultModelGroup,
+  fieldsToLLMGroup,
+  getGroupTerm,
+  getModelTerm,
+  intoRawModelConfigWithQuery,
+  queryGroup
+} from "../../../helper/model"
+import {modelGroupsAtom, modelSettingsAtom} from "../../../atoms/modelState"
+import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {fetchModels as _fetchModels} from "../../../ipc/llm"
+import {getVerifyKey} from "../../../helper/verify"
 import isMatch from "lodash/isMatch"
-import { writeRawConfigAtom } from "../../../atoms/configState"
+import {writeRawConfigAtom} from "../../../atoms/configState"
 
 type ContextType = {
   buffer: { group: LLMGroup, models: BaseModel[] }

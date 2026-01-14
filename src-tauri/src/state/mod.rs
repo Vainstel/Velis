@@ -7,9 +7,6 @@ use tokio::sync::mpsc;
 
 use crate::host::McpHost;
 
-pub mod mcp;
-pub mod oap;
-
 pub struct AppState {
     pub store: Arc<Store<Wry>>,
     pub mcp_host: McpHost,

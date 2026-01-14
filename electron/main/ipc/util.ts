@@ -4,9 +4,8 @@ import path from "node:path"
 import { configDir, scriptsDir } from "../constant"
 import { CancelError, download } from "electron-dl"
 import { ModelGroupSetting } from "../../../types/model"
-import { refreshConfig } from "../deeplink"
 import { getInstallHostDependenciesLog } from "../service"
-import { CLIENT_ID } from "../oap"
+import { CLIENT_ID } from "../client-id"
 import which from "which"
 import mimeTypes from "mime-types"
 
@@ -122,6 +121,44 @@ export function ipcUtilHandler(win: BrowserWindow) {
     clipboard.writeImage(image)
   })
 
+  ipcMain.handle("util:isFirstLaunch", async (_) => {
+    // Check if .setup_completed file exists - if not, it's first launch
+    return !fse.existsSync(path.join(configDir, ".setup_completed"))
+  })
+
+  ipcMain.handle("util:markSetupCompleted", async (_) => {
+    // Create .setup_completed file to mark that initial setup is done
+    await fse.writeFile(path.join(configDir, ".setup_completed"), "")
+  })
+
+  ipcMain.handle("util:resetToInitialSetup", async (_) => {
+    // Delete .setup_completed file
+    const setupCompletedPath = path.join(configDir, ".setup_completed")
+    if (await fse.pathExists(setupCompletedPath)) {
+      await fse.unlink(setupCompletedPath)
+    }
+
+    // Delete model_config.json
+    const modelConfigPath = path.join(configDir, "model_config.json")
+    if (await fse.pathExists(modelConfigPath)) {
+      await fse.unlink(modelConfigPath)
+    }
+
+    // Delete model_settings.json
+    const modelSettingsPath = path.join(configDir, "model_settings.json")
+    if (await fse.pathExists(modelSettingsPath)) {
+      await fse.unlink(modelSettingsPath)
+    }
+
+    // Delete mcp_config.json
+    const mcpConfigPath = path.join(configDir, "mcp_config.json")
+    if (await fse.pathExists(mcpConfigPath)) {
+      await fse.unlink(mcpConfigPath)
+    }
+
+    return { success: true }
+  })
+
   ipcMain.handle("util:getModelSettings", async (_) => {
     if (!fse.existsSync(path.join(configDir, "model_settings.json"))) {
       return null
@@ -132,10 +169,6 @@ export function ipcUtilHandler(win: BrowserWindow) {
 
   ipcMain.handle("util:setModelSettings", async (_, settings: ModelGroupSetting) => {
     return fse.writeJson(path.join(configDir, "model_settings.json"), settings, { spaces: 2 })
-  })
-
-  ipcMain.handle("util:refreshConfig", async () => {
-    return refreshConfig()
   })
 
   ipcMain.handle("util:getInstallHostDependenciesLog", async () => {
@@ -165,6 +198,21 @@ export function ipcUtilHandler(win: BrowserWindow) {
       console.error("Failed to read local file:", filePath, error)
       throw error
     }
+  })
+
+  ipcMain.handle("util:getCommands", async (_) => {
+    const commandsPath = path.join(configDir, "commands.json")
+    if (!fse.existsSync(commandsPath)) {
+      const defaultCommands: any[] = []
+      await fse.writeJson(commandsPath, defaultCommands, { spaces: 2 })
+      return defaultCommands
+    }
+    return fse.readJson(commandsPath)
+  })
+
+  ipcMain.handle("util:saveCommands", async (_, commands) => {
+    const commandsPath = path.join(configDir, "commands.json")
+    return fse.writeJson(commandsPath, commands, { spaces: 2 })
   })
 }
 

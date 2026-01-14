@@ -1,20 +1,20 @@
-import packageJson from "../../package.json"
 import { app, BrowserWindow } from "electron"
 import path from "node:path"
 import fse, { mkdirp } from "fs-extra"
+import { compareFilesAndReplace, npmInstall } from "./util.js"
 import {
+  scriptsDir,
   configDir,
   DEF_MCP_SERVER_CONFIG,
   cwd,
   DEF_MODEL_CONFIG,
-  DEF_DIVE_HTTPD_CONFIG,
+  DEF_VELIS_HTTPD_CONFIG,
   hostCacheDir,
   __dirname,
+  legacyConfigDir,
   envPath,
   VITE_DEV_SERVER_URL,
   DEF_PLUGIN_CONFIG,
-  DEF_MCP_SERVER_NAME,
-  getDefMcpBinPath,
 } from "./constant.js"
 import spawn from "cross-spawn"
 import { ChildProcess, SpawnOptions, StdioOptions } from "node:child_process"
@@ -46,36 +46,12 @@ async function initApp() {
   // create dirs
   await fse.mkdir(baseConfigDir, { recursive: true })
 
+  await migratePrebuiltScripts().catch(console.error)
+  await migrateLegacyConfig().catch(console.error)
+
   // create config file if not exists
   const mcpServerConfigPath = path.join(baseConfigDir, "mcp_config.json")
-  const defMcpBinPath = getDefMcpBinPath()
-  const defMcpBinExists = await fse.pathExists(defMcpBinPath)
-  if (!defMcpBinExists) {
-    console.warn("defalut mcp server not found")
-  }
-
-  // Use config with DEF_MCP_SERVER_NAME if the binary exists, otherwise use empty config
-  // const initialMcpConfig = defMcpBinExists ? getDefMcpServerConfig() : DEF_MCP_SERVER_CONFIG
-  const initialMcpConfig = DEF_MCP_SERVER_CONFIG
-  await createFileIfNotExists(mcpServerConfigPath, JSON.stringify(initialMcpConfig, null, 2))
-
-  // Check if DEF_MCP_SERVER_NAME exists in mcp_config.json, add it if missing
-  if (defMcpBinExists && await fse.pathExists(mcpServerConfigPath)) {
-    try {
-      const mcpConfig = await fse.readJSON(mcpServerConfigPath)
-      if (mcpConfig.mcpServers && !mcpConfig.mcpServers[DEF_MCP_SERVER_NAME]) {
-        mcpConfig.mcpServers[DEF_MCP_SERVER_NAME] = {
-          "transport": "stdio",
-          "enabled": true,
-          "command": defMcpBinPath
-        }
-        await fse.writeJSON(mcpServerConfigPath, mcpConfig, { spaces: 2 })
-        console.log(`added ${DEF_MCP_SERVER_NAME} to mcp_config.json`)
-      }
-    } catch (error) {
-      console.error("Failed to check/update mcp_config.json:", error)
-    }
-  }
+  await createFileIfNotExists(mcpServerConfigPath, JSON.stringify(DEF_MCP_SERVER_CONFIG, null, 2))
 
   // create custom rules file if not exists
   const customRulesPath = path.join(baseConfigDir, "customrules")
@@ -87,7 +63,7 @@ async function initApp() {
 
   // create dive_httpd config file if not exists
   const diveHttpdConfigPath = path.join(baseConfigDir, "dive_httpd.json")
-  await createFileIfNotExists(diveHttpdConfigPath, JSON.stringify(DEF_DIVE_HTTPD_CONFIG, null, 2))
+  await createFileIfNotExists(diveHttpdConfigPath, JSON.stringify(DEF_VELIS_HTTPD_CONFIG, null, 2))
 
   // create plugin config file if not exists
   const pluginConfigPath = path.join(baseConfigDir, "plugin_config.json")
@@ -158,6 +134,79 @@ export async function cleanup() {
   await fse.writeFile(path.join(hostCacheDir, "bus"), "")
 }
 
+async function migrateLegacyConfig() {
+  const files = [
+    "config.json",
+    "model.json",
+    ".customrules",
+  ]
+
+  const newFiles = [
+    "mcp_config.json",
+    "model_config.json",
+    "customrules",
+  ]
+
+  for (let i = 0; i < files.length; i++) {
+    const filePath = path.join(legacyConfigDir, files[i])
+    const newFilePath = path.join(configDir, newFiles[i])
+    if (await fse.pathExists(filePath) && !(await fse.pathExists(newFilePath))) {
+      console.log("copying legacy config", filePath, newFilePath)
+      await fse.copy(filePath, newFilePath)
+    }
+  }
+
+  const modelConfigPath = path.join(configDir, "model_config.json")
+  const modelConfig = await fse.readJSON(modelConfigPath)
+  if (!modelConfig.enableTools && modelConfig.enable_tools) {
+    modelConfig.enableTools = modelConfig.enable_tools
+    delete modelConfig.enable_tools
+  }
+
+  modelConfig.configs = Object.keys(modelConfig.configs).reduce((acc, key) => {
+    const config = modelConfig.configs[key]
+    if (config.modelProvider === "openai" && !config.apiKey) {
+      config.apiKey = ""
+    }
+
+    if ("baseURL" in config && !config.baseURL) {
+      delete config.baseURL
+    }
+
+    if (config.configuration && "baseURL" in config.configuration && !config.configuration.baseURL) {
+      delete config.configuration.baseURL
+    }
+
+    acc[key] = config
+    return acc
+  }, {} as any)
+
+  await fse.writeJSON(modelConfigPath, modelConfig)
+}
+
+async function migratePrebuiltScripts() {
+  console.log("migrating prebuilt scripts")
+
+  // copy scripts
+  const rebuiltScriptsPath = path.join(app.isPackaged ? process.resourcesPath : process.cwd(), "prebuilt/scripts")
+  if(!(await fse.pathExists(scriptsDir))) {
+    await fse.mkdir(scriptsDir, { recursive: true })
+    await fse.copy(rebuiltScriptsPath, scriptsDir)
+  }
+
+  // update prebuilt scripts
+  compareFilesAndReplace(path.join(rebuiltScriptsPath, "echo.js"), path.join(scriptsDir, "echo.js"))
+
+  // install dependencies for prebuilt scripts
+  await npmInstall(scriptsDir).catch(console.error)
+  await npmInstall(scriptsDir, ["install", "express", "cors"]).catch(console.error)
+
+  // remove echo.cjs
+  if (await fse.pathExists(path.join(scriptsDir, "echo.cjs"))) {
+    await fse.unlink(path.join(scriptsDir, "echo.cjs"))
+  }
+}
+
 async function startHostService() {
   const isWindows = process.platform === "win32"
   const resourcePath = app.isPackaged ? process.resourcesPath : cwd
@@ -175,9 +224,8 @@ async function startHostService() {
 
   const httpdEnv: any = {
     ...process.env,
-    DIVE_CONFIG_DIR: baseConfigDir,
+    VELIS_CONFIG_DIR: baseConfigDir,
     RESOURCE_DIR: hostCacheDir,
-    DIVE_USER_AGENT: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Dive/${packageJson.version} (+https://github.com/OpenAgentPlatform/Dive)`,
   }
 
   console.log("httpd executing path: ", httpdExec)

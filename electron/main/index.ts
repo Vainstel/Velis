@@ -3,7 +3,7 @@ import path from "node:path"
 import os from "node:os"
 import AppState from "./state"
 import { cleanup, initMCPClient } from "./service"
-import { getUnixSystemPath, modifyPath } from "./util"
+import { getDarwinSystemPath, modifyPath } from "./util"
 import { binDirList, darwinPathList, __dirname, VITE_DEV_SERVER_URL, RENDERER_DIST, logDir } from "./constant"
 import { update } from "./update"
 import { ipcHandler } from "./ipc"
@@ -11,10 +11,8 @@ import { initTray } from "./tray"
 import { preferencesStore } from "./store"
 import { initProtocol } from "./protocol"
 import log from "electron-log/main"
-import { deeplinkHandler, refreshConfig, setOAPTokenToHost, setupAppImageDeepLink } from "./deeplink"
-import { oapClient } from "./oap"
+import { deeplinkHandler, setupAppImageDeepLink } from "./deeplink"
 import electronDl from "electron-dl"
-// import core from "core-js"
 
 log.initialize()
 log.transports.file.resolvePathFn = () => path.join(logDir, "main-electron.log")
@@ -67,11 +65,11 @@ const indexHtml = path.join(RENDERER_DIST, "index.html")
 async function onReady() {
   if (process.platform === "win32") {
     binDirList.forEach(modifyPath)
-  } else {
-    process.env.PATH = await getUnixSystemPath().catch(() => process.env.PATH)
-  }
+  } else if (process.platform === "darwin") {
+    if (!process.env.PATH) {
+      process.env.PATH = await getDarwinSystemPath().catch(() => "")
+    }
 
-  if (process.platform === "darwin") {
     darwinPathList.forEach(modifyPath)
   }
 
@@ -79,42 +77,6 @@ async function onReady() {
   initProtocol()
   createWindow()
   initMCPClient(win!)
-
-  // core.listenIpcElicitationRequest((e, data) => {
-  //   if (e) {
-  //     console.error(e)
-  //     return
-  //   }
-
-  //   win?.webContents.send("mcp.elicitation", data)
-  // })
-
-  if (import.meta.env.VITE_OAP_TOKEN && !app.isPackaged) {
-    console.info("set oap token from env")
-    setOAPTokenToHost(import.meta.env.VITE_OAP_TOKEN)
-  }
-
-  oapClient.registEvent("login", () => {
-    win!.webContents.send("oap:login")
-  })
-
-  oapClient.registEvent("logout", () => {
-    win!.webContents.send("oap:logout")
-  })
-
-  oapClient.onReceiveWebSocketMessage((message) => {
-    if (VITE_DEV_SERVER_URL) {
-      console.log("receive websocket message", message)
-    }
-
-    switch (message.type) {
-      case "user.settings.mcps.updated":
-      case "user.account.subscription.update":
-        refreshConfig()
-        break
-      default:
-    }
-  })
 }
 
 export async function createWindow() {
@@ -220,7 +182,6 @@ app.on("before-quit", () => {
 app.on("activate", () => {
   const allWindows = BrowserWindow.getAllWindows()
   if (allWindows.length) {
-    allWindows[0].show()
     allWindows[0].focus()
   } else {
     if (win) {

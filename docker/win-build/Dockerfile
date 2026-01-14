@@ -15,4 +15,11 @@ RUN npm ci
 ENV WINEARCH=win64
 ENV WINEDEBUG=-all
 
+# Install UV for Linux to use during build
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    export PATH="$HOME/.local/bin:$PATH"
+
+# Make sure uv is available in PATH
+ENV PATH="/root/.local/bin:${PATH}"
+
 CMD ["npm", "run", "package:windows"]

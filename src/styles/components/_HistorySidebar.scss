@@ -12,10 +12,6 @@
   flex-direction: column;
   background: var(--bg);
 
-  &:focus {
-    outline: none;
-  }
-
   > * {
     white-space: nowrap;
   }
@@ -204,39 +200,11 @@
         }
       }
 
-      .oap-user-info {
+      .user-info {
         display: flex;
         align-items: center;
         gap: 8px;
         line-height: 20px;
-      }
-
-      .oap-avatar {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-      }
-
-      .oap-username {
-        max-width: 138px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .oap-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .oap-level {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        color: var(--text-pri);
-        font-weight: 600;
-        font-size: 16px;
       }
     }
 

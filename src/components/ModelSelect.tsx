@@ -12,7 +12,6 @@ import { systemThemeAtom, userThemeAtom } from "../atoms/themeState"
 import { modelSettingsAtom } from "../atoms/modelState"
 import { getGroupTerm, getModelTerm, getTermFromRawModelConfig, GroupTerm, intoRawModelConfig, matchOpenaiCompatible, ModelTerm, queryGroup, queryModel } from "../helper/model"
 import isEqual from "lodash/isEqual"
-import { cloneDeep } from "lodash"
 
 const DEFAULT_MODEL = {group: {}, model: {}}
 
@@ -29,8 +28,6 @@ const ModelSelect = () => {
 
   const getModelNamePrefix = (group: GroupTerm) => {
     switch (group.modelProvider) {
-      case "oap":
-        return "OAP"
       case "bedrock":
         return `***${group.extra?.credentials?.accessKeyId?.slice(-4)}`
       case "lmstudio":
@@ -47,9 +44,6 @@ const ModelSelect = () => {
   }
 
   const equalCustomizer = useCallback((a: {group: GroupTerm, model: ModelTerm}, b: {group: GroupTerm, model: ModelTerm}) => {
-    a = cloneDeep(a)
-    b = cloneDeep(b)
-
     if (b.group.modelProvider !== "openai_compatible" && b.group.baseURL) {
       const matchProvider = matchOpenaiCompatible(b.group.baseURL)
       if (matchProvider !== "openai_compatible") {
@@ -61,17 +55,6 @@ const ModelSelect = () => {
       b.group.modelProvider = "openai_compatible"
     }
 
-    if (a.group.modelProvider === "openai" && a.group.baseURL) {
-      a.group.modelProvider = "openai_compatible"
-    }
-
-    // For OAP provider, don't compare apiKey
-    if (a.group.modelProvider === "oap" && b.group.modelProvider === "oap") {
-      const { apiKey: _, ...aGroupWithoutApiKey } = a.group
-      const { apiKey: __, ...bGroupWithoutApiKey } = b.group
-      return isEqual({ group: aGroupWithoutApiKey, model: a.model }, { group: bGroupWithoutApiKey, model: b.model })
-    }
-
     return isEqual(a, b)
   }, [])
 
@@ -80,7 +63,7 @@ const ModelSelect = () => {
       .filter((group) => group.active)
       .flatMap((group) =>
         group.models
-          .filter((model) => model.active && model.verifyStatus != "unSupportModel")
+          .filter((model) => model.active)
           .map((model) => ({
             provider: group.modelProvider,
             name: `${getModelNamePrefix(group)}/${model.model}`,
@@ -97,7 +80,7 @@ const ModelSelect = () => {
         return 100
       }
 
-      return a.provider === "oap" ? -1 : 0
+      return 0
     })
 
     return data

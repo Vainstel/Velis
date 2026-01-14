@@ -1,23 +1,20 @@
 //@ts-nocheck
 import jsonlint from "jsonlint-mod"
-import CodeMirror, { EditorView } from "@uiw/react-codemirror"
-import { json } from "@codemirror/lang-json"
-import { linter, lintGutter } from "@codemirror/lint"
-import { systemThemeAtom, themeAtom } from "../../../../atoms/themeState"
-import { mcpServersProps } from ".."
-import { MCPConfig, toolsAtom } from "../../../../atoms/toolState"
-import { useTranslation } from "react-i18next"
-import { useAtomValue, useSetAtom } from "jotai"
-import { showToastAtom } from "../../../../atoms/toastState"
-import { useState, useEffect, useRef, useMemo } from "react"
-import React from "react"
+import CodeMirror, {EditorView} from "@uiw/react-codemirror"
+import {json} from "@codemirror/lang-json"
+import {linter, lintGutter} from "@codemirror/lint"
+import {systemThemeAtom, themeAtom} from "../../../../atoms/themeState"
+import {mcpServersProps} from ".."
+import {MCPConfig, toolsAtom} from "../../../../atoms/toolState"
+import {useTranslation} from "react-i18next"
+import {useAtomValue, useSetAtom} from "jotai"
+import {showToastAtom} from "../../../../atoms/toastState"
+import React, {useEffect, useMemo, useRef, useState} from "react"
 import Tooltip from "../../../../components/Tooltip"
 import PopupConfirm from "../../../../components/PopupConfirm"
 import Button from "../../../../components/Button"
 import Switch from "../../../../components/Switch"
 import Input from "../../../../components/Input"
-import Select from "../../../../components/Select"
-import CheckBox from "../../../../components/CheckBox"
 
 export interface customListProps {
   name: string
@@ -49,7 +46,7 @@ interface LogType {
   timestamp: string
 }
 
-export const FieldType = {
+const FieldType = {
   "enabled": {
     type: "boolean",
     error: "tools.jsonFormatError.booleanError",
@@ -70,19 +67,9 @@ export const FieldType = {
     error: "tools.jsonFormatError.objectError",
     required: false,
   },
-  "headers": {
-    type: "object",
-    error: "tools.jsonFormatError.objectError",
-    required: false,
-  },
   "url": {
     type: "string",
     error: "tools.jsonFormatError.stringError",
-    required: false,
-  },
-  "verify": {
-    type: "boolean",
-    error: "tools.jsonFormatError.booleanError",
     required: false,
   },
   "transport": {
@@ -94,15 +81,6 @@ export const FieldType = {
   "initialTimeout": {
     type: "number",
     min: 10,
-    minError: "tools.jsonFormatError.minRange",
-    maxError: "tools.jsonFormatError.maxRange",
-    required: false,
-    error: "tools.jsonFormatError.floatError"
-  },
-  "toolCallTimeout": {
-    type: "number",
-    default: 600,
-    min: 0,
     minError: "tools.jsonFormatError.minRange",
     maxError: "tools.jsonFormatError.maxRange",
     required: false,
@@ -130,9 +108,6 @@ const emptyCustom = (): customListProps => {
   Object.keys(FieldType).forEach((fieldKey) => {
     if("min" in FieldType[fieldKey as keyof typeof FieldType] && !_emptyCustom.mcpServers[fieldKey]) {
       _emptyCustom.mcpServers[fieldKey] = FieldType[fieldKey as keyof typeof FieldType].min
-    }
-    if("default" in FieldType[fieldKey as keyof typeof FieldType] && !_emptyCustom.mcpServers[fieldKey]) {
-      _emptyCustom.mcpServers[fieldKey] = FieldType[fieldKey as keyof typeof FieldType].default
     }
   })
 
@@ -170,7 +145,6 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
     })
 
     Object.keys(newConfig.mcpServers)
-    .filter((toolName) => !newConfig.mcpServers[toolName]?.extraData?.oap)
     .sort((a, b) => {
       const aEnabled = newConfig.mcpServers[a]?.enabled
       const bEnabled = newConfig.mcpServers[b]?.enabled
@@ -276,10 +250,10 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
         requiredError?.isError && console.log("requiredError:", newTmpCustomName)
         if(nameError) {
           newTmpCustomError = { isError: true, text: "tools.jsonFormatError.nameExist", name: newTmpCustomName }
-        } else if(requiredError?.isError) {
-          newTmpCustomError = { isError: true, text: "tools.jsonFormatError.requiredError", mcp: newTmpCustomName, fieldKey: requiredError.fieldKey }
         } else if(typeError || fieldError) {
           newTmpCustomError = { isError: true, text: "tools.jsonFormatError.format" }
+        } else if(requiredError?.isError) {
+          newTmpCustomError = { isError: true, text: "tools.jsonFormatError.requiredError", mcp: newTmpCustomName, field: requiredError.fieldKey }
         }
         if(newTmpCustomError.isError) {
           break
@@ -290,7 +264,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
         const jsonError = jsonLinterError(newTmpCustomNames.length < 2 ? "add" : "add-json", newTmpCustom.jsonString, newCustomList, newTmpCustom, -1)
         // jsonError.length > 0 && console.log("jsonError:", jsonError)
         if(jsonError.length > 0) {
-          newTmpCustomError = { isError: true, text: "tools.jsonFormatError.jsonError" }
+          newTmpCustomError = { isError: true, text: "tools.jsonFormatError.format" }
         }
       }
       if(newTmpCustomNames.length === 1) {
@@ -298,10 +272,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
         // but mcpServers will be changed, so need to check again
         newTmpCustomError = {
           isError: newTmpCustomError.isError || !isValidField(newTmpCustom.mcpServers),
-          text: newTmpCustomError.text || (!isValidField(newTmpCustom.mcpServers) ? "tools.jsonFormatError.format" : ""),
-          mcp: newTmpCustomError.mcp,
-          fieldKey: newTmpCustomError.fieldKey,
-          name: newTmpCustomError.name
+          text: newTmpCustomError.text || (!isValidField(newTmpCustom.mcpServers) ? "tools.jsonFormatError.format" : "")
         }
       }
       let newTmpCustomRangeError = { isError: false, text: "", fieldKey: "", value: 0 } as Record<string, any>
@@ -313,7 +284,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
       }
       setTmpCustom({
         ...newTmpCustom,
-        isError: newTmpCustomError as { isError: boolean, text: string, name?: string, mcp?: string, fieldKey?: string },
+        isError: newTmpCustomError as { isError: boolean, text: string, name?: string },
         isRangeError: newTmpCustomRangeError as { isError: boolean, text: string, fieldKey: string, value: number }
       })
       newCustomList.forEach((mcp, index) => {
@@ -333,12 +304,10 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
           newMcpError = { isError: true, text: "tools.jsonFormatError.nameExist" }
         } else if(toolNumberError.length > 0) {
           newMcpError = { isError: true, text: toolNumberError }
-        } else if(requiredError?.isError) {
-          newMcpError = { isError: true, text: "tools.jsonFormatError.requiredError", mcp: mcp.name, fieldKey: requiredError.fieldKey }
-        } else if(typeError || fieldError) {
+        } else if(typeError || fieldError || jsonError.length > 0) {
           newMcpError = { isError: true, text: "tools.jsonFormatError.format" }
-        } else if(jsonError.length > 0) {
-          newMcpError = { isError: true, text: "tools.jsonFormatError.jsonError" }
+        } else if(requiredError?.isError) {
+          newMcpError = { isError: true, text: "tools.jsonFormatError.requiredError", mcp: mcp.name, field: requiredError.fieldKey }
         }
         mcp.isError = newMcpError
         mcp.isRangeError = isValidRange(mcp.mcpServers) as { isError: boolean, text: string, fieldKey: string, value: number }
@@ -368,10 +337,10 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
           newMcpError = { isError: true, text: "tools.jsonFormatError.nameExist" }
         } else if(toolNumberError.length > 0) {
           newMcpError = { isError: true, text: toolNumberError }
-        } else if(requiredError?.isError) {
-          newMcpError = { isError: true, text: "tools.jsonFormatError.requiredError", mcp: mcp.name, fieldKey: requiredError.fieldKey }
         } else if(typeError || fieldError || jsonError.length > 0) {
           newMcpError = { isError: true, text: "tools.jsonFormatError.format" }
+        } else if(requiredError?.isError) {
+          newMcpError = { isError: true, text: "tools.jsonFormatError.requiredError", mcp: mcp.name, field: requiredError.fieldKey }
         }
         mcp.isError = newMcpError
         mcp.isRangeError = isValidRange(mcp.mcpServers) as { isError: boolean, text: string, fieldKey: string, value: number }
@@ -389,10 +358,10 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
       if(key === "name") {
         newName = value
       } else {
-        if(!FieldType[key]?.required) {
+        if(!FieldType[key].required) {
           if((FieldType[key]?.type === "number" && isNaN(value))
             || ((FieldType[key]?.type === "array" || FieldType[key]?.type === "object") && value.length === 0)
-            || (FieldType[key]?.type !== "number" && FieldType[key]?.type !== "array" && FieldType[key]?.type !== "boolean" && !value)) {
+            || (FieldType[key]?.type !== "number" && FieldType[key]?.type !== "array" && !value)) {
             delete newMcpServers[key]
           } else {
             newMcpServers[key] = value
@@ -418,10 +387,10 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
       if(key === "name") {
         newName = value
       } else {
-        if(!FieldType[key]?.required) {
+        if(!FieldType[key].required) {
           if((FieldType[key]?.type === "number" && isNaN(value))
             || ((FieldType[key]?.type === "array" || FieldType[key]?.type === "object") && value.length === 0)
-            || (FieldType[key]?.type !== "number" && FieldType[key]?.type !== "array" && FieldType[key]?.type !== "boolean" && !value)) {
+            || (FieldType[key]?.type !== "number" && FieldType[key]?.type !== "array" && !value)) {
             delete newMcpServers[key]
           } else {
             newMcpServers[key] = value
@@ -800,10 +769,10 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
       newMcpServers = newMcpServers.mcpServers
     }
     // If transport is streamable, check if url is valid
-    if(newMcpServers.transport === "streamable" | newMcpServers.transport === "sse") {
+    if(newMcpServers.transport === "streamable") {
       const urlValue = newMcpServers.url?.trim() || ""
       if(!urlValue) {
-        return { isError: true, text: `tools.jsonFormatError.urlRequired${newMcpServers.transport}`, fieldKey: "url" }
+        return { isError: true, text: "tools.jsonFormatError.urlRequired", fieldKey: "url" }
       }
       try {
         new URL(urlValue)
@@ -903,12 +872,6 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
         }
       })
 
-      // add oap servers to newConfig, otherwise "enabled" of oap servers will be reset to true
-      const oapServers = Object.keys(_config.mcpServers).filter((mcp: string) => _config.mcpServers[mcp].extraData?.oap)
-      for(const oap of oapServers) {
-        newConfig.mcpServers[oap] = _config.mcpServers[oap]
-      }
-
       setIsSubmitting(true)
       await onSubmit(newConfig)
     } catch (err) {
@@ -936,7 +899,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
       <div className="tool-edit-list" ref={listRef}>
         <Tooltip
           disabled={!tmpCustom.isError.isError && !tmpCustom.isRangeError?.isError}
-          content={(tmpCustom.isRangeError?.isError && tmpCustom.isRangeError.fieldKey !== "") ? t(tmpCustom.isRangeError.text, { mcp: tmpCustom.name, field: tmpCustom.isRangeError.fieldKey, value: tmpCustom.isRangeError.value }) : t(tmpCustom.isError.text, { mcp: tmpCustom.isError.name ?? tmpCustom.name, field: tmpCustom.isError.fieldKey })}
+          content={(tmpCustom.isRangeError?.isError && tmpCustom.isRangeError.fieldKey !== "") ? t(tmpCustom.isRangeError.text, { mcp: tmpCustom.name, field: tmpCustom.isRangeError.fieldKey, value: tmpCustom.isRangeError.value }) : t(tmpCustom.isError.text, { mcp: tmpCustom.isError.name ?? tmpCustom.name })}
           side="right"
         >
           <div
@@ -973,7 +936,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
           (mcp.isError?.isError || mcp.isRangeError?.isError) ? (
             <Tooltip
               key={index}
-              content={(mcp.isRangeError?.isError && mcp.isRangeError.fieldKey !== "") ? t(mcp.isRangeError.text, { mcp: mcp.name, field: mcp.isRangeError.fieldKey, value: mcp.isRangeError.value }) : t(mcp.isError.text, { mcp: mcp.name, field: mcp.isError.fieldKey })}
+              content={(mcp.isRangeError?.isError && mcp.isRangeError.fieldKey !== "") ? t(mcp.isRangeError.text, { mcp: mcp.name, field: mcp.isRangeError.fieldKey, value: mcp.isRangeError.value }) : t(mcp.isError.text, { mcp: mcp.name })}
               side="right"
             >
               <div
@@ -1072,15 +1035,15 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
       currentMcpServers = currentMcp?.mcpServers
     }
 
-    const handleObjectChange = (newObject: [string, unknown, boolean][], type: "env" | "headers") => {
-      const keys = newObject.map(([key]) => key)
+    const handleEnvChange = (newEnv: [string, unknown, boolean][]) => {
+      const keys = newEnv.map(([key]) => key)
       keys.forEach((key, index) => {
-        newObject[index][2] = false
+        newEnv[index][2] = false
         if(keys.filter(k => k === key).length > 1) {
-          newObject[index][2] = true
+          newEnv[index][2] = true
         }
       })
-      handleCustomChange(type, newObject)
+      handleCustomChange("env", newEnv)
     }
 
     return (
@@ -1135,7 +1098,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
             </div>
           </div>
           {/* Transport */}
-          <div className="field-item">
+          {/* <div className="field-item">
             <label>Transport</label>
             <Select
               options={FieldType.transport.options.map((option) => ({
@@ -1153,7 +1116,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
               value={currentMcpServers.transport ?? FieldType.transport.options[0]}
               onSelect={(value) => handleCustomChange("transport", value)}
             />
-          </div>
+          </div> */}
           {/* Args */}
           <div className="field-item">
             <label>
@@ -1209,7 +1172,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
                 }
                 const nextKey = `key${index}`
                 newEnv.push([nextKey, "", false] as [string, unknown, boolean])
-                handleObjectChange(newEnv, "env")
+                handleEnvChange(newEnv)
               }}>
                 + {t("tools.addEnv")}
               </button>
@@ -1229,7 +1192,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
                           const newEnv = [...(currentMcpServers.env || [])]
                           newEnv[index][0] = e.target.value
                           newEnv[index][2] = false
-                          handleObjectChange(newEnv, "env")
+                          handleEnvChange(newEnv)
                         }}
                       />
                       {isError ? (
@@ -1256,7 +1219,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
                         const newEnv = [...(currentMcpServers.env || [])]
                         newEnv[index][1] = e.target.value
                         newEnv[index][2] = false
-                        handleObjectChange(newEnv, "env")
+                        handleEnvChange(newEnv)
                       }}
                     />
                     <svg
@@ -1268,93 +1231,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
                       className="field-item-array-item-clear"
                       onClick={() => {
                         const newEnv = (currentMcpServers.env || []).filter((_, i) => i !== index)
-                        handleObjectChange(newEnv, "env")
-                      }}
-                    >
-                      <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m13.91 4.09-9.82 9.82M13.91 13.91 4.09 4.09"></path>
-                    </svg>
-                  </div>
-              ))}
-            </div>
-          </div>
-          {/* headers */}
-          <div className="field-item">
-            <label>
-              <Tooltip content={t("tools.headersTitleAlt")}>
-                <div className="field-item-title-label">
-                  HDRS
-                </div>
-              </Tooltip>
-              <button onClick={() => {
-                const newHeaders = Array.isArray(currentMcpServers?.headers)
-                  ? [...currentMcpServers.headers]
-                  : []
-                let index = 0
-                while(newHeaders.some(([key]) => key === `key${index}`)) {
-                  index++
-                }
-                const nextKey = `key${index}`
-                newHeaders.push([nextKey, "", false] as [string, unknown, boolean])
-                handleObjectChange(newHeaders, "headers")
-              }}>
-                + {t("tools.addHeaders")}
-              </button>
-            </label>
-            <div className={`field-item-array ${(currentMcpServers?.headers && currentMcpServers.headers.length > 0) ? "no-border" : ""}`}>
-              {(currentMcpServers?.headers && currentMcpServers.headers.length > 0) && currentMcpServers?.headers.map(([headersKey, headersValue, isError]: [string, unknown, boolean], index: number) => (
-                  <div key={index} className="field-item-array-item">
-                    <div className="key-input-wrapper">
-                      <Input
-                        className="env-key"
-                        size="small"
-                        type="text"
-                        placeholder={t("tools.headersKey")}
-                        value={headersKey}
-                        error={isError}
-                        onChange={(e) => {
-                          const newHeaders = [...(currentMcpServers.headers || [])]
-                          newHeaders[index][0] = e.target.value
-                          newHeaders[index][2] = false
-                          handleObjectChange(newHeaders, "headers")
-                        }}
-                      />
-                      {isError ? (
-                        <Tooltip content={t("tools.inputKeyError", { name: "Header" })} side="left">
-                          <div
-                            className="key-input-error"
-                            onClick={(e) => {
-                              const input = e.currentTarget.parentElement?.parentElement?.querySelector("input")
-                              if (input) {
-                                input.focus()
-                              }
-                            }}
-                          />
-                        </Tooltip>
-                      ) : null}
-                    </div>
-                    <Input
-                      className="env-value"
-                      size="small"
-                      type="text"
-                      placeholder={t("tools.headersValue")}
-                      value={headersValue as string}
-                      onChange={(e) => {
-                        const newHeaders = [...(currentMcpServers.headers || [])]
-                        newHeaders[index][1] = e.target.value
-                        newHeaders[index][2] = false
-                        handleObjectChange(newHeaders, "headers")
-                      }}
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 18 18"
-                      width="22"
-                      height="22"
-                      className="field-item-array-item-clear"
-                      onClick={() => {
-                        const newHeaders = (currentMcpServers.headers || []).filter((_, i) => i !== index)
-                        handleObjectChange(newHeaders, "headers")
+                        handleEnvChange(newEnv)
                       }}
                     >
                       <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m13.91 4.09-9.82 9.82M13.91 13.91 4.09 4.09"></path>
@@ -1365,22 +1242,7 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
           </div>
           {/* Url */}
           <div className="field-item">
-            <div className="field-label">
-              <label>URL</label>
-              {currentMcpServers.transport && currentMcpServers?.transport != "stdio" && (
-                <label className="field-label-checkbox">
-                  <CheckBox
-                    size="s"
-                    checked={Object.keys(currentMcpServers).includes("verify") && !currentMcpServers.verify}
-                    onChange={(e) => {
-                      e.stopPropagation()
-                      handleCustomChange("verify", Object.keys(currentMcpServers).includes("verify") ? (!currentMcpServers.verify) : false)
-                    }}
-                  />
-                  <span>{t("tools.ignoreVerification")}</span>
-                </label>)
-              }
-            </div>
+            <label>URL</label>
             <div className="key-input-wrapper">
               <Input
                 placeholder={t("tools.urlPlaceholder")}
@@ -1427,41 +1289,6 @@ const CustomEdit = React.memo(({ _type, _config, _toolName, onDelete, onCancel, 
               />
               {isValidRange(currentMcpServers, "initialTimeout")?.isError ? (
                 <Tooltip content={t("tools.initialTimeoutError")} side="left">
-                  <div
-                    className="key-input-error"
-                    onClick={(e) => {
-                      const input = e.currentTarget.parentElement?.parentElement?.querySelector("input")
-                      if (input) {
-                        input.focus()
-                      }
-                    }}
-                  />
-                </Tooltip>
-              ) : null}
-            </div>
-          </div>
-          {/* Tool call Timeout (m) */}
-          <div className="field-item">
-            <div className="field-item-title">
-              <label>Tool call Timeout (s)</label>
-              <Tooltip content={t("tools.toolCallTimeoutAlt")} side="bottom" align="start" maxWidth={402}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7.5" stroke="currentColor"/>
-                  <path d="M8.73 6.64V12H7.85V6.64H8.73ZM8.3 4.63C8.43333 4.63 8.55 4.67667 8.65 4.77C8.75667 4.85667 8.81 4.99667 8.81 5.19C8.81 5.37667 8.75667 5.51667 8.65 5.61C8.55 5.70333 8.43333 5.75 8.3 5.75C8.15333 5.75 8.03 5.70333 7.93 5.61C7.83 5.51667 7.78 5.37667 7.78 5.19C7.78 4.99667 7.83 4.85667 7.93 4.77C8.03 4.67667 8.15333 4.63 8.3 4.63Z" fill="currentColor"/>
-                </svg>
-              </Tooltip>
-            </div>
-            <div className="key-input-wrapper">
-              <Input
-                placeholder={t("tools.toolCallTimeoutPlaceholder")}
-                size="small"
-                type="number"
-                value={currentMcpServers.toolCallTimeout}
-                error={isValidRange(currentMcpServers, "toolCallTimeout")?.isError}
-                onChange={(e) => handleCustomChange("toolCallTimeout", parseFloat(e.target.value))}
-              />
-              {isValidRange(currentMcpServers, "toolCallTimeout")?.isError ? (
-                <Tooltip content={t("tools.toolCallTimeoutError")} side="left">
                   <div
                     className="key-input-error"
                     onClick={(e) => {

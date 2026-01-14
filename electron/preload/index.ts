@@ -1,6 +1,5 @@
 import { ipcRenderer, contextBridge } from "electron"
 
-import type { OAPModelDescriptionParam, MCPServerSearchParam, OAPLimiterCheckParam } from "../../types/oap"
 import type { ModelGroupSetting } from "../../types/model"
 
 // --------- Expose some API to the Renderer process ---------
@@ -38,6 +37,9 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   fillPathToConfig: (config: string) => ipcRenderer.invoke("util:fillPathToConfig", config),
   download: (url: string) => ipcRenderer.invoke("util:download", { url }),
   copyImage: (url: string) => ipcRenderer.invoke("util:copyimage", url),
+  isFirstLaunch: () => ipcRenderer.invoke("util:isFirstLaunch"),
+  markSetupCompleted: () => ipcRenderer.invoke("util:markSetupCompleted"),
+  resetToInitialSetup: () => ipcRenderer.invoke("util:resetToInitialSetup"),
   getModelSettings: () => ipcRenderer.invoke("util:getModelSettings"),
   setModelSettings: (settings: ModelGroupSetting) => ipcRenderer.invoke("util:setModelSettings", settings),
   refreshConfig: () => ipcRenderer.invoke("util:refreshConfig"),
@@ -75,40 +77,11 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   getResourcesPath: (p: string) => ipcRenderer.invoke("env:getResourcesPath", p),
   isDev: () => ipcRenderer.invoke("env:isDev"),
 
-  // oap
-  oapLogin: (regist: boolean) => ipcRenderer.invoke("oap:login", regist),
-  oapLogout: () => ipcRenderer.invoke("oap:logout"),
-  oapGetToken: () => ipcRenderer.invoke("oap:getToken"),
-  oapSearchMCPServer: (params: MCPServerSearchParam) => ipcRenderer.invoke("oap:searchMCPServer", params),
-  oapModelDescription: (params?: OAPModelDescriptionParam) => ipcRenderer.invoke("oap:modelDescription", params),
-  oapApplyMCPServer: (ids: string[]) => ipcRenderer.invoke("oap:applyMCPServer", ids),
-  oapGetMCPServers: () => ipcRenderer.invoke("oap:getMCPServers"),
-  oapGetMe: () => ipcRenderer.invoke("oap:getMe"),
-  oapGetUsage: () => ipcRenderer.invoke("oap:getUsage"),
-  oapLimiterCheck: (params: OAPLimiterCheckParam) => ipcRenderer.invoke("oap:limiterCheck", params),
-  oapGetMCPTags: () => ipcRenderer.invoke("oap:getMCPTags"),
-  oapRegistEvent: (event: "login" | "logout", callback: () => void) => {
-    ipcRenderer.on(`oap:${event}`, callback)
-    return () => ipcRenderer.off(`oap:${event}`, callback)
-  },
-
   // deep link
-  listenRefresh: (cb: () => void) => {
-    ipcRenderer.on("refresh", cb)
-    return () => ipcRenderer.off("refresh", cb)
-  },
   listenMcpApply: (cb: (id: string) => void) => {
     const listener = (_event: Electron.IpcMainInvokeEvent, id: string) => cb(id)
     ipcRenderer.on("mcp.install", listener as any)
     return () => ipcRenderer.off("mcp.install", listener as any)
-  },
-
-  // lipc
-  responsedIPCElicitation: (action: number, content: any) => ipcRenderer.invoke("lipc:elicitation", action, content),
-  listenIPCElicitationRequest: (cb: (data: any) => void) => {
-    const listener = (_event: Electron.IpcMainInvokeEvent, data: any) => cb(data)
-    ipcRenderer.on("mcp.elicitation", listener as any)
-    return () => ipcRenderer.off("mcp.elicitation", listener as any)
   },
 })
 

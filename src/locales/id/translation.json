@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "Buka sidebar",
     "closeSidebar": "Tutup sidebar"
   },
@@ -33,7 +33,6 @@
     "retry": "Coba Lagi",
     "noModelAlert": "Tidak ada model yang tersedia",
     "noModelBanner": "Tidak ada model yang tersedia, pilih model terlebih dahulu",
-    "onLimit": "Anda telah mencapai batas penggunaan paket {{plan}}, model oap tidak dapat digunakan",
     "modelSettings": "Pengaturan Model",
     "copy": "Salin",
     "copied": "Disalin",
@@ -53,24 +52,6 @@
       "enableToast": "Panggilan Alat diaktifkan",
       "enable": "Aktifkan Panggilan Alat"
     },
-    "reAuthorize": {
-      "title": "Kesalahan otorisasi saat memanggil alat",
-      "description": "Otorisasi untuk alat ini telah kedaluwarsa atau dibatalkan, sehingga alat tidak dapat digunakan. Otorisasi baru diperlukan untuk memulihkan fungsionalitas penuh.",
-      "confirm": "Otorisasi ulang",
-      "stopChange": "Otorisasi sedang berlangsung, jangan ubah konfigurasi"
-    },
-    "elicitation": {
-      "title": "Input diperlukan",
-      "selectOption": "Pilih opsi",
-      "decline": "Tolak",
-      "submit": "Kirim",
-      "confirmTitle": "Konfirmasi diperlukan",
-      "confirm": "Konfirmasi",
-      "pendingRequests": "{{count}} permintaan tertunda",
-      "pendingRequests_one": "{{count}} permintaan tertunda",
-      "acceptAll": "Terima semua",
-      "declineAll": "Tolak semua"
-    },
     "tokens": {
       "tooltip": "Jumlah Token Input",
       "model": "Model",
@@ -78,13 +59,6 @@
       "output": "Output",
       "count": "Jumlah Token",
       "total": "Total Penggunaan",
-      "composition": "Struktur Komposisi Token Input",
-      "compositionAlt": "Jumlah token ini diperkirakan oleh Langchain, penggunaan aktual mungkin sedikit berbeda",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "Penundaan pertama {{time}} ms",
       "firstDelayDesc": "Penundaan pertama: Waktu yang dibutuhkan AI untuk mulai menghasilkan karakter pertama",
       "generationRate": "{{time}} token per detik",
@@ -92,7 +66,7 @@
     }
   },
   "welcome": {
-    "title": "Selamat datang di Dive AI",
+    "title": "Selamat datang di Velis AI",
     "subtitle": "Mulai percakapan AI Anda",
     "startChat": "Mulai Obrolan"
   },
@@ -122,7 +96,6 @@
     "models": "Pengaturan Model",
     "system": "Pengaturan Sistem",
     "manageAndSettings": "Manajemen dan Pengaturan",
-    "OAPhub": "OAPhub",
     "signOut": "Keluar",
     "chat": {
       "starredChat": "Favorit",
@@ -189,17 +162,7 @@
     "initialTimeoutError": "Silakan masukkan angka yang lebih besar atau sama dengan 10",
     "jsonDesc": "Silakan masukkan atau tempel JSON Server MCP di bidang",
     "addArg": "Tambah Argumen",
-    "argsTitleAlt": "Argumen",
     "addEnv": "Tambah Variabel Lingkungan",
-    "envTitleAlt": "Variabel Lingkungan",
-    "ignoreVerification": "Abaikan verifikasi SSL/TLS",
-    "addHeaders": "Tambah Headers",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "Default adalah 600 detik, tidak ada batas maksimum.",
-    "toolCallTimeoutPlaceholder": "Masukkan Tool call Timeout...",
-    "toolCallTimeoutError": "Silakan masukkan angka desimal yang lebih besar atau sama dengan 0",
-    "headersKey": "Masukkan nama Headers (Key)...",
-    "headersValue": "Masukkan nilai Headers (Value)...",
     "jsonFormatError": {
       "addFormat": "Kesalahan format konfigurasi, silakan periksa dan perbaiki format",
       "format": "Kesalahan format konfigurasi {{mcp}}, silakan periksa dan perbaiki format",
@@ -224,9 +187,7 @@
       "initialTimeout": "Alat {{mcp}}: Bidang initialTimeout harus berupa angka desimal",
       "range": "Alat {{mcp}}: Nilai bidang {{field}} berada di luar jangkauan, silakan periksa dan perbaiki nilai",
       "minRange": "Alat {{mcp}}: Bidang {{field}} harus lebih besar atau sama dengan {{value}}",
-      "maxRange": "Alat {{mcp}}: Bidang {{field}} harus lebih kecil atau sama dengan {{value}}",
-      "urlRequiredstreamable": "Alat {{mcp}}: URL diperlukan untuk transport streamable",
-      "urlRequiredsse": "Alat {{mcp}}: URL diperlukan untuk transport SSE"
+      "maxRange": "Alat {{mcp}}: Bidang {{field}} harus lebih kecil atau sama dengan {{value}}"
     },
     "namePlaceholder": "Masukkan nama...",
     "commandPlaceholder": "Masukkan perintah...",
@@ -242,18 +203,11 @@
     "logTitle": "Jalankan Perintah UVX",
     "logProcessing": "Memproses...",
     "no_tool_title": "Tidak Ada Server MCP yang Tersedia",
-    "no_oap_tool_message": {
-      "all": "Silakan pilih Server MCP OAP untuk digunakan, atau tambahkan Server MCP khusus.",
-      "oap": "Silakan pilih Server MCP OAP untuk digunakan.",
-      "custom": "Silakan tambahkan Server MCP khusus."
-    },
     "no_tool_message": "Silakan tambahkan Server MCP.",
     "tab": {
       "all": "Semua Alat",
-      "oap": "Alat OAP",
       "custom": "Alat Khusus"
     },
-    "oapStoreLinkAlt": "Lihat Detail",
     "subToolsCount": "Alat Diaktifkan: {{count}} / {{total}}",
     "disableAll": "Nonaktifkan semua",
     "enableAll": "Aktifkan semua",
@@ -270,28 +224,6 @@
       "headerBtn": "Muat Ulang",
       "headerBtnAlt": "Muat Ulang dan Perbarui Alat MCP"
     },
-    "oap": {
-      "type": {
-        "all": "Semua Alat",
-        "base": "Tampilkan Base Saja",
-        "pro": "Tampilkan Pro Saja",
-        "official": "Tampilkan Official Saja"
-      },
-      "sort": {
-        "title": "Urutkan",
-        "popular": "Populer",
-        "new": "Baru"
-      },
-      "tag": "Kategori",
-      "show_more": "Lebih Banyak",
-      "no_search_data_title": "Tidak ditemukan Alat MCP",
-      "no_search_data": "Tidak ditemukan hasil pencarian, silakan hapus kata kunci pencarian atau sesuaikan kondisi filter.",
-      "clear_filter": "Hapus Filter",
-      "hint": "Server MCP tingkat tinggi memerlukan upgrade ke versi Pro untuk instalasi",
-      "high_cost_title": "Aktifkan Server MCP Berbiaya Tinggi",
-      "high_cost_desc": "Anda telah memilih Server MCP yang mengonsumsi banyak token. Silakan periksa apakah penggunaan paket Anda mencukupi.",
-      "headerBtnAlt": "Tambah / Lihat Alat MCP OAP"
-    },
     "custom": {
       "headerBtn": "Tambah / Edit Konfigurasi",
       "headerBtnAlt": "Tambah / Edit Alat Khusus",
@@ -306,7 +238,7 @@
       "add": "Tambah Konektor",
       "addTitle": "Tambah Konektor",
       "editTitle": "Edit Konektor {{name}}",
-      "description": "Dive akan menggunakan otorisasi koneksi OAuth untuk menghubungkan akun Anda dengan aman ke alat dan mulai menggunakan konektor yang sudah dibuat sebelumnya.",
+      "description": "Velis AI akan menggunakan otorisasi koneksi OAuth untuk menghubungkan akun Anda dengan aman ke alat dan mulai menggunakan konektor yang sudah dibuat sebelumnya.",
       "connect": "Hubungkan",
       "disconnect": "Putuskan",
       "nameTitle": "Nama",
@@ -439,14 +371,11 @@
     "reasoningLevelTooltip": "Rendah mewakili respons cepat, berfokus pada kesimpulan dan tanpa detail tambahan, dengan penalaran langsung dan sederhana. Sedang memberikan respons dengan penjelasan logis yang cukup, mencakup informasi kunci. Tinggi menawarkan respons mendalam dengan analisis dan penjelasan yang terstruktur dan rinci.",
     "tokenBudgetDescription": "Tetapkan nilai penalaran ({{min}}~{{max}})",
     "parameterVerify": "Verifikasi Parameter",
-    "expired": "Model ini telah dihentikan secara resmi",
-    "expiredInfo": "Model ini tidak lagi ada dalam daftar resmi dan hanya ditampilkan sebagai riwayat lokal. Mungkin tidak berfungsi atau diperbarui dengan benar. Jika Anda menghapus centang, model akan dihapus dan tidak dapat dipulihkan dari daftar.",
     "verifyErrorInfo": "Detail Kesalahan Verifikasi",
     "verifyErrorMsg": "Model tidak menggunakan alat apa pun selama verifikasi, yang mungkin karena kurangnya dukungan atau tidak dipicu. Oleh karena itu, tidak mungkin untuk mengonfirmasi apakah ia mendukung alat.",
     "verifyStatusSuccess": "Verifikasi model berhasil, diaktifkan dengan konfigurasi asli",
     "verifyStatusSuccessInPrompt": "Verifikasi model berhasil, diaktifkan dengan MCP Prompts",
     "verifyUnexpectedFailed": "Verifikasi model gagal, terjadi kesalahan yang tidak diketahui, silakan coba lagi nanti",
-    "oapUsageLimit": "Batas penggunaan tercapai, untuk sementara tidak tersedia",
     "providerFilter": {
       "Alt": "Jika model yang ingin Anda gunakan tidak ada dalam opsi model populer, Anda dapat menggunakan fungsi pencarian untuk menemukannya.",
       "Clear": "Hapus"
@@ -463,33 +392,35 @@
     "autoDownload": "Unduh Pembaruan Otomatis",
     "autoDownloadDescription": "Unduh versi baru DIVE secara otomatis ketika pengguna restart atau klik tombol \"Upgrade\" di halaman menu, versi baru akan diaktifkan",
     "autoLaunch": "Peluncuran Otomatis",
-    "autoLaunchDescription": "Luncurkan Dive AI secara otomatis saat sistem dimulai",
+    "autoLaunchDescription": "Luncurkan Velis AI secara otomatis saat sistem dimulai",
     "minimalToTray": "Minimalkan ke baki",
     "minimalToTrayDescription": "Saat menutup jendela, program akan diminimalkan ke baki sistem alih-alih keluar sepenuhnya",
-    "loginTitle": "Login OAP",
-    "loginDescription": "Gunakan OpenAgentPlatform untuk login, tidak diperlukan latar belakang teknis untuk dengan mudah menghubungkan LLM, AI Agents, dan MCP Servers — Rasakan solusi cerdas sekarang!",
     "personalInformationTitle": "Informasi Pribadi",
     "defaultSystemPrompt": "Prompt Sistem Default Dive",
     "defaultSystemPromptDescription": "Prompt Sistem Default Dive digunakan sebagai prompt sistem default untuk obrolan. Ini memberitahu LLM bahwa obrolan Dive mendukung KaTeX / Markdown / Mermaid, dll. Fitur ini mengonsumsi token tertentu, yang dapat membuat respons lebih lambat dari prompt tanpa prompt sistem. Di sisi lain, jika dinonaktifkan, kualitas respons LLM mungkin menurun",
-    "usageAnalytics": "Buka halaman Dashboard di OAP Hub untuk melihat",
     "usageAnalyticsTitle": "Analitik Penggunaan",
-    "userEdit": "Buka halaman Akun di OAP Hub untuk membuat perubahan",
     "planSectionTitle": "Penggunaan paket saat ini",
     "subscriptionDate": "Tanggal berlangganan",
     "remainingUsage": "Penggunaan tersisa",
     "usageWarningTitle": "Batas penggunaan token tercapai.",
-    "usageWarning": "Kuota akan direset bulan depan, atau beli paket kredit untuk penggunaan lebih banyak. Penyediaan terbatas server MCP dasar.",
-    "BaseUsageWarning": "Server MCP Base: {{mcpLimit}} panggilan per jam. Untuk menggunakan server MCP lainnya, silakan upgrade paket Anda di <planLink>halaman tagihan</planLink>.",
+    "usageWarning": "Kuota akan direset bulan depan, atau beli paket token untuk penggunaan lebih banyak. Model dasar dan MCP dasar masih tersedia.",
+    "BaseUsageWarning": "Model Base: {{callLimit}} panggilan per {{callUnit}} jam | Server MCP Base: {{mcpLimit}} panggilan per jam. Untuk menggunakan model dan MCP lain, tingkatkan paket Anda dari <planLink>halaman paket</planLink>.",
     "customPromptDescription": "Jika Anda memerlukan instruksi khusus tambahan, silakan klik fungsi \"Prompt Khusus\" di bawah ini untuk mengaturnya.",
     "customPromptButton": "Prompt Khusus",
     "tokenPackageTitle": "Penggunaan paket token",
     "tokenPackageHint": "Paket token tidak memiliki tanggal kedaluwarsa dan hanya akan digunakan setelah kuota paket bulanan habis.",
     "tokenPackageRemainingUsage": "Penggunaan tersisa",
     "tokenPackageWarningTitle": "Kuota token habis.",
-    "tokenPackageWarning": "Anda dapat mengisi ulang lebih banyak penggunaan token di <planLink>halaman Dashboard</planLink> OAPhub.",
     "skipTlsVerifyWarning": "Peringatan keamanan: Mengabaikan verifikasi sertifikat dapat mengurangi keamanan koneksi. Disarankan untuk digunakan di lingkungan jaringan tepercaya.",
+    "allRateLimitReachedTitle": "Batas panggilan model & server MCP tercapai.",
+    "llmRateLimitReachedTitle": "Batas panggilan model tercapai.",
     "mcpRateLimitReachedTitle": "Batas panggilan server MCP tercapai.",
-    "rateLimitReachedDescription": "Harap tunggu sebelum membuat permintaan baru; kuota akan dipulihkan secara otomatis."
+    "rateLimitReachedDescription": "Harap tunggu sebelum membuat permintaan baru; kuota akan dipulihkan secara otomatis.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "Disalin ke clipboard",
@@ -524,14 +455,10 @@
     "clickToInstall": "Klik untuk Memasang Pembaruan"
   },
   "login": {
-    "subtitle": "Dive AI adalah aplikasi desktop open-source yang mengintegrasikan berbagai model bahasa besar yang mendukung panggilan fungsi dengan mulus. Melalui antarmukanya yang bersih dan intuitif, Anda dapat dengan mudah berbincang dengan AI mutakhir, dari pertanyaan sehari-hari hingga tugas profesional, mendapatkan respons yang tepat dan menjadikannya asisten cerdas Anda.",
+    "subtitle": "Velis AI adalah aplikasi desktop open-source yang mengintegrasikan berbagai model bahasa besar yang mendukung panggilan fungsi dengan mulus. Melalui antarmukanya yang bersih dan intuitif, Anda dapat dengan mudah berbincang dengan AI mutakhir, dari pertanyaan sehari-hari hingga tugas profesional, mendapatkan respons yang tepat dan menjadikannya asisten cerdas Anda.",
     "title1": "Gunakan Model yang Anda Persiapkan Sendiri",
     "description1": "Cocok untuk ahli AI tingkat lanjut. Jika Anda sudah memiliki konfigurasi sendiri yang siap, baik itu Ollama lokal, llama.cpp, atau API LLM jarak jauh dari Openrouter, OpenAI, Anthropic, atau perusahaan AI lainnya, silakan gunakan opsi ini.",
-    "button1": "Buka Pengaturan Model",
-    "title2": "Gunakan OpenAgentPlatform",
-    "description2": "OAP memudahkan semua orang untuk menggunakan layanan AI paling canggih, menghubungkan LLM, AI Agents, dan MCP Servers tanpa memerlukan keahlian teknis. Jelajahi kemungkinan AI yang tak terbatas dan rasakan solusi cerdas sekarang.",
-    "button2": "Daftar untuk OAP",
-    "button3": "Masuk ke OAP"
+    "button1": "Buka Pengaturan Model"
   },
   "InstallHostDependencies": {
     "title": "Mengunduh Dependensi Host...",

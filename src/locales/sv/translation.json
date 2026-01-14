@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "Öppna sidofält",
     "closeSidebar": "Stäng sidofält"
   },
@@ -33,7 +33,6 @@
     "retry": "Försök igen",
     "noModelAlert": "Inga modeller tillgängliga",
     "noModelBanner": "Inga modeller tillgängliga, välj en modell först",
-    "onLimit": "Du har nått användningsgränsen för {{plan}}-planen, oap-modeller kan inte användas",
     "modelSettings": "Modellinställningar",
     "copy": "Kopiera",
     "copied": "Kopierad",
@@ -53,24 +52,6 @@
       "enableToast": "Verktygsanrop aktiverade",
       "enable": "Aktivera verktygsanrop"
     },
-    "reAuthorize": {
-      "title": "Auktoriseringsfel vid anrop av verktyget",
-      "description": "Auktoriseringen för detta verktyg har gått ut eller har avbrutits, så verktyget kan inte användas. Ny auktorisering krävs för att återställa full funktionalitet.",
-      "confirm": "Återauktorisera",
-      "stopChange": "Auktorisering pågår, ändra inte konfigurationen"
-    },
-    "elicitation": {
-      "title": "Inmatning krävs",
-      "selectOption": "Välj ett alternativ",
-      "decline": "Avvisa",
-      "submit": "Skicka",
-      "confirmTitle": "Bekräftelse krävs",
-      "confirm": "Bekräfta",
-      "pendingRequests": "{{count}} väntande förfrågningar",
-      "pendingRequests_one": "{{count}} väntande förfrågan",
-      "acceptAll": "Acceptera alla",
-      "declineAll": "Avvisa alla"
-    },
     "tokens": {
       "tooltip": "Antal ingångstokens",
       "model": "Model",
@@ -78,13 +59,6 @@
       "output": "Utgång",
       "count": "Antal tokens",
       "total": "Total användning",
-      "composition": "Ingångstoken-sammansättningsstruktur",
-      "compositionAlt": "Detta tokenantal är uppskattat av Langchain, faktisk användning kan variera något",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "Första fördröjning {{time}} ms",
       "firstDelayDesc": "Första fördröjning: Tid för AI att börja generera första tecknet",
       "generationRate": "{{time}} tokens per sekund",
@@ -92,7 +66,7 @@
     }
   },
   "welcome": {
-    "title": "Välkommen till Dive AI",
+    "title": "Välkommen till Velis AI",
     "subtitle": "Starta din AI-konversation",
     "startChat": "Starta chatt"
   },
@@ -122,7 +96,6 @@
     "models": "Modellinställningar",
     "system": "Systeminställningar",
     "manageAndSettings": "Hantering och inställningar",
-    "OAPhub": "OAPhub",
     "signOut": "Logga ut",
     "chat": {
       "starredChat": "Favoriter",
@@ -189,17 +162,7 @@
     "initialTimeoutError": "Ange ett nummer som är större än eller lika med 10",
     "jsonDesc": "Ange eller klistra in MCP Server JSON i fältet",
     "addArg": "Lägg till argument",
-    "argsTitleAlt": "Argument",
     "addEnv": "Lägg till miljövariabel",
-    "envTitleAlt": "Miljövariabel",
-    "ignoreVerification": "Ignorera SSL/TLS-verifiering",
-    "addHeaders": "Lägg till Headers",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "Standard är 600 sekunder, ingen maxgräns.",
-    "toolCallTimeoutPlaceholder": "Ange Tool call Timeout...",
-    "toolCallTimeoutError": "Ange ett flyttal som är större än eller lika med 0",
-    "headersKey": "Ange Headers-namn (Key)...",
-    "headersValue": "Ange Headers-värde (Value)...",
     "jsonFormatError": {
       "addFormat": "Konfigurationsformatfel, kontrollera och korrigera formatet",
       "format": "{{mcp}} konfigurationsformatfel, kontrollera och korrigera formatet",
@@ -224,9 +187,7 @@
       "initialTimeout": "Verktyg {{mcp}}: Fältet initialTimeout måste vara ett flyttal",
       "range": "Verktyg {{mcp}}: Fältvärdet {{field}} är utanför intervallet, kontrollera och korrigera värdet",
       "minRange": "Verktyg {{mcp}}: Fältet {{field}} måste vara större än eller lika med {{value}}",
-      "maxRange": "Verktyg {{mcp}}: Fältet {{field}} måste vara mindre än eller lika med {{value}}",
-      "urlRequiredstreamable": "Verktyg {{mcp}}: URL krävs för streamable-transport",
-      "urlRequiredsse": "Verktyg {{mcp}}: URL krävs för SSE-transport"
+      "maxRange": "Verktyg {{mcp}}: Fältet {{field}} måste vara mindre än eller lika med {{value}}"
     },
     "namePlaceholder": "Ange namn...",
     "commandPlaceholder": "Ange kommando...",
@@ -242,18 +203,11 @@
     "logTitle": "Kör UVX-kommando",
     "logProcessing": "Bearbetar...",
     "no_tool_title": "Inga MCP-servrar tillgängliga",
-    "no_oap_tool_message": {
-      "all": "Välj en OAP MCP-server att använda eller lägg till en anpassad MCP-server.",
-      "oap": "Välj en OAP MCP-server att använda.",
-      "custom": "Lägg till en anpassad MCP-server."
-    },
     "no_tool_message": "Lägg till en MCP-server.",
     "tab": {
       "all": "Alla verktyg",
-      "oap": "OAP-verktyg",
       "custom": "Anpassade verktyg"
     },
-    "oapStoreLinkAlt": "Visa detaljer",
     "subToolsCount": "Verktyg aktiverade: {{count}} / {{total}}",
     "disableAll": "Inaktivera alla",
     "enableAll": "Aktivera alla",
@@ -270,28 +224,6 @@
       "headerBtn": "Ladda om",
       "headerBtnAlt": "Ladda om och uppdatera MCP-verktyg"
     },
-    "oap": {
-      "type": {
-        "all": "Alla verktyg",
-        "base": "Visa endast Base",
-        "pro": "Visa endast Pro",
-        "official": "Visa endast Official"
-      },
-      "sort": {
-        "title": "Sortera",
-        "popular": "Populär",
-        "new": "Ny"
-      },
-      "tag": "Kategori",
-      "show_more": "Mer",
-      "no_search_data_title": "Inga MCP-verktyg hittades",
-      "no_search_data": "Inga sökresultat hittades, rensa sökordet eller justera filtervillkoren.",
-      "clear_filter": "Rensa filter",
-      "hint": "Högnivå MCP-servrar kräver uppgradering till Pro-versionen för installation",
-      "high_cost_title": "Aktivera högkostnads MCP-servrar",
-      "high_cost_desc": "Du har valt MCP-servrar som förbrukar många tokens. Kontrollera om din planerade användning är tillräcklig.",
-      "headerBtnAlt": "Lägg till / Visa OAP MCP-verktyg"
-    },
     "custom": {
       "headerBtn": "Lägg till / Redigera konfiguration",
       "headerBtnAlt": "Lägg till / Redigera anpassade verktyg",
@@ -306,7 +238,7 @@
       "add": "Lägg till anslutning",
       "addTitle": "Lägg till anslutning",
       "editTitle": "Redigera {{name}} anslutning",
-      "description": "Dive kommer att använda OAuth-anslutningsauktorisering för att säkert ansluta ditt konto till verktyg och börja använda förbyggda anslutningar.",
+      "description": "Velis AI kommer att använda OAuth-anslutningsauktorisering för att säkert ansluta ditt konto till verktyg och börja använda förbyggda anslutningar.",
       "connect": "Anslut",
       "disconnect": "Koppla från",
       "nameTitle": "Namn",
@@ -439,14 +371,11 @@
     "reasoningLevelTooltip": "Låg representerar ett snabbt svar, fokuserar på slutsatser och utan ytterligare detaljer, med direkt och enkel resonemang. Medium ger ett svar med tillräcklig logisk förklaring, som täcker nyckelinformation. Hög erbjuder ett djupt svar med strukturerad och detaljerad analys och förklaring.",
     "tokenBudgetDescription": "Ställ in resonemangsvärde ({{min}}~{{max}})",
     "parameterVerify": "Parameterverifiering",
-    "expired": "Denna modell har officiellt avslutats",
-    "expiredInfo": "Denna modell finns inte längre på den officiella listan och visas endast som lokal historik. Den kanske inte fungerar eller uppdateras korrekt. Om du avmarkerar kommer den att tas bort och kan inte återställas från listan.",
     "verifyErrorInfo": "Verifieringsfeldetaljer",
     "verifyErrorMsg": "Modellen använde inga verktyg under verifiering, vilket kan bero på bristande stöd eller att den inte utlöstes. Därför är det inte möjligt att bekräfta om den stöder verktyg.",
     "verifyStatusSuccess": "Modellverifiering lyckades, aktiverad med ursprunglig konfiguration",
     "verifyStatusSuccessInPrompt": "Modellverifiering lyckades, aktiverad med MCP Prompts",
     "verifyUnexpectedFailed": "Modellverifiering misslyckades, ett okänt fel uppstod, försök igen senare",
-    "oapUsageLimit": "Användningsgräns nådd, tillfälligt otillgänglig",
     "providerFilter": {
       "Alt": "Om modellen du vill använda inte finns bland de populära modellalternativen kan du använda sökfunktionen för att hitta den.",
       "Clear": "Rensa"
@@ -463,33 +392,35 @@
     "autoDownload": "Automatisk nedladdning av uppdatering",
     "autoDownloadDescription": "Ladda automatiskt ner den nya versionen av DIVE när användaren startar om eller klickar på \"Uppgradera\"-knappen på menysidan, den nya versionen kommer att aktiveras",
     "autoLaunch": "Automatisk start",
-    "autoLaunchDescription": "Starta Dive AI automatiskt när systemet startar",
+    "autoLaunchDescription": "Starta Velis AI automatiskt när systemet startar",
     "minimalToTray": "Minimera till systemfältet",
     "minimalToTrayDescription": "När fönstret stängs kommer programmet att minimeras till systemfältet istället för att avslutas helt",
-    "loginTitle": "OAP-inloggning",
-    "loginDescription": "Använd OpenAgentPlatform för att logga in, ingen teknisk bakgrund krävs för att enkelt ansluta LLM, AI-agenter och MCP-servrar — Upplev smarta lösningar nu!",
     "personalInformationTitle": "Personlig information",
-    "defaultSystemPrompt": "Dive standardsystemprompt",
-    "defaultSystemPromptDescription": "Dive standardsystemprompt används som standardsystemprompt för chatt. Den berättar för LLM att Dive-chatt stöder KaTeX / Markdown / Mermaid etc. Denna funktion förbrukar vissa tokens, vilket kan göra svaret långsammare än prompten utan systemprompt. Å andra sidan, om den är inaktiverad, kan kvaliteten på LLM:s svar minska",
-    "usageAnalytics": "Gå till instrumentpanelssidan i OAP Hub för att se",
+    "defaultSystemPrompt": "Velis AI standardsystemprompt",
+    "defaultSystemPromptDescription": "Velis AI standardsystemprompt används som standardsystemprompt för chatt. Den berättar för LLM att Dive-chatt stöder KaTeX / Markdown / Mermaid etc. Denna funktion förbrukar vissa tokens, vilket kan göra svaret långsammare än prompten utan systemprompt. Å andra sidan, om den är inaktiverad, kan kvaliteten på LLM:s svar minska",
     "usageAnalyticsTitle": "Användningsanalys",
-    "userEdit": "Gå till kontosidan i OAP Hub för att göra ändringar",
     "planSectionTitle": "Aktuell plananvändning",
     "subscriptionDate": "Prenumerationsdatum",
     "remainingUsage": "Återstående användning",
     "usageWarningTitle": "Token-användningsgräns nådd.",
-    "usageWarning": "Kvoten återställs nästa månad, eller köp kreditpaket för mer användning. Begränsat utbud av grundläggande MCP-servrar.",
-    "BaseUsageWarning": "Bas-MCP-servrar: {{mcpLimit}} anrop per timme. För att använda andra MCP-servrar, uppgradera ditt abonnemang på <planLink>faktureringssidan</planLink>.",
+    "usageWarning": "Kvoten återställs nästa månad, eller köp tokenpaket för mer användning. Grundmodeller och grund-MCP är fortfarande tillgängliga.",
+    "BaseUsageWarning": "Basmodeller: {{callLimit}} samtal per {{callUnit}} timmar | Bas-MCP-servrar: {{mcpLimit}} samtal per timme. För att använda andra modeller och MCP:er, uppgradera din plan från <planLink>plansidan</planLink>.",
     "customPromptDescription": "Om du behöver ytterligare anpassade instruktioner, klicka på \"Anpassad prompt\"-funktionen nedan för att ställa in den.",
     "customPromptButton": "Anpassad prompt",
     "tokenPackageTitle": "Token-paketanvändning",
     "tokenPackageHint": "Token-paket har inget utgångsdatum och kommer endast att användas efter att månatlig plankvot är uttömd.",
     "tokenPackageRemainingUsage": "Återstående användning",
     "tokenPackageWarningTitle": "Token-kvot förbrukad.",
-    "tokenPackageWarning": "Du kan fylla på mer token-användning på OAPhub <planLink>instrumentpanelssidan</planLink>.",
     "skipTlsVerifyWarning": "Säkerhetsvarning: Att ignorera certifikatverifiering kan minska anslutningens säkerhet. Det rekommenderas att använda i pålitliga nätverksmiljöer.",
+    "allRateLimitReachedTitle": "Anropsgräns för modeller och MCP-servrar nådd.",
+    "llmRateLimitReachedTitle": "Anropsgräns för modeller nådd.",
     "mcpRateLimitReachedTitle": "Anropsgräns för MCP-servrar nådd.",
-    "rateLimitReachedDescription": "Vänta innan du gör nya förfrågningar; kvoten återställs automatiskt."
+    "rateLimitReachedDescription": "Vänta innan du gör nya förfrågningar; kvoten återställs automatiskt.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "Kopierad till urklipp",
@@ -524,14 +455,10 @@
     "clickToInstall": "Klicka för att installera uppdatering"
   },
   "login": {
-    "subtitle": "Dive AI är en öppen källkod desktop-applikation som sömlöst integrerar olika stora språkmodeller som stöder funktionsanrop. Genom sitt rena och intuitiva gränssnitt kan du enkelt konversera med banbrytande AI, från dagliga frågor till professionella uppgifter, få exakta svar och göra det till din intelligenta assistent.",
+    "subtitle": "Velis AI är en öppen källkod desktop-applikation som sömlöst integrerar olika stora språkmodeller som stöder funktionsanrop. Genom sitt rena och intuitiva gränssnitt kan du enkelt konversera med banbrytande AI, från dagliga frågor till professionella uppgifter, få exakta svar och göra det till din intelligenta assistent.",
     "title1": "Använd dina egna förberedda modeller",
     "description1": "Lämplig för avancerade AI-experter. Om du redan har din egen konfiguration redo, oavsett om det är lokalt Ollama, llama.cpp eller fjärr-LLM-API:er från Openrouter, OpenAI, Anthropic eller andra AI-företag, använd detta alternativ.",
-    "button1": "Gå till modellinställningar",
-    "title2": "Använd OpenAgentPlatform",
-    "description2": "OAP gör det enkelt för alla att använda de mest avancerade AI-tjänsterna, ansluta LLM, AI-agenter och MCP-servrar utan att kräva teknisk expertis. Utforska de obegränsade möjligheterna med AI och upplev smarta lösningar nu.",
-    "button2": "Registrera dig för OAP",
-    "button3": "Logga in på OAP"
+    "button1": "Gå till modellinställningar"
   },
   "InstallHostDependencies": {
     "title": "Laddar ner värdberoenden...",

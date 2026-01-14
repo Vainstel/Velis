@@ -1,28 +1,28 @@
 import "katex/dist/katex.min.css"
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, {useEffect, useMemo, useRef, useState} from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import rehypeKatex from "rehype-katex"
 import rehypeRaw from "rehype-raw"
-import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter"
-import { tomorrow, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { codeStreamingAtom } from "../../atoms/codeStreaming"
+import {PrismAsyncLight as SyntaxHighlighter} from "react-syntax-highlighter"
+import {oneLight, tomorrow} from "react-syntax-highlighter/dist/esm/styles/prism"
+import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {codeStreamingAtom} from "../../atoms/codeStreaming"
 import ToolPanel from "./ToolPanel"
 import FilePreview from "./FilePreview"
-import { useTranslation } from "react-i18next"
-import { themeAtom } from "../../atoms/themeState"
+import {useTranslation} from "react-i18next"
+import {themeAtom} from "../../atoms/themeState"
 import Textarea from "../../components/WrappedTextarea"
-import { isChatStreamingAtom } from "../../atoms/chatState"
+import {isChatStreamingAtom} from "../../atoms/chatState"
 import Zoom from "../../components/Zoom"
-import { convertLocalFileSrc } from "../../ipc/util"
+import {convertLocalFileSrc} from "../../ipc/util"
 import Button from "../../components/Button"
-import { useLocation } from "react-router-dom"
+import {useLocation} from "react-router-dom"
+import InfoTooltip from "../../components/InfoTooltip"
 import Tooltip from "../../components/Tooltip"
 import VideoPlayer from "../../components/VideoPlayer"
-import TokenUsagePopup, { ResourceUsage } from "./TokenUsagePopup"
 
 declare global {
   namespace JSX {
@@ -38,18 +38,11 @@ declare global {
       "none": {
         children: any
       }
-      "chat-error": {
-        children: any
-      }
       "thread-query-error": {
         children: any
       }
       "rate-limit-exceeded": {
         children: any
-      }
-      "system-tool-call": {
-        children: any
-        name: string
       }
     }
   }
@@ -64,12 +57,16 @@ interface MessageProps {
   isError?: boolean
   isLoading?: boolean
   isRateLimitExceeded?: boolean
-  resourceUsage?: ResourceUsage
+  inputTokens?: number
+  outputTokens?: number
+  modelName?: string
+  timeToFirstToken?: number
+  tokensPerSecond?: number
   onRetry: () => void
   onEdit: (editedText: string) => void
 }
 
-const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLimitExceeded, onRetry, onEdit, resourceUsage }: MessageProps) => {
+const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLimitExceeded, onRetry, onEdit, inputTokens, outputTokens, modelName, timeToFirstToken, tokensPerSecond }: MessageProps) => {
   const { t } = useTranslation()
   const [theme] = useAtom(themeAtom)
   const updateStreamingCode = useSetAtom(codeStreamingAtom)
@@ -81,7 +78,6 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
   const [editedText, setEditedText] = useState(text)
   const isChatStreaming = useAtomValue(isChatStreamingAtom)
   const [openToolPanels, setOpenToolPanels] = useState<Record<string, boolean>>({})
-  const [showTokensPopup, setShowTokensPopup] = useState(false)
   const messageContentRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
 
@@ -134,7 +130,7 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
     }
 
     const handleMouseLeave = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
+      const target = e.target as HTMLElement;
       if (target.classList.contains("markdown-link-wrapper")) {
         const wrapper = target.querySelector(".copy-link-button-wrapper")
         if (wrapper) {
@@ -257,7 +253,7 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
             // Check if children contain block-level custom elements or media elements
             const hasBlockElement = node?.children?.some((child: any) =>
               child.type === "element" &&
-              ["think", "tool-call", "thread-query-error", "video", "audio", "img", "system-tool-call", "chat-error"].includes(child.tagName)
+              ["think", "tool-call", "thread-query-error", "video", "audio", "img"].includes(child.tagName)
             )
             // If contains block elements, render as fragment to avoid p > div nesting
             if (hasBlockElement) {
@@ -270,9 +266,6 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
           },
           none() {
             return null
-          },
-          "chat-error"({ children }) {
-            return <p>{children}</p>
           },
           "thread-query-error"({ children }) {
             return (
@@ -494,15 +487,10 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
                 <SyntaxHighlighter
                   language={language.toLowerCase()}
                   style={theme === "dark" ? tomorrow : oneLight}
-                  codeTagProps={{
-                    style: {
-                      background: "none"
-                    }
-                  }}
                   customStyle={{
                     margin: 0,
                     padding: "12px",
-                    background: "none"
+                    background: "transparent"
                   }}
                 >
                   {code}
@@ -526,15 +514,7 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
                 </div>
               </div>
             )
-          },
-          "system-tool-call"({ name }) {
-            return (
-              <div className="system-tool-call">
-                <div className="system-tool-call-spinner" />
-                <span className="system-tool-call-name">{name}</span>
-              </div>
-            )
-          },
+          }
         }}
       >
         {
@@ -544,9 +524,6 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
           // prompt tool call from host
           .replaceAll("<tool_call>", "<none>")
           .replaceAll("</tool_call>", "</none>")
-          // Fix code block closing followed by text without newline (e.g., ```xxx)
-          // Use (?!\w) to avoid breaking ```language patterns for consecutive code blocks
-          .replace(/```(\w*)\n((?:(?!```)[^])*?)```(?!\w)([^\n`])/g, "```$1\n$2```\n$3")
         }
       </ReactMarkdown>
     )
@@ -576,6 +553,98 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
         )}
         {!isRateLimitExceeded && (
           <div className="message-tools">
+            {!isLoading && !isSent && (
+              <InfoTooltip
+                side="bottom"
+                className="message-tokens-tooltip-wrapper"
+                content={
+                  <div className="message-tokens-tooltip">
+                    {modelName && (
+                      <div className="message-tokens-tooltip-model">
+                        <div className="message-tokens-tooltip-model-title">
+                          <span>{t("chat.tokens.model")}</span>
+                        </div>
+                        <div className="message-tokens-tooltip-model-name">
+                          <span>{modelName}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="message-tokens-tooltip-count">
+                      <div className="message-tokens-tooltip-top">
+                        <div className="message-tokens-tooltip-block">
+                          <div className="message-tokens-tooltip-block-title">
+                            <span>{t("chat.tokens.input")}</span>
+                          </div>
+                          <div className="message-tokens-tooltip-block-content">
+                            <span className="message-tokens-tooltip-block-content-number">{inputTokens}</span>
+                            <span>{t("chat.tokens.count")}</span>
+                          </div>
+                        </div>
+                        <div className="message-tokens-tooltip-block">
+                          <div className="message-tokens-tooltip-block-title">
+                            <span>{t("chat.tokens.output")}</span>
+                          </div>
+                          <div className="message-tokens-tooltip-block-content">
+                            <span className="message-tokens-tooltip-block-content-number">{outputTokens}</span>
+                            <span>{t("chat.tokens.count")}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="message-tokens-tooltip-bottom">
+                        <div className="message-tokens-tooltip-block">
+                          <div className="message-tokens-tooltip-block-content">
+                            <span>{t("chat.tokens.total")}</span>
+                            <span className="message-tokens-tooltip-block-content-number">{(inputTokens ?? 0) + (outputTokens ?? 0)} Tokens</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="message-tokens-tooltip-desc">
+                      <div className="message-tokens-tooltip-desc-title">
+                        <span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M7 4V8L10 9.5" stroke="currentColor" strokeLinejoin="round"/>
+                            <circle cx="7" cy="7" r="6.5" stroke="currentColor"/>
+                          </svg>
+                          {t("chat.tokens.firstDelay", { time: ((timeToFirstToken ?? 0) * 1000).toFixed(0) })}
+                        </span>
+                        <span>|</span>
+                        <span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="15" viewBox="0 0 12 15" fill="none">
+                            <path d="M0.5 8L6.5 0.5V5.5H11.5L5.5 14V8H0.5Z" stroke="currentColor" strokeLinejoin="round"/>
+                          </svg>
+                          {t("chat.tokens.generationRate", { time: tokensPerSecond?.toFixed(0) })}
+                        </span>
+                      </div>
+                      <div className="message-tokens-tooltip-desc-content">
+                        <span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 14 14" fill="none">
+                            <path d="M7 4V8L10 9.5" stroke="currentColor" strokeLinejoin="round"/>
+                            <circle cx="7" cy="7" r="6.5" stroke="currentColor"/>
+                          </svg>
+                          {t("chat.tokens.firstDelayDesc")}
+                        </span>
+                        <span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="7" height="8" viewBox="0 0 12 15" fill="none">
+                            <path d="M0.5 8L6.5 0.5V5.5H11.5L5.5 14V8H0.5Z" stroke="currentColor" strokeLinejoin="round"/>
+                          </svg>
+                          {t("chat.tokens.generationRateDesc")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              >
+                <div className="message-tokens">
+                  <div className="message-tokens-main">
+                    Tokens: {(inputTokens ?? 0) + (outputTokens ?? 0)}
+                  </div>
+                  <div className="message-tokens-detail">
+                    ↑ {inputTokens ?? 0} ↓ {outputTokens ?? 0}
+                  </div>
+                </div>
+              </InfoTooltip>
+            )}
             {!isLoading && (
               <Button
                 className="message-tools-hide"
@@ -625,7 +694,7 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
                 </>
                 :
                 <>
-                  {messageId && messageId.includes("-") && (  //if messageId doesn't contain "-" then it's aborted before ready then it can't retry
+                  {messageId.includes("-") && (  //if messageId doesn't contain "-" then it's aborted before ready then it can't retry
                     <Button
                       className="message-tools-hide"
                       theme="TextOnly"
@@ -647,34 +716,18 @@ const Message = ({ messageId, text, isSent, files, isError, isLoading, isRateLim
                 </>
               )
             }
-            {!isError && !isLoading && !isSent && (
-              <Button
-                className="message-tokens-button message-tools-hide"
-                theme="TextOnly"
-                color="neutral"
-                size="small"
-                noFocus
-                onClick={() => setShowTokensPopup(true)}
-              >
+            {isSent && (inputTokens ?? 0) > 0 && (
+              <Tooltip content={t("chat.tokens.tooltip")}>
                 <div className="message-tokens">
                   <div className="message-tokens-main">
-                    Tokens
-                  </div>
-                  <div className="message-tokens-detail">
-                    ↑ {resourceUsage?.total_input_tokens ?? 0} ↓ {resourceUsage?.total_output_tokens ?? 0}
+                    Tokens: {inputTokens}
                   </div>
                 </div>
-              </Button>
+              </Tooltip>
             )}
           </div>
         )}
       </div>
-      {showTokensPopup && !isError && (
-        <TokenUsagePopup
-          resourceUsage={resourceUsage}
-          onClose={() => setShowTokensPopup(false)}
-        />
-      )}
     </div>
   )
 }

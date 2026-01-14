@@ -15,6 +15,7 @@
 @use "./components/DropDown";
 @use "./components/Keymap";
 @use "./overlay/Overlay";
+@use "./overlay/Commands";
 
 * {
   box-sizing: border-box;
@@ -49,7 +50,6 @@ body {
 .app-content {
   display: flex;
   flex: 1;
-  overflow: hidden;
 }
 
 .outlet-container {

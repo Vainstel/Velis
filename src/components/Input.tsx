@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react"
+import React, {forwardRef} from "react"
 import "@/styles/components/_Input.scss"
 import WrappedInput from "./WrappedInput"
 

@@ -1,7 +1,7 @@
 import React from "react"
 import Zoom from "../../components/Zoom"
 import "@/styles/components/_Zoom.scss"
-import { convertLocalFileSrc } from "../../ipc/util"
+import {convertLocalFileSrc} from "../../ipc/util"
 
 interface FilePreviewProps {
   files: (File | string)[]

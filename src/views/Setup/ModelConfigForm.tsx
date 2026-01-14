@@ -1,19 +1,24 @@
-import React, { useState, useEffect, useRef } from "react"
-import { useTranslation } from "react-i18next"
-import { FieldDefinition, PROVIDER_LABELS, PROVIDERS } from "../../atoms/interfaceState"
-import { ModelConfig, verifyModelWithConfig, writeEmptyConfigAtom, writeRawConfigAtom } from "../../atoms/configState"
-import { useSetAtom } from "jotai"
-import { loadConfigAtom } from "../../atoms/configState"
+import React, {useEffect, useRef, useState} from "react"
+import {useTranslation} from "react-i18next"
+import {FieldDefinition, PROVIDER_LABELS, PROVIDERS} from "../../atoms/interfaceState"
+import {
+  loadConfigAtom,
+  ModelConfig,
+  verifyModelWithConfig,
+  writeEmptyConfigAtom,
+  writeRawConfigAtom
+} from "../../atoms/configState"
+import {useSetAtom} from "jotai"
 import useDebounce from "../../hooks/useDebounce"
-import { showToastAtom } from "../../atoms/toastState"
+import {showToastAtom} from "../../atoms/toastState"
 import Input from "../../components/Input"
 import Tooltip from "../../components/Tooltip"
 import SelectSearch from "../../components/SelectSearch"
-import { getVerifyStatus } from "../../views/Overlay/Model/ModelVerify"
-import { useNavigate } from "react-router-dom"
-import { ModelProvider } from "../../../types/model"
-import { defaultBaseModel, fieldsToLLMGroup, intoModelConfig } from "../../helper/model"
-import { modelSettingsAtom } from "../../atoms/modelState"
+import {getVerifyStatus} from "../../views/Overlay/Model/ModelVerify"
+import {useNavigate} from "react-router-dom"
+import {ModelProvider} from "../../../types/model"
+import {defaultBaseModel, fieldsToLLMGroup, intoModelConfig} from "../../helper/model"
+import {modelSettingsAtom} from "../../atoms/modelState"
 import Button from "../../components/Button"
 
 interface ModelConfigFormProps {
@@ -215,8 +220,14 @@ const ModelConfigForm: React.FC<ModelConfigFormProps> = ({
     return true
   }
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     writeEmptyConfig()
+
+    // Mark setup as completed even when skipped
+    if (window.ipcRenderer) {
+      await window.ipcRenderer.markSetupCompleted()
+    }
+
     navigate("/")
   }
 

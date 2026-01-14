@@ -1,8 +1,8 @@
 import React from "react"
-import { useAtom } from "jotai"
-import { toastsAtom, hideToastAtom } from "../atoms/toastState"
+import {useAtom} from "jotai"
+import {hideToastAtom, toastsAtom} from "../atoms/toastState"
 import Toast from "./Toast"
-import { createPortal } from "react-dom"
+import {createPortal} from "react-dom"
 
 const GlobalToast = () => {
   const [toasts] = useAtom(toastsAtom)

@@ -1,89 +1,27 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import React, { memo, useEffect, useMemo, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { modelVerifyListAtom } from "../../../../atoms/configState"
-import { showToastAtom } from "../../../../atoms/toastState"
+import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import React, {useEffect, useMemo, useRef, useState} from "react"
+import {useTranslation} from "react-i18next"
+import {modelVerifyListAtom} from "../../../../atoms/configState"
+import {showToastAtom} from "../../../../atoms/toastState"
 import CheckBox from "../../../../components/CheckBox"
-import Dropdown, { DropDownOptionType } from "../../../../components/DropDown"
+import Dropdown, {DropDownOptionType} from "../../../../components/DropDown"
 import PopupConfirm from "../../../../components/PopupConfirm"
 import Tooltip from "../../../../components/Tooltip"
-import { useModelsProvider } from "../ModelsProvider"
-import { getVerifyStatus, ModelVerifyDetail, useModelVerify } from "../ModelVerify"
+import {useModelsProvider} from "../ModelsProvider"
+import {getVerifyStatus, ModelVerifyDetail, useModelVerify} from "../ModelVerify"
 import AdvancedSettingPopup from "./AdvancedSetting"
 import CustomIdPopup from "./CustomId"
-import { BaseModel, ModelProvider, ModelVerifyStatus } from "../../../../../types/model"
-import { isDefaultModelGroup } from "../../../../helper/model"
-import InfoTooltip from "../../../../components/InfoTooltip"
-import { OAP_ROOT_URL } from "../../../../../shared/oap"
-import { OAPModelDescription } from "../../../../../types/oap"
-import { oapModelDescription } from "../../../../ipc"
-import { isProviderIconNoFilter } from "../../../../atoms/interfaceState"
-import { systemThemeAtom, userThemeAtom } from "../../../../atoms/themeState"
-import { openUrl } from "@tauri-apps/plugin-opener"
+import {BaseModel, ModelVerifyStatus} from "../../../../../types/model"
+import {isDefaultModelGroup} from "../../../../helper/model"
+import {systemThemeAtom, userThemeAtom} from "../../../../atoms/themeState"
 import Input from "../../../../components/Input"
 import Button from "../../../../components/Button"
-import { imgPrefix } from "../../../../ipc"
+import {imgPrefix} from "../../../../ipc"
 
 type Props = {
   onClose: () => void
   onSuccess: () => void
 }
-
-const ModelDescription = memo(({ data }: { data?: OAPModelDescription }) => {
-  const userTheme = useAtomValue(userThemeAtom)
-  const systemTheme = useAtomValue(systemThemeAtom)
-
-  if (!data) {
-    return null
-  }
-
-  return (
-    <div className="model-option-description">
-      <div className="model-option-description-header">
-        <div className="header-row">
-          <div className="title-section">
-            <div className="model-option-description-name-wrapper">
-              <img
-                src={`${data.icon.startsWith("http") ? data.icon : `${OAP_ROOT_URL}/${data.icon}`}`}
-                alt={data.provider}
-                className={`oap-model-icon ${isProviderIconNoFilter(data.provider as ModelProvider, userTheme, systemTheme) ? "no-filter" : ""}`}
-              />
-              <div className="model-option-description-name">
-                {data.name}
-              </div>
-            </div>
-            <button className="oap-store-link" onClick={() => openUrl(`${OAP_ROOT_URL}/llm/${data.id}`)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 17 16" fill="none">
-                <path d="M3.83333 14C3.46667 14 3.15278 13.8694 2.89167 13.6083C2.63056 13.3472 2.5 13.0333 2.5 12.6667V3.33333C2.5 2.96667 2.63056 2.65278 2.89167 2.39167C3.15278 2.13056 3.46667 2 3.83333 2H7.83333C8.02222 2 8.18056 2.06389 8.30833 2.19167C8.43611 2.31944 8.5 2.47778 8.5 2.66667C8.5 2.85556 8.43611 3.01389 8.30833 3.14167C8.18056 3.26944 8.02222 3.33333 7.83333 3.33333H3.83333V12.6667H13.1667V8.66667C13.1667 8.47778 13.2306 8.31944 13.3583 8.19167C13.4861 8.06389 13.6444 8 13.8333 8C14.0222 8 14.1806 8.06389 14.3083 8.19167C14.4361 8.31944 14.5 8.47778 14.5 8.66667V12.6667C14.5 13.0333 14.3694 13.3472 14.1083 13.6083C13.8472 13.8694 13.5333 14 13.1667 14H3.83333ZM13.1667 4.26667L7.43333 10C7.31111 10.1222 7.15556 10.1833 6.96667 10.1833C6.77778 10.1833 6.62222 10.1222 6.5 10C6.37778 9.87778 6.31667 9.72222 6.31667 9.53333C6.31667 9.34444 6.37778 9.18889 6.5 9.06667L12.2333 3.33333H10.5C10.3111 3.33333 10.1528 3.26944 10.025 3.14167C9.89722 3.01389 9.83333 2.85556 9.83333 2.66667C9.83333 2.47778 9.89722 2.31944 10.025 2.19167C10.1528 2.06389 10.3111 2 10.5 2H13.8333C14.0222 2 14.1806 2.06389 14.3083 2.19167C14.4361 2.31944 14.5 2.47778 14.5 2.66667V6C14.5 6.18889 14.4361 6.34722 14.3083 6.475C14.1806 6.60278 14.0222 6.66667 13.8333 6.66667C13.6444 6.66667 13.4861 6.60278 13.3583 6.475C13.2306 6.34722 13.1667 6.18889 13.1667 6V4.26667Z" fill="currentColor"/>
-              </svg>
-            </button>
-          </div>
-          <div className="model-option-description-cost">
-            {data.token_cost} / million token
-          </div>
-          {data.extra?.feature && (
-            <div className="model-option-description-feature">
-              {data.extra?.feature}
-            </div>
-          )}
-        </div>
-      </div>
-      {data.extra?.special && (
-        <div className="model-option-description-special">
-          <ul>
-            {data.extra?.special.map((item: any, index: number) => {
-              return (
-                <li key={index}>
-                  {item}
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      )}
-    </div>
-  )
-})
 
 const ModelPopup = ({ onClose, onSuccess }: Props) => {
   const { t } = useTranslation()
@@ -102,7 +40,6 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
   const [allVerifiedList, setAllVerifiedList] = useAtom(modelVerifyListAtom)
   const { verify, abort } = useModelVerify()
   const showToast = useSetAtom(showToastAtom)
-  const [descriptionList, setDescriptionList] = useState<OAPModelDescription[]>([])
   const sortOrderRef = useRef<Map<string, number>>(new Map())
   const [selectedModel, setSelectedModel] = useState<BaseModel | null>(null)
 
@@ -111,16 +48,6 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
   useEffect(() => {
     reloadModelList()
   }, [])
-
-  const getDescriptionList = async (models: BaseModel[]) => {
-    const params = {
-      models: models.map((model: any) => model.model),
-    }
-    const res = await oapModelDescription(params)
-    if (res && res.status === "success" && res.data && res.data.length > 0) {
-      setDescriptionList(res.data)
-    }
-  }
 
   const latestModelsWithVerifyStatus = useMemo(() => {
     const models = getLatestBuffer().models
@@ -263,9 +190,6 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
 
     setIsFetching(true)
     const reloadModels = await fetchModels()
-    if(getLatestBuffer().group?.modelProvider === "oap") {
-      await getDescriptionList(innerModelBuffer)
-    }
     setIsFetching(false)
     if (!reloadModels.length) {
       return
@@ -282,20 +206,6 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
             verifyStatus: existModel?.verifyStatus ?? "unVerified"
           }
         }),
-        // handle expired models
-        ...models.filter(model => !customModels.find(custom => model.model === custom.model) && !reloadModels.find(reloadModel => model.model === reloadModel.model) && model.active).map(m => {
-          const existModel = models.find(model => model.model === m.model)
-          const is_expired = !existModel || !reloadModels.find(reloadModel => reloadModel.model === existModel.model)
-          if(existModel && is_expired) {
-            onVerifyIgnore([existModel])
-          }
-          return {
-            ...m,
-            active: existModel?.active ?? false,
-            verifyStatus: existModel?.verifyStatus ?? "unVerified",
-            expired: is_expired,
-          }
-        })
       ]
 
       updateCheckboxState(ms)
@@ -422,11 +332,10 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
     isVerifying.current = true
 
     const _models = models ?? innerModelBuffer
-    const needVerifyList = _models.length == 1 ? _models.filter(model=> !model.expired) : _models.filter(model =>
-        (model.verifyStatus === "unVerified" ||
+    const needVerifyList = _models.length == 1 ? _models : _models.filter(model =>
+        model.verifyStatus === "unVerified" ||
         model.verifyStatus === "error" ||
-        !model.verifyStatus) &&
-        !model.expired
+        !model.verifyStatus
       )
     setVerifyingCnt(needVerifyList.length)
 
@@ -439,7 +348,7 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
       setInnerModelBuffer(model => {
         return model.map(m => {
           const _detail = detail.find(item => item.name == m.model)
-          return _detail ? { ...m, verifyStatus: m.expired ? "ignore" : _detail.status } :  { ...m, verifyStatus: m.expired ? "ignore" : m.verifyStatus }
+          return _detail ? { ...m, verifyStatus: _detail.status } : m
         })
       })
     }
@@ -476,34 +385,6 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
   }
 
   const verifyStatusNode = (model: BaseModel) => {
-    if(model.expired) {
-      return (
-        <Tooltip
-          content={t("models.expiredInfo")}
-          align="start"
-        >
-          <div className="verify-status">
-            <div className="verify-status-text verify-status-error">
-              {t("models.expired")}
-                <div className="verify-status-icon-wrapper">
-                <svg className="warning-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256">
-                  <path
-                    d="M128 28 C150 42 178 48 202 54 V132 C202 180 170 214 128 232 C86 214 54 180 54 132 V54 C78 48 106 42 128 28 Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="14"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                  />
-                  <rect x="120" y="74" width="16" height="74" rx="8" fill="currentColor"/>
-                  <circle cx="128" cy="172" r="10" fill="currentColor"/>
-                </svg>
-                </div>
-            </div>
-          </div>
-        </Tooltip>
-      )
-    }
     switch(model.verifyStatus) {
       case "unSupportModel":
       case "unSupportTool":
@@ -548,7 +429,7 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
         return (
           <Tooltip
             content={t("models.verifyStatusSuccess")}
-            disabled={getLatestBuffer().group?.modelProvider === "oap"}
+            disabled={false}
           >
             <div className="verify-status-icon-wrapper">
               <svg className="correct-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" width="20" height="20">
@@ -618,30 +499,24 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
       },
     })
 
-    if(getLatestBuffer().group?.modelProvider === "oap") {
-      return menu
-    }
-
     // verify model
-    if(!model.expired) {
-      menu["root"].subOptions.push({
-        label:
-          <div className="model-option-verify-menu-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M7 2.5L1.06389 4.79879C1.02538 4.8137 1 4.85075 1 4.89204V11.9315C1 11.9728 1.02538 12.0098 1.06389 12.0247L7 14.3235" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M7.5 10.5V7.5L12.8521 4.58066C12.9188 4.54432 13 4.59255 13 4.66845V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M1 5L7.5 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M7 2.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <circle cx="15.5" cy="15.5" r="5.5" stroke="currentColor" strokeWidth="2"/>
-              <path d="M13 15.1448L14.7014 17L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            {t("models.verifyMenu.verify")}
-          </div>,
-        onClick: () => {
-          onVerifyConfirm([model])
-        }
-      })
-    }
+    menu["root"].subOptions.push({
+      label:
+        <div className="model-option-verify-menu-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M7 2.5L1.06389 4.79879C1.02538 4.8137 1 4.85075 1 4.89204V11.9315C1 11.9728 1.02538 12.0098 1.06389 12.0247L7 14.3235" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M7.5 10.5V7.5L12.8521 4.58066C12.9188 4.54432 13 4.59255 13 4.66845V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M1 5L7.5 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M7 2.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="15.5" cy="15.5" r="5.5" stroke="currentColor" strokeWidth="2"/>
+            <path d="M13 15.1448L14.7014 17L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          {t("models.verifyMenu.verify")}
+        </div>,
+      onClick: () => {
+        onVerifyConfirm([model])
+      }
+    })
 
     // ignore verify model
     if(status !== "ignore" && status !== "success"){
@@ -830,19 +705,13 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
                 </svg>
               }
             />
-            {
-              getLatestBuffer().group?.modelProvider !== "oap" && (
-                <>
-                  <div
-                    className="models-reload-btn"
-                    onClick={() => reloadModelList()}
-                  >
-                    {t("models.reloadModelList")}
-                  </div>
-                  <CustomIdPopup onAddCustomModelID={onAddCustomModelID} />
-                </>
-              )
-            }
+            <div
+              className="models-reload-btn"
+              onClick={() => reloadModelList()}
+            >
+              {t("models.reloadModelList")}
+            </div>
+            <CustomIdPopup onAddCustomModelID={onAddCustomModelID} />
           </div>
         </div>
         {providerFilter.length > 0 && (
@@ -950,27 +819,6 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
                           <div className="model-option-name">
                             {model.model}
                           </div>
-                          {getLatestBuffer().group?.modelProvider === "oap" && descriptionList.find(d => d.model_id === model.model) && (
-                            <InfoTooltip
-                              side="bottom"
-                              className="model-option-description-tooltip"
-                              content={<ModelDescription data={descriptionList.find(d => d.model_id === model.model)} />}
-                            >
-                              <div className="model-option-name-hint">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 23 22" width="18" height="18">
-                                  <g clipPath="url(#ic_information_svg__a)">
-                                    <circle cx="11.5" cy="11" r="10.25" stroke="currentColor" strokeWidth="1.5"></circle>
-                                    <path fill="currentColor" d="M9.928 13.596h3.181c-.126-2.062 2.516-2.63 2.516-5.173 0-2.01-1.6-3.677-4.223-3.608-2.229.051-4.08 1.288-4.026 3.9h2.714c0-.824.593-1.168 1.222-1.185.593 0 1.258.326 1.222.962-.144 1.942-2.911 2.389-2.606 5.104Zm1.582 3.591c.988 0 1.779-.618 1.779-1.563 0-.963-.791-1.581-1.78-1.581-.97 0-1.76.618-1.76 1.58 0 .946.79 1.565 1.76 1.565Z"></path>
-                                  </g>
-                                  <defs>
-                                    <clipPath id="ic_information_svg__a">
-                                      <path fill="currentColor" d="M.5 0h22v22H.5z"></path>
-                                    </clipPath>
-                                  </defs>
-                                </svg>
-                              </div>
-                            </InfoTooltip>
-                          )}
                         </div>
                         <div className="model-option-hint">
                           {verifyStatusNode(model)}

@@ -1,8 +1,7 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
-import { forwardRef, useLayoutEffect, useRef, useState } from "react"
+import React, {forwardRef, useLayoutEffect, useRef, useState} from "react"
 import "@/styles/components/_SelectSearch.scss"
 import WrappedInput from "./WrappedInput"
-import React from "react"
 
 interface Props<T = string>{
   options: {

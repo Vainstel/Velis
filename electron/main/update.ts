@@ -7,24 +7,20 @@ import type {
 } from "electron-updater"
 import path from "node:path"
 import { cwd } from "./constant"
-import { CLIENT_ID } from "./oap"
-import { OAP_ROOT_URL } from "../../shared/oap"
+import { CLIENT_ID } from "./client-id"
 
 const { autoUpdater } = createRequire(import.meta.url)("electron-updater")
 
-// Update server configuration
-const PRIMARY_UPDATE_SERVER = `${OAP_ROOT_URL}/api/v1/version`
-const FALLBACK_CONFIG = {
+// Update server configuration - using GitHub releases only
+const UPDATE_SERVER_CONFIG = {
   provider: "github",
-  owner: "OpenAgentPlatform",
-  repo: "Dive"
+  owner: "dive-app",
+  repo: "dive"
 }
 
 // Auto update check configuration
 const CHECK_INTERVAL = 60 * 60 * 1000 // 1 hour in milliseconds
 const INITIAL_DELAY = 3 * 1000 // 3 seconds delay for first check
-
-let useFallback = false
 
 export function update(win: Electron.BrowserWindow) {
 
@@ -36,6 +32,9 @@ export function update(win: Electron.BrowserWindow) {
   if (process.env.DEBUG) {
     autoUpdater.updateConfigPath = path.join(cwd, "dev-app-update.yml")
   }
+
+  // Configure update server
+  configureUpdateServer()
 
   // Setup automatic update checking
   if (app.isPackaged) {
@@ -53,9 +52,6 @@ export function update(win: Electron.BrowserWindow) {
   async function performAutoUpdateCheck() {
     try {
       console.log("Performing automatic update check...")
-      if (!useFallback) {
-        await configurePrimaryServer()
-      }
       await autoUpdater.checkForUpdatesAndNotify()
     } catch (error) {
       console.error("Auto update check failed:", error)
@@ -74,7 +70,7 @@ export function update(win: Electron.BrowserWindow) {
     win.webContents.send("update-can-available", { update: false, version: app.getVersion(), newVersion: arg?.version })
   })
 
-  // Checking for updates with fallback mechanism
+  // Checking for updates
   ipcMain.handle("check-update", async () => {
     if (!app.isPackaged) {
       const error = new Error("The update feature is only available after the package.")
@@ -82,30 +78,9 @@ export function update(win: Electron.BrowserWindow) {
     }
 
     try {
-      // Try primary server first
-      if (!useFallback) {
-        await configurePrimaryServer()
-      }
-
       return await autoUpdater.checkForUpdatesAndNotify()
     } catch (error) {
-      console.error("Primary update server failed:", error)
-
-      // If primary server fails and we haven't tried fallback yet
-      if (!useFallback) {
-        console.log("Switching to fallback update server (GitHub)")
-        useFallback = true
-        configureFallbackServer()
-
-        try {
-          // Try fallback server (GitHub)
-          return await autoUpdater.checkForUpdatesAndNotify()
-        } catch (fallbackError) {
-          console.error("Fallback update server also failed:", fallbackError)
-          return { message: "All update servers failed", error: fallbackError }
-        }
-      }
-
+      console.error("Update check failed:", error)
       return { message: "Network error", error }
     }
   })
@@ -145,25 +120,12 @@ function startDownload(
   autoUpdater.downloadUpdate()
 }
 
-// Configure primary update server (custom server)
-async function configurePrimaryServer() {
-  console.log("Configuring primary update server:", PRIMARY_UPDATE_SERVER)
-
-  // Set custom request headers
+// Configure update server (GitHub releases)
+function configureUpdateServer() {
+  console.log("Configuring update server: GitHub")
   autoUpdater.requestHeaders = {
     "User-Agent": `DiveDesktop/${app.getVersion()}`,
     "X-Dive-Id": CLIENT_ID,
   }
-
-  autoUpdater.setFeedURL({
-    provider: "generic",
-    url: PRIMARY_UPDATE_SERVER,
-  })
-}
-
-// Configure fallback update server (GitHub releases)
-function configureFallbackServer() {
-  console.log("Configuring fallback update server: GitHub")
-  autoUpdater.requestHeaders = {}
-  autoUpdater.setFeedURL(FALLBACK_CONFIG)
+  autoUpdater.setFeedURL(UPDATE_SERVER_CONFIG)
 }

@@ -14,8 +14,8 @@
     {
       "identifier": "fs:scope",
       "allow": [
-        { "path": "$HOME/.dive" },
-        { "path": "$HOME/.dive/**/*" }
+        { "path": "$HOME/.velis" },
+        { "path": "$HOME/.velis/**/*" }
       ]
     },
     "fs:allow-write-text-file",

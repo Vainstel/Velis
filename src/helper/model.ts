@@ -1,6 +1,6 @@
 import type { BaseModel, BedrockModelGroup, CommonConfiguration, DefaultModelGroup, LLMGroup, ModelGroupSetting, ModelProvider } from "../../types/model"
 import { ModelConfig, ModelConfigMap, ModelParameter, RawModelConfig } from "../atoms/configState"
-import { defaultInterface, OPEAI_COMPATIBLE_PROVIDER } from "../atoms/interfaceState"
+import { defaultInterface } from "../atoms/interfaceState"
 import isMatch from "lodash/isMatch"
 import merge from "lodash/merge"
 import { getVerifyKey, getVerifyKeyFromModelConfig } from "./verify"
@@ -83,7 +83,7 @@ export function fromRawConfigToModelGroupSetting(rawConfig: RawModelConfig): Mod
       model.model = modelName!
       model.toolsInPrompt = !!toolsInPrompt
       model.disableStreaming = !!disable_streaming
-      model.verifyStatus = config.modelProvider === "oap" ? "success" : getVerifyStatus(allVerifiedList?.[getVerifyKeyFromModelConfig(config)] ?? null)
+      model.verifyStatus = getVerifyStatus(allVerifiedList?.[getVerifyKeyFromModelConfig(config)] ?? null)
 
       if (model.model) {
         group.models.push(model)
@@ -161,8 +161,6 @@ export function matchOpenaiCompatible(baseURL: string): ModelProvider {
       return "nvdia"
     case defaultInterface.perplexity["baseURL"].default:
       return "perplexity"
-    case defaultInterface.cerebras["baseURL"].default:
-      return "cerebras"
     default:
       return "openai_compatible"
   }
@@ -278,7 +276,15 @@ export function intoModelConfig(group: LLMGroup, model: BaseModel): ModelConfig 
   modelConfig.disable_streaming = disableStreaming
   modelConfig.toolsInPrompt = status === "successInPrompt"
   modelConfig.model = modelName
-  modelConfig.modelProvider = OPEAI_COMPATIBLE_PROVIDER.includes(group.modelProvider) ? "openai" : group.modelProvider
+  modelConfig.modelProvider = [
+    "openai_compatible",
+    "lmstudio",
+    "openrouter",
+    "groq",
+    "grok",
+    "nvdia",
+    "perplexity",
+  ].includes(group.modelProvider) ? "openai" : group.modelProvider
 
   if (apiKey) {
     modelConfig.apiKey = apiKey

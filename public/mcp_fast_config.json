@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "atlassian": {
+      "transport": "sse",
+      "url": "https://mcp.atlassian.com/v1/sse",
+      "enabled": true
+    },
+    "airtable": {
+      "args": [
+        "-y",
+        "airtable-mcp-server"
+      ],
+      "blocked_tools": [
+        "create_field",
+        "update_field",
+        "create_table",
+        "update_table",
+        "create_record",
+        "update_records",
+        "delete_records"
+      ],
+      "command": "npx",
+      "enabled": true,
+      "env": {
+        "AIRTABLE_API_KEY": ""
+      },
+      "type": "stdio"
+    }
+  }
+}

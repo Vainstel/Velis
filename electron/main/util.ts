@@ -59,7 +59,7 @@ export function setNodePath() {
 }
 
 export function getLatestVersion(): Promise<string> {
-  return fetch("https://api.github.com/repos/OpenAgentPlatform/Dive/releases/latest")
+  return fetch("https://api.github.com/repos/dive-app/dive/releases/latest")
     .then(res => res.json())
     .then(data => data.tag_name.slice(1))
 }
@@ -94,7 +94,7 @@ export function compareFilesAndReplace(filePath1: string, filePath2: string) {
   }
 }
 
-export function getUnixSystemPath(): Promise<string> {
+export function getDarwinSystemPath(): Promise<string> {
   return new Promise((resolve, reject) => {
     exec("echo $PATH", (error, stdout, stderr) => {
       if (error) {

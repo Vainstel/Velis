@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "Kenar çubuğunu aç",
     "closeSidebar": "Kenar çubuğunu kapat"
   },
@@ -33,7 +33,6 @@
     "retry": "Yeniden Dene",
     "noModelAlert": "Kullanılabilir model yok",
     "noModelBanner": "Kullanılabilir model yok, lütfen önce bir model seçin",
-    "onLimit": "{{plan}} planı kullanım limitine ulaştınız, oap modelleri kullanılamaz",
     "modelSettings": "Model Ayarları",
     "copy": "Kopyala",
     "copied": "Kopyalandı",
@@ -53,24 +52,6 @@
       "enableToast": "Araç Çağrıları etkinleştirildi",
       "enable": "Araç Çağrılarını Etkinleştir"
     },
-    "reAuthorize": {
-      "title": "Araç çağrılırken yetkilendirme hatası oluştu",
-      "description": "Bu araç için yetkilendirme süresi dolmuş veya iptal edilmiş, bu nedenle araç kullanılamıyor. Tam işlevselliği geri yüklemek için yeni bir yetkilendirme gereklidir.",
-      "confirm": "Yeniden yetkilendir",
-      "stopChange": "Yetkilendirme devam ediyor, yapılandırmayı değiştirmeyin"
-    },
-    "elicitation": {
-      "title": "Giriş gerekli",
-      "selectOption": "Bir seçenek seçin",
-      "decline": "Reddet",
-      "submit": "Gönder",
-      "confirmTitle": "Onay gerekli",
-      "confirm": "Onayla",
-      "pendingRequests": "{{count}} bekleyen istek",
-      "pendingRequests_one": "{{count}} bekleyen istek",
-      "acceptAll": "Tümünü kabul et",
-      "declineAll": "Tümünü reddet"
-    },
     "tokens": {
       "tooltip": "Giriş Token Sayısı",
       "model": "Model",
@@ -78,13 +59,6 @@
       "output": "Çıkış",
       "count": "Token Sayısı",
       "total": "Toplam Kullanım",
-      "composition": "Giriş Token Bileşim Yapısı",
-      "compositionAlt": "Bu token sayısı Langchain tarafından tahmin edilmiştir, gerçek kullanım biraz farklılık gösterebilir",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "İlk gecikme {{time}} ms",
       "firstDelayDesc": "İlk gecikme: AI'nın ilk karakteri oluşturmaya başlaması için geçen süre",
       "generationRate": "Saniyede {{time}} token",
@@ -92,7 +66,7 @@
     }
   },
   "welcome": {
-    "title": "Dive AI'ya Hoş Geldiniz",
+    "title": "Velis AI'ya Hoş Geldiniz",
     "subtitle": "AI konuşmanızı başlatın",
     "startChat": "Sohbeti Başlat"
   },
@@ -122,7 +96,6 @@
     "models": "Model Ayarları",
     "system": "Sistem Ayarları",
     "manageAndSettings": "Yönetim ve Ayarlar",
-    "OAPhub": "OAPhub",
     "signOut": "Çıkış Yap",
     "chat": {
       "starredChat": "Favoriler",
@@ -184,20 +157,12 @@
     "deleteAllTitle": "Tüm araçları silmeyi onayla?",
     "fieldTitle": "Alan",
     "fieldTitleAlt": "Alanlar genellikle çoğu ihtiyacı karşılar, ancak MCP ayarlarınız ek alanlar veya farklı türler gerektiriyorsa, programınızın gereksinimlerini karşılamak için sağdaki JSON metin alanında doğrudan düzenleyebilirsiniz",
-    "addHeaders": "Headers Ekle",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "Varsayılan 600 saniyedir, maksimum sınır yoktur.",
-    "toolCallTimeoutPlaceholder": "Tool call Timeout girin...",
-    "toolCallTimeoutError": "Lütfen 0 veya daha büyük herhangi bir ondalık sayı girin",
-    "headersKey": "Headers adını girin (Key)...",
-    "headersValue": "Headers değerini girin (Value)...",
     "initialTimeoutAlt": "İlk bağlantı bekleme süresi varsayılan olarak 10 saniye olarak ayarlanmıştır, ancak 10 saniye veya daha fazla herhangi bir ondalık sayıya ayarlanabilir. Saniye sayısında sınır yoktur. Sunucunun bağlantısı yavaşsa bu değeri ayarlamanız önerilir.",
     "initialTimeoutPlaceholder": "İlk Zaman Aşımını Girin...",
     "initialTimeoutError": "Lütfen 10'dan büyük veya eşit bir sayı girin",
     "jsonDesc": "Lütfen alana MCP Sunucu JSON'unu girin veya yapıştırın",
     "addArg": "Argüman Ekle",
     "addEnv": "Ortam Değişkeni Ekle",
-    "ignoreVerification": "SSL/TLS doğrulamasını yoksay",
     "jsonFormatError": {
       "addFormat": "Yapılandırma format hatası, lütfen formatı kontrol edin ve düzeltin",
       "format": "{{mcp}} yapılandırma format hatası, lütfen formatı kontrol edin ve düzeltin",
@@ -222,9 +187,7 @@
       "initialTimeout": "Araç {{mcp}}: initialTimeout alanı bir ondalık sayı olmalıdır",
       "range": "Araç {{mcp}}: {{field}} alan değeri aralık dışında, lütfen değeri kontrol edin ve düzeltin",
       "minRange": "Araç {{mcp}}: {{field}} alanı {{value}} değerinden büyük veya eşit olmalıdır",
-      "maxRange": "Araç {{mcp}}: {{field}} alanı {{value}} değerinden küçük veya eşit olmalıdır",
-      "urlRequiredstreamable": "Araç {{mcp}}: Streamable taşıması için URL gereklidir",
-      "urlRequiredsse": "Araç {{mcp}}: SSE taşıması için URL gereklidir"
+      "maxRange": "Araç {{mcp}}: {{field}} alanı {{value}} değerinden küçük veya eşit olmalıdır"
     },
     "namePlaceholder": "Ad girin...",
     "commandPlaceholder": "Komut girin...",
@@ -240,18 +203,11 @@
     "logTitle": "UVX Komutunu Çalıştır",
     "logProcessing": "İşleniyor...",
     "no_tool_title": "Kullanılabilir MCP Sunucusu Yok",
-    "no_oap_tool_message": {
-      "all": "Lütfen kullanmak için bir OAP MCP Sunucusu seçin veya özel bir MCP Sunucusu ekleyin.",
-      "oap": "Lütfen kullanmak için bir OAP MCP Sunucusu seçin.",
-      "custom": "Lütfen özel bir MCP Sunucusu ekleyin."
-    },
     "no_tool_message": "Lütfen bir MCP Sunucusu ekleyin.",
     "tab": {
       "all": "Tüm Araçlar",
-      "oap": "OAP Araçları",
       "custom": "Özel Araçlar"
     },
-    "oapStoreLinkAlt": "Detayları Görüntüle",
     "subToolsCount": "Etkinleştirilen Araçlar: {{count}} / {{total}}",
     "disableAll": "Tümünü devre dışı bırak",
     "enableAll": "Tümünü etkinleştir",
@@ -267,28 +223,6 @@
     "reload": {
       "headerBtn": "Yeniden Yükle",
       "headerBtnAlt": "MCP Araçlarını Yeniden Yükle ve Güncelle"
-    },
-    "oap": {
-      "type": {
-        "all": "Tüm Araçlar",
-        "base": "Yalnızca Base Göster",
-        "pro": "Yalnızca Pro Göster",
-        "official": "Yalnızca Official Göster"
-      },
-      "sort": {
-        "title": "Sırala",
-        "popular": "Popüler",
-        "new": "Yeni"
-      },
-      "tag": "Kategori",
-      "show_more": "Daha Fazla",
-      "no_search_data_title": "MCP Aracı bulunamadı",
-      "no_search_data": "Arama sonucu bulunamadı, lütfen arama kelimesini temizleyin veya filtre koşullarını ayarlayın.",
-      "clear_filter": "Filtreyi Temizle",
-      "hint": "Yüksek seviye MCP Sunucuları kurulum için Pro sürümüne yükseltme gerektirir",
-      "high_cost_title": "Yüksek Maliyetli MCP Sunucularını Etkinleştir",
-      "high_cost_desc": "Çok fazla jeton tüketen MCP Sunucuları seçtiniz. Lütfen plan kullanımınızın yeterli olup olmadığını kontrol edin.",
-      "headerBtnAlt": "OAP MCP Araçlarını Ekle / Görüntüle"
     },
     "custom": {
       "headerBtn": "Yapılandırma Ekle / Düzenle",
@@ -437,14 +371,11 @@
     "reasoningLevelTooltip": "Düşük, hızlı bir yanıtı temsil eder, sonuçlara odaklanır ve ek ayrıntılar olmadan doğrudan ve basit bir akıl yürütme ile. Orta, yeterli mantıksal açıklama ile bir yanıt sağlar, anahtar bilgileri kapsar. Yüksek, yapılandırılmış ve ayrıntılı analiz ve açıklama ile derin bir yanıt sunar.",
     "tokenBudgetDescription": "Akıl yürütme değerini ayarlayın ({{min}}~{{max}})",
     "parameterVerify": "Parametre Doğrulama",
-    "expired": "Bu model resmi olarak kullanımdan kaldırıldı",
-    "expiredInfo": "Bu model artık resmi listede değil ve yalnızca yerel geçmiş olarak görüntüleniyor. Düzgün çalışmayabilir veya güncellenemeyebilir. İşareti kaldırırsanız, kaldırılacak ve listeden kurtarılamayacaktır.",
     "verifyErrorInfo": "Doğrulama Hatası Ayrıntıları",
     "verifyErrorMsg": "Model doğrulama sırasında herhangi bir araç kullanmadı, bu destek eksikliği veya tetiklenmemesi nedeniyle olabilir. Bu nedenle araçları destekleyip desteklemediğini doğrulamak mümkün değil.",
     "verifyStatusSuccess": "Model doğrulama başarılı, orijinal yapılandırma ile etkinleştirildi",
     "verifyStatusSuccessInPrompt": "Model doğrulama başarılı, MCP İstemler ile etkinleştirildi",
     "verifyUnexpectedFailed": "Model doğrulama başarısız, bilinmeyen bir hata oluştu, lütfen daha sonra tekrar deneyin",
-    "oapUsageLimit": "Kullanım limiti ulaşıldı, geçici olarak kullanılamıyor",
     "providerFilter": {
       "Alt": "Kullanmak istediğiniz model popüler model seçeneklerinde yoksa, onu bulmak için arama işlevini kullanabilirsiniz.",
       "Clear": "Temizle"
@@ -461,33 +392,35 @@
     "autoDownload": "Otomatik Güncelleme İndirme",
     "autoDownloadDescription": "Kullanıcı yeniden başlattığında veya menü sayfasındaki \"Yükselt\" düğmesine tıkladığında DIVE'ın yeni sürümünü otomatik olarak indirin, yeni sürüm etkinleştirilecek",
     "autoLaunch": "Otomatik Başlatma",
-    "autoLaunchDescription": "Sistem başladığında Dive AI'yı otomatik olarak başlat",
+    "autoLaunchDescription": "Sistem başladığında Velis AI'yı otomatik olarak başlat",
     "minimalToTray": "Sistem tepsisine küçült",
     "minimalToTrayDescription": "Pencere kapatıldığında program tamamen çıkmak yerine sistem tepsisine küçültülecek",
-    "loginTitle": "OAP Girişi",
-    "loginDescription": "Giriş yapmak için OpenAgentPlatform kullanın, LLM'leri, AI Ajanlarını ve MCP Sunucularını kolayca bağlamak için teknik geçmişe gerek yok — Akıllı çözümleri şimdi deneyimleyin!",
     "personalInformationTitle": "Kişisel Bilgiler",
-    "defaultSystemPrompt": "Dive Varsayılan Sistem İstemi",
-    "defaultSystemPromptDescription": "Dive Varsayılan Sistem İstemi, sohbet için varsayılan sistem istemi olarak kullanılır. LLM'ye Dive sohbetinin KaTeX / Markdown / Mermaid vb.'yi desteklediğini söyler. Bu özellik belirli jetonları tüketir, bu da yanıtı sistem istemi olmayan isteme göre daha yavaş hale getirebilir. Öte yandan, devre dışı bırakılırsa LLM'nin yanıt kalitesi azalabilir",
-    "usageAnalytics": "Görüntülemek için OAP Hub'daki Kontrol Paneli sayfasına gidin",
+    "defaultSystemPrompt": "Velis AI Varsayılan Sistem İstemi",
+    "defaultSystemPromptDescription": "Velis AI Varsayılan Sistem İstemi, sohbet için varsayılan sistem istemi olarak kullanılır. LLM'ye Dive sohbetinin KaTeX / Markdown / Mermaid vb.'yi desteklediğini söyler. Bu özellik belirli jetonları tüketir, bu da yanıtı sistem istemi olmayan isteme göre daha yavaş hale getirebilir. Öte yandan, devre dışı bırakılırsa LLM'nin yanıt kalitesi azalabilir",
     "usageAnalyticsTitle": "Kullanım Analitikleri",
-    "userEdit": "Değişiklik yapmak için OAP Hub'daki Hesap sayfasına gidin",
     "planSectionTitle": "Mevcut plan kullanımı",
     "subscriptionDate": "Abonelik tarihi",
     "remainingUsage": "Kalan kullanım",
     "usageWarningTitle": "Jeton kullanım limiti ulaşıldı.",
-    "usageWarning": "Kota gelecek ay sıfırlanır veya daha fazla kullanım için kredi paketi satın alın. Temel MCP sunucularının sınırlı sağlanması.",
-    "BaseUsageWarning": "Temel MCP sunucuları: {{mcpLimit}} çağrı/saat. Diğer MCP sunucularını kullanmak için <planLink>fatura sayfasından</planLink> planınızı yükseltin.",
+    "usageWarning": "Kota gelecek ay sıfırlanır veya daha fazla kullanım için token paketleri satın alın. Temel modeller ve temel MCP hala kullanılabilir.",
+    "BaseUsageWarning": "Temel modeller: {{callLimit}} çağrı / {{callUnit}} saat | Temel MCP sunucuları: {{mcpLimit}} çağrı/saat. Diğer modelleri ve MCP'leri kullanmak için lütfen planınızı <planLink>plan sayfasından</planLink> yükseltin.",
     "customPromptDescription": "Ek özel talimatlara ihtiyacınız varsa, lütfen ayarlamak için aşağıdaki \"Özel İstem\" işlevine tıklayın.",
     "customPromptButton": "Özel İstem",
     "tokenPackageTitle": "Jeton paketi kullanımı",
     "tokenPackageHint": "Jeton paketlerinin son kullanma tarihi yoktur ve yalnızca aylık plan kotası tükendikten sonra kullanılacaktır.",
     "tokenPackageRemainingUsage": "Kalan kullanım",
     "tokenPackageWarningTitle": "Jeton kotası tükendi.",
-    "tokenPackageWarning": "OAPhub <planLink>Kontrol Paneli sayfasında</planLink> daha fazla jeton kullanımı doldurabilirsiniz.",
     "skipTlsVerifyWarning": "Güvenlik uyarısı: Sertifika doğrulamasını yoksaymak bağlantı güvenliğini azaltabilir. Güvenilir ağ ortamlarında kullanılması önerilir.",
+    "allRateLimitReachedTitle": "Model ve MCP sunucu çağrı sınırına ulaşıldı.",
+    "llmRateLimitReachedTitle": "Model çağrı sınırına ulaşıldı.",
     "mcpRateLimitReachedTitle": "MCP sunucu çağrı sınırına ulaşıldı.",
-    "rateLimitReachedDescription": "Yeni istekler yapmadan önce lütfen bekleyin; kota otomatik olarak geri yüklenecektir."
+    "rateLimitReachedDescription": "Yeni istekler yapmadan önce lütfen bekleyin; kota otomatik olarak geri yüklenecektir.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "Panoya kopyalandı",
@@ -522,14 +455,10 @@
     "clickToInstall": "Güncellemeyi yüklemek için tıklayın"
   },
   "login": {
-    "subtitle": "Dive AI, işlev çağrılarını destekleyen çeşitli büyük dil modellerini sorunsuz bir şekilde entegre eden açık kaynaklı bir masaüstü uygulamasıdır. Temiz ve sezgisel arayüzü sayesinde günlük sorulardan profesyonel görevlere kadar en ileri AI ile kolayca konuşabilir, kesin yanıtlar alabilir ve onu akıllı asistanınız yapabilirsiniz.",
+    "subtitle": "Velis AI, işlev çağrılarını destekleyen çeşitli büyük dil modellerini sorunsuz bir şekilde entegre eden açık kaynaklı bir masaüstü uygulamasıdır. Temiz ve sezgisel arayüzü sayesinde günlük sorulardan profesyonel görevlere kadar en ileri AI ile kolayca konuşabilir, kesin yanıtlar alabilir ve onu akıllı asistanınız yapabilirsiniz.",
     "title1": "Kendi Hazırladığınız Modelleri Kullanın",
     "description1": "İleri düzey AI uzmanları için uygundur. Yerel Ollama, llama.cpp veya Openrouter, OpenAI, Anthropic veya diğer AI şirketlerinden uzak LLM API'leri olsun, kendi yapılandırmanız hazırsa lütfen bu seçeneği kullanın.",
-    "button1": "Model Ayarlarına Git",
-    "title2": "OpenAgentPlatform'u Kullanın",
-    "description2": "OAP, teknik uzmanlık gerektirmeden LLM'leri, AI Ajanlarını ve MCP Sunucularını bağlayarak herkesin en gelişmiş AI hizmetlerini kullanmasını kolaylaştırır. AI'nın sınırsız olanaklarını keşfedin ve akıllı çözümleri şimdi deneyimleyin.",
-    "button2": "OAP için Kayıt Ol",
-    "button3": "OAP'ye Giriş Yap"
+    "button1": "Model Ayarlarına Git"
   },
   "InstallHostDependencies": {
     "title": "Ana Bilgisayar Bağımlılıkları İndiriliyor...",

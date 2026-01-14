@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
+import {useEffect, useRef, useState} from "react"
+import {useTranslation} from "react-i18next"
 import PopupConfirm from "../../../../components/PopupConfirm"
-import { useModelsProvider } from "../ModelsProvider"
+import {useModelsProvider} from "../ModelsProvider"
 import Input from "../../../../components/Input"
 
 type Props = {

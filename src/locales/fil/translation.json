@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "Buksan ang sidebar",
     "closeSidebar": "Isara ang sidebar"
   },
@@ -33,7 +33,6 @@
     "retry": "Subukan Muli",
     "noModelAlert": "Walang available na mga modelo",
     "noModelBanner": "Walang available na mga modelo, pumili muna ng modelo",
-    "onLimit": "Naabot mo na ang limitasyon sa paggamit ng {{plan}} plan, hindi magagamit ang oap models",
     "modelSettings": "Mga Setting ng Modelo",
     "copy": "Kopyahin",
     "copied": "Nakopya",
@@ -53,24 +52,6 @@
       "enableToast": "Na-enable ang Tool Calls",
       "enable": "I-enable ang Tool Calls"
     },
-    "reAuthorize": {
-      "title": "Naganap ang error sa authorization habang tinatawag ang tool",
-      "description": "Nag-expire na o na-cancel ang authorization para sa tool na ito, kaya hindi na magagamit ang tool. Kailangan ng bagong authorization para maibalik ang buong functionality.",
-      "confirm": "Mag-reauthorize",
-      "stopChange": "Nagp-proseso ang authorization, huwag baguhin ang configuration"
-    },
-    "elicitation": {
-      "title": "Kailangan ng Input",
-      "selectOption": "Pumili ng opsyon",
-      "decline": "Tanggihan",
-      "submit": "Isumite",
-      "confirmTitle": "Kailangan ng Kumpirmasyon",
-      "confirm": "Kumpirmahin",
-      "pendingRequests": "{{count}} mga kahilingang nakabinbin",
-      "pendingRequests_one": "{{count}} kahilingang nakabinbin",
-      "acceptAll": "Tanggapin lahat",
-      "declineAll": "Tanggihan lahat"
-    },
     "tokens": {
       "tooltip": "Bilang ng Input Token",
       "model": "Model",
@@ -78,13 +59,6 @@
       "output": "Output",
       "count": "Bilang ng Token",
       "total": "Kabuuang Paggamit",
-      "composition": "Istraktura ng Komposisyon ng Input Token",
-      "compositionAlt": "Ang bilang ng token na ito ay tinantya ng Langchain, ang aktwal na paggamit ay maaaring bahagyang magkaiba",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "Unang pagkaantala {{time}} ms",
       "firstDelayDesc": "Unang pagkaantala: Oras para magsimulang lumikha ang AI ng unang karakter",
       "generationRate": "{{time}} tokens bawat segundo",
@@ -92,7 +66,7 @@
     }
   },
   "welcome": {
-    "title": "Maligayang pagdating sa Dive AI",
+    "title": "Maligayang pagdating sa Velis AI",
     "subtitle": "Simulan ang iyong AI conversation",
     "startChat": "Magsimula ng Chat"
   },
@@ -122,7 +96,6 @@
     "models": "Mga Setting ng Modelo",
     "system": "Mga Setting ng Sistema",
     "manageAndSettings": "Pamamahala at Mga Setting",
-    "OAPhub": "OAPhub",
     "signOut": "Mag-sign Out",
     "chat": {
       "starredChat": "Mga Paborito",
@@ -189,17 +162,7 @@
     "initialTimeoutError": "Mangyaring maglagay ng numero na mas malaki o katumbas ng 10",
     "jsonDesc": "Mangyaring maglagay o mag-paste ng MCP Server Json sa field",
     "addArg": "Magdagdag ng Argument",
-    "argsTitleAlt": "Mga Argument",
     "addEnv": "Magdagdag ng Environment Variable",
-    "envTitleAlt": "Environment Variable",
-    "ignoreVerification": "Huwag pansinin ang SSL/TLS verification",
-    "addHeaders": "Magdagdag ng Headers",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "Default ay 600 segundo, walang maximum na limitasyon.",
-    "toolCallTimeoutPlaceholder": "Ilagay ang Tool call Timeout...",
-    "toolCallTimeoutError": "Mangyaring maglagay ng anumang float number na mas malaki o katumbas ng 0",
-    "headersKey": "Ilagay ang pangalan ng Headers (Key)...",
-    "headersValue": "Ilagay ang halaga ng Headers (Value)...",
     "jsonFormatError": {
       "addFormat": "May error sa format ng configuration, pakisuri at itama ang format",
       "format": "May error sa format ng configuration ng {{mcp}}, pakisuri at itama ang format",
@@ -224,9 +187,7 @@
       "initialTimeout": "Tool {{mcp}}: Ang field initialTimeout ay dapat na float",
       "range": "Tool {{mcp}}: Ang value ng field {{field}} ay wala sa saklaw, pakisuri at itama ang value",
       "minRange": "Tool {{mcp}}: Ang field {{field}} ay dapat na mas malaki o katumbas ng {{value}}",
-      "maxRange": "Tool {{mcp}}: Ang field {{field}} ay dapat na mas maliit o katumbas ng {{value}}",
-      "urlRequiredstreamable": "Tool {{mcp}}: Kinakailangan ang URL para sa streamable transport",
-      "urlRequiredsse": "Tool {{mcp}}: Kinakailangan ang URL para sa SSE transport"
+      "maxRange": "Tool {{mcp}}: Ang field {{field}} ay dapat na mas maliit o katumbas ng {{value}}"
     },
     "namePlaceholder": "Ilagay ang pangalan...",
     "commandPlaceholder": "Ilagay ang command...",
@@ -242,18 +203,11 @@
     "logTitle": "Patakbuhin ang UVX Command",
     "logProcessing": "Pinoproseso...",
     "no_tool_title": "Walang Available na MCP Servers",
-    "no_oap_tool_message": {
-      "all": "Mangyaring pumili ng OAP MCP Server na gagamitin, o magdagdag ng custom MCP Server.",
-      "oap": "Mangyaring pumili ng OAP MCP Server na gagamitin.",
-      "custom": "Mangyaring magdagdag ng custom MCP Server."
-    },
     "no_tool_message": "Mangyaring magdagdag ng MCP Server.",
     "tab": {
       "all": "Lahat ng Tools",
-      "oap": "OAP Tools",
       "custom": "Custom Tools"
     },
-    "oapStoreLinkAlt": "Tingnan ang Mga Detalye",
     "subToolsCount": "Mga Tool na Naka-enable: {{count}} / {{total}}",
     "disableAll": "I-disable lahat",
     "enableAll": "I-enable lahat",
@@ -269,28 +223,6 @@
     "reload": {
       "headerBtn": "I-reload",
       "headerBtnAlt": "I-reload at I-update ang MCP Tools"
-    },
-    "oap": {
-      "type": {
-        "all": "Lahat ng Tools",
-        "base": "Ipakita ang Base Lamang",
-        "pro": "Ipakita ang Pro Lamang",
-        "official": "Ipakita ang Official Lamang"
-      },
-      "sort": {
-        "title": "Ayusin",
-        "popular": "Sikat",
-        "new": "Bago"
-      },
-      "tag": "Kategorya",
-      "show_more": "Higit Pa",
-      "no_search_data_title": "Walang nahanap na MCP Tools",
-      "no_search_data": "Walang nahanap na resulta sa paghahanap, mangyaring i-clear ang keyword sa paghahanap o isaayos ang mga kundisyon ng filter.",
-      "clear_filter": "I-clear ang Filter",
-      "hint": "Ang mga high-level MCP Servers ay nangangailangan ng pag-upgrade sa Pro version upang ma-install",
-      "high_cost_title": "I-enable ang High-Cost MCP Servers",
-      "high_cost_desc": "Pumili ka ng mga MCP Servers na kumokonsumo ng maraming tokens. Pakisuri kung sapat ang iyong paggamit ng plan.",
-      "headerBtnAlt": "Magdagdag / Tingnan ang OAP MCP Tools"
     },
     "custom": {
       "headerBtn": "Magdagdag / I-edit ang Config",
@@ -439,14 +371,11 @@
     "reasoningLevelTooltip": "Ang Low ay kumakatawan sa mabilis na tugon, nakatuon sa mga konklusyon at walang karagdagang mga detalye, na may direkta at simpleng pangangatwiran. Ang Medium ay nagbibigay ng tugon na may sapat na paliwanag sa lohika, sumasaklaw sa mga pangunahing impormasyon. Ang High ay nag-aalok ng malalim na tugon na may nakabalangkas at detalyadong pagsusuri at paliwanag.",
     "tokenBudgetDescription": "Itakda ang value ng pangangatwiran ({{min}}~{{max}})",
     "parameterVerify": "Pag-verify ng Parameter",
-    "expired": "Ang modelo na ito ay opisyal nang itinigil",
-    "expiredInfo": "Ang modelo na ito ay wala na sa opisyal na listahan at ipinapakita lamang bilang lokal na kasaysayan. Maaaring hindi ito gumana o mag-update nang maayos. Kung aalisin mo ang check, ito ay maaalis at hindi na mababawi mula sa listahan.",
     "verifyErrorInfo": "Mga Detalye ng Error sa Pag-verify",
     "verifyErrorMsg": "Ang modelo ay hindi gumamit ng anumang mga tool sa panahon ng pag-verify, na maaaring dahil sa kakulangan ng suporta o hindi na-trigger. Kaya, hindi makumpirma kung sinusuportahan nito ang mga tool.",
     "verifyStatusSuccess": "Matagumpay ang pag-verify ng modelo, na-enable na may orihinal na configuration",
     "verifyStatusSuccessInPrompt": "Matagumpay ang pag-verify ng modelo, na-enable na may MCP Prompts",
     "verifyUnexpectedFailed": "Nabigo ang pag-verify ng modelo, naganap ang hindi kilalang error, mangyaring subukan muli sa ibang pagkakataon",
-    "oapUsageLimit": "Naabot ang limitasyon sa paggamit, pansamantalang hindi available",
     "providerFilter": {
       "Alt": "Kung ang modelo na gusto mong gamitin ay wala sa mga popular na opsyon ng modelo, maaari mong gamitin ang function ng paghahanap upang mahanap ito.",
       "Clear": "Linisin"
@@ -463,33 +392,35 @@
     "autoDownload": "Auto Download ng Update",
     "autoDownloadDescription": "Awtomatikong i-download ang bagong bersyon ng DIVE kapag nag-restart ang user o nag-click ng \"Upgrade\" button sa menu page, mae-enable ang bagong bersyon",
     "autoLaunch": "Auto Launch",
-    "autoLaunchDescription": "Awtomatikong simulan ang Dive AI kapag nagsisimula ang sistema",
+    "autoLaunchDescription": "Awtomatikong simulan ang Velis AI kapag nagsisimula ang sistema",
     "minimalToTray": "I-minimize sa tray",
     "minimalToTrayDescription": "Kapag isinasara ang window, ang program ay mai-minimize sa system tray sa halip na lumabas nang buo",
-    "loginTitle": "OAP Login",
-    "loginDescription": "Gumamit ng OpenAgentPlatform upang mag-login, walang kinakailangang technical background upang madaling ikonekta ang mga LLM, AI Agents at MCP Servers — Maranasan ang mga matalinong solusyon ngayon!",
     "personalInformationTitle": "Personal na Impormasyon",
-    "defaultSystemPrompt": "Dive Default System Prompt",
+    "defaultSystemPrompt": "Velis AI Default System Prompt",
     "defaultSystemPromptDescription": "Ang Dive Default System Prompt ay ginagamit bilang default system prompt para sa chat. Sinasabi nito sa LLM na sinusuportahan ng Dive chat ang KaTeX / Markdown / Mermaid, atbp. Ang feature na ito ay umuubos ng ilang mga token, na maaaring gawing mas mabagal ang tugon kaysa sa prompt na walang system prompt. Sa kabilang banda, kung ito ay na-disable, ang kalidad ng tugon ng LLM ay maaaring bumaba",
-    "usageAnalytics": "Pumunta sa Dashboard page sa OAP Hub upang tingnan",
     "usageAnalyticsTitle": "Analytics ng Paggamit",
-    "userEdit": "Pumunta sa Account page sa OAP Hub upang gumawa ng mga pagbabago",
     "planSectionTitle": "Kasalukuyang paggamit ng plan",
     "subscriptionDate": "Petsa ng subscription",
     "remainingUsage": "Natitirang paggamit",
     "usageWarningTitle": "Naabot ang limitasyon sa paggamit ng token.",
-    "usageWarning": "Ang quota ay mare-reset sa susunod na buwan, o bumili ng credit package para sa mas maraming paggamit. Limitadong probisyon ng mga pangunahing MCP server.",
-    "BaseUsageWarning": "Base MCP servers: {{mcpLimit}} na tawag bawat oras. Para magamit ang ibang MCP servers, i-upgrade ang iyong plano sa <planLink>billing page</planLink>.",
+    "usageWarning": "Ang quota ay mare-reset sa susunod na buwan, o bumili ng token packages para sa mas maraming paggamit. Ang mga Basic na modelo at MCP ay maaari pa ring gamitin.",
+    "BaseUsageWarning": "Base na mga modelo: {{callLimit}} tawag bawat {{callUnit}} oras | Base MCP servers: {{mcpLimit}} tawag bawat oras. Upang gumamit ng iba pang mga modelo at MCP, mag-upgrade ng iyong plano mula sa <planLink>pahina ng plano</planLink>.",
     "customPromptDescription": "Kung kailangan mo ng karagdagang custom instructions, mangyaring i-click ang \"Custom Prompt\" function sa ibaba upang i-set up ito.",
     "customPromptButton": "Custom Prompt",
     "tokenPackageTitle": "Paggamit ng token package",
     "tokenPackageHint": "Ang mga token package ay walang expiration date at gagamitin lamang pagkatapos maubos ang monthly plan quota.",
     "tokenPackageRemainingUsage": "Natitirang paggamit",
     "tokenPackageWarningTitle": "Naubos ang token quota.",
-    "tokenPackageWarning": "Maaari mong dagdagan ang higit pang paggamit ng token sa OAPhub <planLink>Dashboard page</planLink>.",
     "skipTlsVerifyWarning": "Babala sa seguridad: Ang pag-ignore sa pag-verify ng certificate ay maaaring bawasan ang seguridad ng koneksyon. Inirerekomenda na gamitin sa pinagkakatiwalaang network environment.",
+    "allRateLimitReachedTitle": "Naabot na ang limitasyon ng tawag sa mga modelo at MCP server.",
+    "llmRateLimitReachedTitle": "Naabot na ang limitasyon ng tawag sa mga modelo.",
     "mcpRateLimitReachedTitle": "Naabot na ang limitasyon ng tawag sa MCP server.",
-    "rateLimitReachedDescription": "Mangyaring maghintay bago gumawa ng mga bagong kahilingan; ang quota ay awtomatikong maibabalik."
+    "rateLimitReachedDescription": "Mangyaring maghintay bago gumawa ng mga bagong kahilingan; ang quota ay awtomatikong maibabalik.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "Nakopya sa clipboard",
@@ -524,14 +455,10 @@
     "clickToInstall": "I-click upang I-install ang Update"
   },
   "login": {
-    "subtitle": "Ang Dive AI ay isang open-source desktop application na walang tigil na nagsasama ng iba't ibang malalaking language model na sumusuporta sa mga function call. Sa pamamagitan ng malinis at intuitive na interface nito, madali mong makakausap ang mga cutting-edge na AI, mula sa pang-araw-araw na Q&A hanggang sa propesyonal na mga gawain, nakakakuha ng tumpak na mga tugon at ginagawa itong iyong matalinong katulong.",
+    "subtitle": "Ang Velis AI ay isang open-source desktop application na walang tigil na nagsasama ng iba't ibang malalaking language model na sumusuporta sa mga function call. Sa pamamagitan ng malinis at intuitive na interface nito, madali mong makakausap ang mga cutting-edge na AI, mula sa pang-araw-araw na Q&A hanggang sa propesyonal na mga gawain, nakakakuha ng tumpak na mga tugon at ginagawa itong iyong matalinong katulong.",
     "title1": "Gumamit ng Iyong Sariling Inihanda na Mga Modelo",
     "description1": "Angkop para sa mga advanced na AI expert. Kung mayroon ka nang iyong sariling configuration na handa na, maging ito man ay lokal na Ollama, llama.cpp, o malayong Openrouter, OpenAI, Anthropic, o iba pang LLM API ng mga kumpanya ng AI, mangyaring gamitin ang opsyon na ito.",
-    "button1": "Pumunta sa Mga Setting ng Modelo",
-    "title2": "Gumamit ng OpenAgentPlatform",
-    "description2": "Ginagawang madali ng OAP para sa lahat na gumamit ng mga pinaka-advanced na serbisyo ng AI, na kumokonekta sa mga LLM, AI Agents, at MCP Servers nang hindi nangangailangan ng technical na kadalubhasaan. Tuklasin ang walang hanggang posibilidad ng AI at maranasan ang mga matalinong solusyon ngayon.",
-    "button2": "Magrehistro para sa OAP",
-    "button3": "Mag-login sa OAP"
+    "button1": "Pumunta sa Mga Setting ng Modelo"
   },
   "InstallHostDependencies": {
     "title": "Nag-da-download ng Host Dependencies...",

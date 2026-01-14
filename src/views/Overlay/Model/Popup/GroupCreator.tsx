@@ -37,7 +37,7 @@ const GroupCreator = ({ onClose, onSuccess }: Props) => {
   const settings = useAtomValue(modelSettingsAtom)
 
   const providerList = useMemo(() => {
-    return PROVIDERS.filter(p => p !== "default" && !(p === "oap" && !window.isDev))
+    return PROVIDERS.filter(p => p !== "default")
   }, [])
 
   const {

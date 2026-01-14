@@ -1,10 +1,10 @@
 import "../styles/pages/_InstallHostDependencies.scss"
 
-import React, { useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { systemThemeAtom, themeAtom } from "../atoms/themeState"
-import { useAtom } from "jotai"
-import { onReceiveDownloadDependencyLog, startReceiveDownloadDependencyLog } from "../ipc"
+import React, {useEffect, useRef, useState} from "react"
+import {useTranslation} from "react-i18next"
+import {systemThemeAtom, themeAtom} from "../atoms/themeState"
+import {useAtom} from "jotai"
+import {onReceiveDownloadDependencyLog, startReceiveDownloadDependencyLog} from "../ipc"
 
 type Log = {
   timestamp: string

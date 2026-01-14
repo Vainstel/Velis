@@ -4,11 +4,9 @@ import { invoke as tauriInvoke } from "@tauri-apps/api/core"
 
 export * from "./env"
 export * from "./init"
-export * from "./oap"
 export * from "./host"
 export * from "./config"
 export * from "./llm"
-export * from "./lipc"
 
 export function listenIPC(event: string, listener: (...args: any[]) => void): () => void {
   if (isElectron) {

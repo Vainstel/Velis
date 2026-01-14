@@ -8,17 +8,12 @@ import Tooltip from "../../../components/Tooltip"
 import PopupConfirm from "../../../components/PopupConfirm"
 import Dropdown from "../../../components/DropDown"
 import { imgPrefix } from "../../../ipc"
-import OAPServerList from "./Popup/OAPServerList"
 import Tabs from "../../../components/Tabs"
-import { OAPMCPServer } from "../../../types/oap"
-import { isLoggedInOAPAtom, loadOapToolsAtom, oapToolsAtom } from "../../../atoms/oapState"
-import { OAP_ROOT_URL } from "../../../../shared/oap"
 import { openUrl, checkCommandExist } from "../../../ipc/util"
-import { oapApplyMCPServer } from "../../../ipc"
 import cloneDeep from "lodash/cloneDeep"
 import { ClickOutside } from "../../../components/ClickOutside"
 import Button from "../../../components/Button"
-import CustomEdit, { FieldType } from "./Popup/CustomEdit"
+import CustomEdit from "./Popup/CustomEdit"
 import { createPortal } from "react-dom"
 import "../../../styles/overlay/_Tools.scss"
 import { Subtab } from "../Setting"
@@ -29,8 +24,7 @@ import { showToastAtom } from "../../../atoms/toastState"
 interface ToolsCache {
   [key: string]: {
     toolType: "tool" | "connector"
-    sourceType: "oap" | "custom"
-    oapId?: string
+    sourceType: "custom"
     plan?: string
     description: string
     icon?: string
@@ -59,19 +53,14 @@ export interface mcpServersProps {
   args?: string[]
   env?: [string, unknown, boolean][]
   url?: string
-  verify?: boolean
   transport?: string
   initialTimeout?: number
-  extraData?: {
-    oap?: boolean
-  }
 }
 
 const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
   const { t } = useTranslation()
   const showToast = useSetAtom(showToastAtom)
   const [tools, setTools] = useAtom(toolsAtom)
-  const [oapTools, setOapTools] = useAtom(oapToolsAtom)
   const [mcpConfig, setMcpConfig] = useAtom(mcpConfigAtom)
   const mcpConfigRef = useRef<MCPConfig>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -83,7 +72,6 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
   const [showCustomEditPopup, setShowCustomEditPopup] = useState(false)
   const [showConfirmCancelConnector, setShowConfirmCancelConnector] = useState(false)
   const [showConfirmDisConnector, setShowConfirmDisConnector] = useState(false)
-  const [showOapMcpPopup, setShowOapMcpPopup] = useState(false)
   const [showUnsavedSubtoolsPopup, setShowUnsavedSubtoolsPopup] = useState(false)
   const changingToolRef = useRef<Tool | null>(null)
   const [currentTool, setCurrentTool] = useState<string>("")
@@ -95,11 +83,9 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
   const abortToolLogRef = useRef<AbortController | null>(null)
   const [toolLogReader, setToolLogReader] = useState<ReadableStreamDefaultReader<Uint8Array> | null>(null)
   const [connectorReader, setConnectorReader] = useState<ReadableStreamDefaultReader<Uint8Array> | null>(null)
-  const [toolType, setToolType] = useState<"all" | "oap" | "custom">("all")
+  const [toolType, setToolType] = useState<"all" | "custom">("all")
   const [filterSearch, setFilterSearch] = useState("")
-  const isLoggedInOAP = useAtomValue(isLoggedInOAPAtom)
   const loadMcpConfig = useSetAtom(loadMcpConfigAtom)
-  const loadOapTools = useSetAtom(loadOapToolsAtom)
   const [isResort, setIsResort] = useState(true)
   const sortedConfigOrderRef = useRef<string[]>([])
   const [expandedSections, setExpandedSections] = useState<string[]>([])
@@ -246,10 +232,6 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
     return _subtab === "Connector" && _tabdata?.currentTool && authorizeState !== null
   }
 
-  const isOapTool = (toolName: string) => {
-    return oapTools?.find(oapTool => oapTool.name === toolName) ? true : false
-  }
-
   const isConnector = (toolName: string, _mcpConfig: MCPConfig) => {
     const config = _mcpConfig ?? mcpConfig
     return config.mcpServers[toolName]?.transport === "streamable"
@@ -259,20 +241,12 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
     await loadTools()
     const _mcpConfig = await getMcpConfig()
 
-
-    let _oapTools: OAPMCPServer[] = []
-    setOapTools((oapTools) => {
-      _oapTools = oapTools
-      return oapTools
-    })
-
     const newCache: ToolsCache = {}
     setTools(prevTools => {
       prevTools.forEach((tool: Tool) => {
         newCache[tool.name] = {
           toolType: isConnector(tool.name, _mcpConfig) ? "connector" : "tool",
-          sourceType: _oapTools && _oapTools.find(oapTool => oapTool.name === tool.name) ? "oap" : "custom",
-          plan: _oapTools && _oapTools.find(oapTool => oapTool.name === tool.name)?.plan,
+          sourceType: "custom",
           description: tool.description || "",
           icon: tool.icon,
           subTools: tool.tools?.map(subTool => ({
@@ -295,7 +269,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
     Object.keys(config.mcpServers).forEach(key => {
       const cfg = config.mcpServers[key]
       if (!cfg.transport) {
-        config.mcpServers[key].transport = FieldType.transport.options[0]
+        config.mcpServers[key].transport = cfg.url ? "sse" : "stdio"
       }
 
       if (!("enabled" in config.mcpServers[key])) {
@@ -339,7 +313,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
     Object.keys(config.mcpServers).forEach(key => {
       const cfg = config.mcpServers[key]
       if (!cfg.transport) {
-        config.mcpServers[key].transport = FieldType.transport.options[0]
+        config.mcpServers[key].transport = cfg.url ? "sse" : "stdio"
       }
 
       if (!("enabled" in config.mcpServers[key])) {
@@ -422,28 +396,18 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
       })
     }
 
-    try {
-      const response = await fetch(`/api/config/mcpserver${force ? "?force=1" : ""}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(config),
-        signal: abortControllerRef.current.signal
+    return await fetch(`/api/config/mcpserver${force ? "?force=1" : ""}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(config),
+      signal: abortControllerRef.current.signal
+    })
+      .then(async (response) => await response.json())
+      .catch((error) => {
+        console.error("Failed to update MCP config:", error)
       })
-
-      if (!response.ok) {
-        showToast({
-          message: "Failed to update MCP config",
-          type: "error"
-        })
-        abortToolLogRef.current.abort()
-        throw new Error(`HTTP error! status: ${response.status}`)
-        return
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Failed to update MCP config:", error)
-    }
   }
 
   const handleUpdateConfigResponse = (data: { errors: { error: string; serverName: string }[] }, isShowToast = false, toolName?: string) => {
@@ -479,7 +443,18 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
       await onDisconnectConnector(key)
     }
     try {
+      // const filledConfig = await window.ipcRenderer.fillPathToConfig(JSON.stringify(newConfig))
       const filledConfig = { ...newConfig }
+      const connectorList = Object.entries(mcpConfig.mcpServers).filter(([key, value]) => value.transport === "streamable").reduce((acc, [key, value]) => {
+        acc[key] = value
+        return acc
+      }, {} as MCPConfig)
+
+      filledConfig.mcpServers = {
+        ...newConfig.mcpServers,
+        ...connectorList,
+      }
+
       const data = await updateMCPConfig(filledConfig, false, true)
       if (data?.errors && Array.isArray(data.errors) && data.errors.length) {
         data.errors
@@ -518,15 +493,8 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
 
   const deleteTool = async (toolName: string) => {
     setIsLoading(true)
-    if(isOapTool(toolName)) {
-      await oapApplyMCPServer(oapTools.filter(oapTool => oapTool.name !== toolName).map(oapTool => oapTool.id))
-    }
     const newConfig = JSON.parse(JSON.stringify(mcpConfig))
     delete newConfig.mcpServers[toolName]
-    await fetch("/api/plugins/oap-platform/config/refresh", {
-      method: "POST",
-    })
-    await loadOapTools()
     await updateToolsCache()
     await updateMCPConfig(newConfig)
     setMcpConfig(newConfig)
@@ -679,7 +647,9 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
     }
     setLoadingTools(prev => ({ ...prev, [toolLoadingKey]: { enabled: !tool.enabled } }))
     try {
-      mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
+      if(!mcpConfigRef.current) {
+        mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
+      }
 
       const currentEnabled = tool.enabled
       const newConfig = JSON.parse(JSON.stringify(mcpConfigRef.current))
@@ -706,7 +676,6 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
 
       if (data.success) {
         setMcpConfig(mcpConfigRef.current)
-        await loadOapTools()
         await updateToolsCache()
         handleUpdateConfigResponse(data, true, tool.name)
       }
@@ -799,9 +768,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
       changingToolRef.current = {
         ...tool,
         disabled: Boolean(tool?.error),
-        type: isOapTool(toolName) ? "oap" : "custom",
-        plan: isOapTool(toolName) ? oapTools?.find(oapTool => oapTool.name === toolName)?.plan : undefined,
-        oapId: isOapTool(toolName) ? oapTools?.find(oapTool => oapTool.name === toolName)?.id : undefined,
+        type: "custom",
       }
     } else {
       changingToolRef.current = null
@@ -837,9 +804,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
       changingToolRef.current = {
         ...tool,
         disabled: Boolean(tool?.error),
-        type: isOapTool(toolName) ? "oap" : "custom",
-        plan: isOapTool(toolName) ? oapTools?.find(oapTool => oapTool.name === toolName)?.plan : undefined,
-        oapId: isOapTool(toolName) ? oapTools?.find(oapTool => oapTool.name === toolName)?.id : undefined,
+        type: "custom",
       }
     } else {
       changingToolRef.current = null
@@ -924,16 +889,12 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
       if(type === "all") {
         setIsLoading(true)
       }
-      await fetch("/api/plugins/oap-platform/config/refresh", {
-        method: "POST",
-      })
     } catch (_error) {
       console.error(_error)
     }
     const _mcpConfig = await getMcpConfig()
     await updateMCPConfig(_mcpConfig, true)
 
-    await loadOapTools()
     await loadMcpConfig()
     await updateToolsCache()
     setIsResort(true)
@@ -943,7 +904,6 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
   const sortedTools = useMemo(() => {
     const configOrder = mcpConfig.mcpServers ? Object.keys(mcpConfig.mcpServers) : []
     const toolSort = (a: string, b: string) => {
-      const aIsOap = oapTools?.find(oapTool => oapTool.name === a)
       const aEnabled = tools.find(tool => tool.name === a)?.enabled
       const bEnabled = tools.find(tool => tool.name === b)?.enabled
       if (isResort) {
@@ -951,7 +911,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
           return -1
         if (!aEnabled && bEnabled)
           return 1
-        return aIsOap ? -1 : 1
+        return 0
       } else {
         const aIndex = sortedConfigOrderRef.current.indexOf(a)
         const bIndex = sortedConfigOrderRef.current.indexOf(b)
@@ -967,8 +927,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
     }
     setIsResort(false)
     const toolMap = new Map(
-      tools.filter(tool => !(isOapTool(tool.name) && !isLoggedInOAP))
-          .map(tool => [tool.name, tool])
+      tools.map(tool => [tool.name, tool])
     )
 
     const configTools = sortedConfigOrder.map(name => {
@@ -990,9 +949,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
           }),
           disabled: Boolean(tool?.error),
           toolType: isConnector(name) ? "connector" : "tool",
-          sourceType: isOapTool(name) && oapTools.find(oapTool => oapTool.name === name) ? "oap" : "custom",
-          plan: isOapTool(name) ? oapTools?.find(oapTool => oapTool.name === name)?.plan : undefined,
-          oapId: isOapTool(name) ? oapTools?.find(oapTool => oapTool.name === name)?.id : undefined,
+          sourceType: "custom",
           commandExists: commandExistsMap[name] ?? true,
           command: mcpConfig?.mcpServers?.[name]?.command,
         }
@@ -1019,9 +976,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
           error: mcpServers[name]?.error,
           disabled: Boolean(mcpServers[name]?.disabled || mcpServers[name]?.error),
           toolType: isConnector(name) ? "connector" : "tool",
-          sourceType: isOapTool(name) && oapTools.find(oapTool => oapTool.name === name) ? "oap" : "custom",
-          plan: isOapTool(name) ? oapTools?.find(oapTool => oapTool.name === name)?.plan : undefined,
-          oapId: isOapTool(name) ? oapTools?.find(oapTool => oapTool.name === name)?.id : undefined,
+          sourceType: "custom",
           commandExists: commandExistsMap[name] ?? true,
           command: mcpServers[name]?.command,
         }
@@ -1034,33 +989,19 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
         url: mcpServers[name]?.url,
         disabled: Boolean(mcpServers[name]?.disabled || mcpServers[name]?.error),
         toolType: isConnector(name) ? "connector" : "tool",
-        sourceType: isOapTool(name) && oapTools.find(oapTool => oapTool.name === name) ? "oap" : "custom",
-        plan: isOapTool(name) ? oapTools?.find(oapTool => oapTool.name === name)?.plan : undefined,
-        oapId: isOapTool(name) ? oapTools?.find(oapTool => oapTool.name === name)?.id : undefined,
+        sourceType: "custom",
         commandExists: commandExistsMap[name] ?? true,
         command: mcpServers[name]?.command,
       }
     })
 
     return [...configTools].filter(tool => toolType === "all" || toolType === tool.sourceType)
-  }, [tools, oapTools, mcpConfig.mcpServers, toolType, loadingTools, commandExistsMap])
+  }, [tools, mcpConfig.mcpServers, toolType, loadingTools, commandExistsMap])
 
   const toolMenu = (tool: Tool & { type: string }) => {
     return {
       "root": {
         subOptions: [
-          { label:
-              <div className="tool-edit-menu-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 17 16" fill="none">
-                  <path d="M3.83333 14C3.46667 14 3.15278 13.8694 2.89167 13.6083C2.63056 13.3472 2.5 13.0333 2.5 12.6667V3.33333C2.5 2.96667 2.63056 2.65278 2.89167 2.39167C3.15278 2.13056 3.46667 2 3.83333 2H7.83333C8.02222 2 8.18056 2.06389 8.30833 2.19167C8.43611 2.31944 8.5 2.47778 8.5 2.66667C8.5 2.85556 8.43611 3.01389 8.30833 3.14167C8.18056 3.26944 8.02222 3.33333 7.83333 3.33333H3.83333V12.6667H13.1667V8.66667C13.1667 8.47778 13.2306 8.31944 13.3583 8.19167C13.4861 8.06389 13.6444 8 13.8333 8C14.0222 8 14.1806 8.06389 14.3083 8.19167C14.4361 8.31944 14.5 8.47778 14.5 8.66667V12.6667C14.5 13.0333 14.3694 13.3472 14.1083 13.6083C13.8472 13.8694 13.5333 14 13.1667 14H3.83333ZM13.1667 4.26667L7.43333 10C7.31111 10.1222 7.15556 10.1833 6.96667 10.1833C6.77778 10.1833 6.62222 10.1222 6.5 10C6.37778 9.87778 6.31667 9.72222 6.31667 9.53333C6.31667 9.34444 6.37778 9.18889 6.5 9.06667L12.2333 3.33333H10.5C10.3111 3.33333 10.1528 3.26944 10.025 3.14167C9.89722 3.01389 9.83333 2.85556 9.83333 2.66667C9.83333 2.47778 9.89722 2.31944 10.025 2.19167C10.1528 2.06389 10.3111 2 10.5 2H13.8333C14.0222 2 14.1806 2.06389 14.3083 2.19167C14.4361 2.31944 14.5 2.47778 14.5 2.66667V6C14.5 6.18889 14.4361 6.34722 14.3083 6.475C14.1806 6.60278 14.0222 6.66667 13.8333 6.66667C13.6444 6.66667 13.4861 6.60278 13.3583 6.475C13.2306 6.34722 13.1667 6.18889 13.1667 6V4.26667Z" fill="currentColor"/>
-                </svg>
-                {t("tools.toolMenu.detail")}
-              </div>,
-            onClick: () => {
-              openUrl(`${OAP_ROOT_URL}/mcp/${tool.oapId}`)
-            },
-            active: isOapTool(tool.name)
-          },
           { label:
               <div className="tool-edit-menu-item">
                 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1093,7 +1034,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
               setCurrentTool(tool.name)
               setShowCustomEditPopup(true)
             },
-            active: !isOapTool(tool.name)
+            active: true
           },
           { label:
               <div className="tool-edit-menu-item">
@@ -1155,22 +1096,6 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
         <div className="tools-header">
           <div>{t("tools.title")}</div>
           <div className="header-actions">
-            {isLoggedInOAP &&
-              <Tooltip content={t("tools.oap.headerBtnAlt")}>
-                <Button
-                  theme="Color"
-                  color="primary"
-                  size="medium"
-                  onClick={() => {
-                    setShowOapMcpPopup(true)
-                  }}
-                >
-                  <img className="oap-logo" src={`${imgPrefix}logo_oap.png`} alt="info" />
-                  OAPhub
-                </Button>
-              </Tooltip>
-            }
-
             <Tooltip content={t("tools.custom.headerBtnAlt")}>
               <Button
                 theme="Color"
@@ -1212,14 +1137,6 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
 
         <div className="tools-list">
           <div className="tools-filter-container">
-            {isLoggedInOAP &&
-              <Tabs
-                className="tools-type-tabs"
-                tabs={[{ label: t("tools.tab.all"), value: "all" }, { label: t("tools.tab.oap"), value: "oap" }, { label: t("tools.tab.custom"), value: "custom" }]}
-                value={toolType}
-                onChange={setToolType}
-              />
-            }
             <div className="tools-filter-search">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 22" width="18" height="18">
                 <path stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="2" d="m15 15 5 5"></path>
@@ -1241,26 +1158,26 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
               )}
             </div>
           </div>
-          {sortedTools.length > 0 && !isLoading && filterSearch && !sortedTools.some(tool => tool.name.toLowerCase().includes(filterSearch.toLowerCase())) && 
-            <div className="no-oap-result-container">
-              <div className="no-oap-result-title">
+          {sortedTools.length > 0 && !isLoading && filterSearch && !sortedTools.some(tool => tool.name.toLowerCase().includes(filterSearch.toLowerCase())) &&
+            <div className="no-result-container">
+              <div className="no-result-title">
                 {t("tools.filter.noResult")}
               </div>
             </div>
           }
           {sortedTools.length === 0 && !isLoading &&
-            <div className="no-oap-result-container">
+            <div className="no-result-container">
               <div className="cloud-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="41" height="41" viewBox="0 0 41 41" fill="none">
                   <path d="M24.4 40.3C23.9 40.5667 23.3917 40.6083 22.875 40.425C22.3583 40.2417 21.9667 39.9 21.7 39.4L18.7 33.4C18.4333 32.9 18.3917 32.3917 18.575 31.875C18.7583 31.3583 19.1 30.9667 19.6 30.7C20.1 30.4333 20.6083 30.3917 21.125 30.575C21.6417 30.7583 22.0333 31.1 22.3 31.6L25.3 37.6C25.5667 38.1 25.6083 38.6083 25.425 39.125C25.2417 39.6417 24.9 40.0333 24.4 40.3ZM36.4 40.3C35.9 40.5667 35.3917 40.6083 34.875 40.425C34.3583 40.2417 33.9667 39.9 33.7 39.4L30.7 33.4C30.4333 32.9 30.3917 32.3917 30.575 31.875C30.7583 31.3583 31.1 30.9667 31.6 30.7C32.1 30.4333 32.6083 30.3917 33.125 30.575C33.6417 30.7583 34.0333 31.1 34.3 31.6L37.3 37.6C37.5667 38.1 37.6083 38.6083 37.425 39.125C37.2417 39.6417 36.9 40.0333 36.4 40.3ZM12.4 40.3C11.9 40.5667 11.3917 40.6083 10.875 40.425C10.3583 40.2417 9.96667 39.9 9.7 39.4L6.7 33.4C6.43333 32.9 6.39167 32.3917 6.575 31.875C6.75833 31.3583 7.1 30.9667 7.6 30.7C8.1 30.4333 8.60833 30.3917 9.125 30.575C9.64167 30.7583 10.0333 31.1 10.3 31.6L13.3 37.6C13.5667 38.1 13.6083 38.6083 13.425 39.125C13.2417 39.6417 12.9 40.0333 12.4 40.3ZM11.5 28.5C8.46667 28.5 5.875 27.425 3.725 25.275C1.575 23.125 0.5 20.5333 0.5 17.5C0.5 14.7333 1.41667 12.3167 3.25 10.25C5.08333 8.18333 7.35 6.96667 10.05 6.6C11.1167 4.7 12.575 3.20833 14.425 2.125C16.275 1.04167 18.3 0.5 20.5 0.5C23.5 0.5 26.1083 1.45833 28.325 3.375C30.5417 5.29167 31.8833 7.68333 32.35 10.55C34.65 10.75 36.5833 11.7 38.15 13.4C39.7167 15.1 40.5 17.1333 40.5 19.5C40.5 22 39.625 24.125 37.875 25.875C36.125 27.625 34 28.5 31.5 28.5H11.5ZM11.5 24.5H31.5C32.9 24.5 34.0833 24.0167 35.05 23.05C36.0167 22.0833 36.5 20.9 36.5 19.5C36.5 18.1 36.0167 16.9167 35.05 15.95C34.0833 14.9833 32.9 14.5 31.5 14.5H28.5V12.5C28.5 10.3 27.7167 8.41667 26.15 6.85C24.5833 5.28333 22.7 4.5 20.5 4.5C18.9 4.5 17.4417 4.93333 16.125 5.8C14.8083 6.66667 13.8167 7.83333 13.15 9.3L12.65 10.5H11.4C9.5 10.5667 7.875 11.275 6.525 12.625C5.175 13.975 4.5 15.6 4.5 17.5C4.5 19.4333 5.18333 21.0833 6.55 22.45C7.91667 23.8167 9.56667 24.5 11.5 24.5Z" fill="currentColor"/>
                 </svg>
               </div>
               <div>
-                <div className="no-oap-result-title">
+                <div className="no-result-title">
                   {t("tools.no_tool_title")}
                 </div>
-                <div className="no-oap-result-message">
-                  {isLoggedInOAP ? t(`tools.no_oap_tool_message.${toolType}`) : t("tools.no_tool_message")}
+                <div className="no-result-message">
+                  {t("tools.no_tool_message")}
                 </div>
               </div>
             </div>
@@ -1308,38 +1225,17 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
                           </>
                         }
                       </div>
-                      {displayTool.sourceType === "oap" ?
-                        <img className="tool-header-content-icon oap-logo" src={`${imgPrefix}logo_oap.png`} alt="info" />
-                      :
-                        <svg className="tool-header-content-icon" width="20" height="20" viewBox="0 0 24 24">
-                          <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
-                        </svg>
-                      }
+                      <svg className="tool-header-content-icon" width="20" height="20" viewBox="0 0 24 24">
+                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                      </svg>
                       <span className="tool-name">{displayTool.name}</span>
-                      {displayTool.sourceType === "oap" &&
-                        <>
-                          <div className={`tool-tag ${displayTool.plan}`}>
-                            {displayTool.plan}
-                          </div>
-                          <Tooltip content={t("tools.oapStoreLinkAlt")}>
-                            <button className="oap-store-link" onClick={(e) => {
-                              e.stopPropagation()
-                              openUrl(`${OAP_ROOT_URL}/mcp/${displayTool.oapId}`)
-                            }}>
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 17 16" fill="none">
-                                <path d="M3.83333 14C3.46667 14 3.15278 13.8694 2.89167 13.6083C2.63056 13.3472 2.5 13.0333 2.5 12.6667V3.33333C2.5 2.96667 2.63056 2.65278 2.89167 2.39167C3.15278 2.13056 3.46667 2 3.83333 2H7.83333C8.02222 2 8.18056 2.06389 8.30833 2.19167C8.43611 2.31944 8.5 2.47778 8.5 2.66667C8.5 2.85556 8.43611 3.01389 8.30833 3.14167C8.18056 3.26944 8.02222 3.33333 7.83333 3.33333H3.83333V12.6667H13.1667V8.66667C13.1667 8.47778 13.2306 8.31944 13.3583 8.19167C13.4861 8.06389 13.6444 8 13.8333 8C14.0222 8 14.1806 8.06389 14.3083 8.19167C14.4361 8.31944 14.5 8.47778 14.5 8.66667V12.6667C14.5 13.0333 14.3694 13.3472 14.1083 13.6083C13.8472 13.8694 13.5333 14 13.1667 14H3.83333ZM13.1667 4.26667L7.43333 10C7.31111 10.1222 7.15556 10.1833 6.96667 10.1833C6.77778 10.1833 6.62222 10.1222 6.5 10C6.37778 9.87778 6.31667 9.72222 6.31667 9.53333C6.31667 9.34444 6.37778 9.18889 6.5 9.06667L12.2333 3.33333H10.5C10.3111 3.33333 10.1528 3.26944 10.025 3.14167C9.89722 3.01389 9.83333 2.85556 9.83333 2.66667C9.83333 2.47778 9.89722 2.31944 10.025 2.19167C10.1528 2.06389 10.3111 2 10.5 2H13.8333C14.0222 2 14.1806 2.06389 14.3083 2.19167C14.4361 2.31944 14.5 2.47778 14.5 2.66667V6C14.5 6.18889 14.4361 6.34722 14.3083 6.475C14.1806 6.60278 14.0222 6.66667 13.8333 6.66667C13.6444 6.66667 13.4861 6.60278 13.3583 6.475C13.2306 6.34722 13.1667 6.18889 13.1667 6V4.26667Z" fill="currentColor"/>
-                              </svg>
-                            </button>
-                          </Tooltip>
-                        </>
-                      }
-                      {/* {displayTool.toolType === "connector" && displayTool.sourceType !== "oap" &&
+                      {displayTool.toolType === "connector" &&
                         <Tooltip content={t("tools.tag_oauth")}>
                           <div className={`tool-tag ${(!displayTool.hasCredential && displayTool.status === "running") ? "success" : ""}`}>
                             OAuth
                           </div>
                         </Tooltip>
-                      } */}
+                      }
                     </div>
                     <div onClick={(e) => e.stopPropagation()}>
                       <Dropdown
@@ -1618,16 +1514,6 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
             {t("tools.connector.confirmDisConnectDescription", { connector: currentTool })}
           </div>
         </PopupConfirm>
-      )}
-
-      {showOapMcpPopup && (
-        <OAPServerList
-          oapTools={oapTools ?? []}
-          onConfirm={handleReloadMCPServers}
-          onCancel={() => {
-            setShowOapMcpPopup(false)
-          }}
-        />
       )}
 
       {showUnsavedSubtoolsPopup && (

@@ -4,11 +4,10 @@ import { watch, readTextFile, exists } from "@tauri-apps/plugin-fs"
 import * as path from "@tauri-apps/api/path"
 import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
-import { setHost } from "./oap"
 
 async function waitHostBus(): Promise<number> {
   const home = await path.homeDir()
-  const file = await path.join(home, ".dive", "host_cache", "bus")
+  const file = await path.join(home, ".velis", "host_cache", "bus")
   const read = async (file: string) => {
     const body = await readTextFile(file)
     if (!body) {
@@ -77,7 +76,6 @@ async function getPort() {
 export async function initFetch() {
   const port = await getPort()
   console.log("host port", port)
-  setHost(`http://localhost:${port}`)
 
   if (isElectron) {
     return initElectronFetch(+port)

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSetAtom, useAtomValue } from "jotai"
 import { codeStreamingAtom } from "../atoms/codeStreaming"
@@ -6,8 +6,6 @@ import { useTranslation } from "react-i18next"
 import { historiesAtom, loadHistoriesAtom } from "../atoms/historyState"
 import ChatInput from "../components/ChatInput"
 import Login from "./Login"
-import { isLoggedInOAPAtom } from "../atoms/oapState"
-import { modelGroupsAtom } from "../atoms/modelState"
 import "../styles/pages/_Welcome.scss"
 
 const Welcome = () => {
@@ -16,9 +14,7 @@ const Welcome = () => {
   const updateStreamingCode = useSetAtom(codeStreamingAtom)
   const histories = useAtomValue(historiesAtom)
   const loadHistories = useSetAtom(loadHistoriesAtom)
-  const isInitialized = useMemo(() => localStorage.getItem("isInitialized") === "true", [])
-  const isLoggedInOAP = useAtomValue(isLoggedInOAPAtom)
-  const modelGroups = useAtomValue(modelGroupsAtom)
+  const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null)
 
   useEffect(() => {
     document.title = t("header.title")
@@ -32,12 +28,41 @@ const Welcome = () => {
     loadHistories()
   }, [loadHistories])
 
+  const checkFirstLaunch = () => {
+    if (window.ipcRenderer) {
+      window.ipcRenderer.isFirstLaunch().then(setIsFirstLaunch)
+    }
+  }
+
+  useEffect(() => {
+    // Check if this is first launch by checking if .setup_completed exists
+    checkFirstLaunch()
+  }, [])
+
+  useEffect(() => {
+    // Re-check when navigating back to this page
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkFirstLaunch()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
+
   const recentHistories = useMemo(() => {
     const sortedHistories = [...histories.normal, ...histories.starred].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     return sortedHistories.slice(0, 3)
   }, [histories])
 
-  if (!isInitialized && !isLoggedInOAP && modelGroups.length === 0) {
+  // Show login screen if model_config.json doesn't exist (first launch)
+  if (isFirstLaunch === null) {
+    // Still checking, show nothing
+    return null
+  }
+
+  if (isFirstLaunch) {
     return <Login />
   }
 

@@ -1,5 +1,5 @@
-import { useAtomValue, useSetAtom } from "jotai"
-import { ThemeType, setThemeAtom, userThemeAtom } from "../atoms/themeState"
+import {useAtomValue, useSetAtom} from "jotai"
+import {setThemeAtom, ThemeType, userThemeAtom} from "../atoms/themeState"
 import Tabs from "./Tabs"
 
 const ThemeSwitch = () => {

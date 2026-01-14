@@ -22,6 +22,7 @@ export default function useUpdateProgress(onComplete: () => void, onError: (e: {
 
   const electronStartDownload = useCallback(() => {
     window.ipcRenderer.invoke("start-download")
+    setProgress(0.1)
   }, [])
 
   const tauriStartDownload = useCallback(async (silent: boolean = false) => {
@@ -63,16 +64,11 @@ export default function useUpdateProgress(onComplete: () => void, onError: (e: {
 
   const update = useCallback(async () => {
     if (window.PLATFORM === "darwin") {
-      openUrl("https://oaphub.ai/download")
+      openUrl("https://github.com/dive-app/dive/releases/latest")
       return
     }
 
-    if (!isElectron && window.PLATFORM === "linux") {
-      openUrl("https://github.com/OpenAgentPlatform/Dive/releases/latest")
-      return
-    }
-
-    if (getAutoDownload() && progress === 0) {
+    if (getAutoDownload()) {
       return isElectron ? window.ipcRenderer.invoke("quit-and-install") : tauriStartDownload(true)
     }
 

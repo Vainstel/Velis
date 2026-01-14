@@ -18,7 +18,6 @@ import isMatch from "lodash/isMatch"
 import { getVerifyKey } from "../../../helper/verify"
 import { getVerifyStatus } from "./ModelVerify"
 import { commonFlashAtom } from "../../../atoms/globalState"
-import { isOAPUsageLimitAtom } from "../../../atoms/oapState"
 
 const PageLayout = () => {
   const { t } = useTranslation()
@@ -37,12 +36,9 @@ const PageLayout = () => {
   const modelGroups = useAtomValue(modelGroupsAtom)
   const rawConfig = useAtomValue(configAtom)
   const writeEmptyConfig = useSetAtom(writeEmptyConfigAtom)
-  const isOAPUsageLimit = useAtomValue(isOAPUsageLimitAtom)
 
   const listModelGroups = useMemo(() => {
-    const _modelGroups = clone(modelGroups)
-    _modelGroups.sort((g, _) => g.modelProvider === "oap" ? -1 : 1)
-    return _modelGroups
+    return clone(modelGroups)
   }, [modelGroups])
 
   const [settings, setSettings] = useAtom(modelSettingsAtom)
@@ -122,20 +118,14 @@ const PageLayout = () => {
     setShowNoModelAfterDelete(false)
     const group = clone(getLatestBuffer().group)
     setSettings(settings => {
-      if (settings.groups.length === 1) {
-        settings.groups = []
-      }
-
       settings.groups = removeGroup(getGroupTerm(group), settings.groups)
       return clone(settings)
     })
 
-    if (settings.groups[0]) {
-      showToast({
-        message: t("models.deleteToast", { name: settings.groups[0].modelProvider }),
-        type: "success"
-      })
-    }
+    showToast({
+      message: t("models.deleteToast", { name: group.modelProvider }),
+      type: "success"
+    })
 
     handleActiveConfigNotInSettings()
   }
@@ -222,7 +212,7 @@ const PageLayout = () => {
               </div>
             </div>
           </div>
-          <div className={`providers-list ${isOAPUsageLimit ? "oap-usage-limit" : ""}`}>
+          <div className="providers-list">
             <div className="providers-list-item head">
               <div className="provider-col-1"></div>
               <div className="provider-col-2">{t("Provider")}</div>

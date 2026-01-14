@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { useAtom } from "jotai"
-import { showToastAtom } from "../atoms/toastState"
+import React, {useEffect, useState} from "react"
+import {useTranslation} from "react-i18next"
+import {useAtom} from "jotai"
+import {showToastAtom} from "../atoms/toastState"
 import Textarea from "./WrappedTextarea"
 
 const CustomInstructions = () => {

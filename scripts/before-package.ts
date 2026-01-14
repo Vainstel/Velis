@@ -1,8 +1,8 @@
 import spawn from "cross-spawn"
 import path from "path"
-import { fileURLToPath } from "url"
+import {fileURLToPath} from "url"
 import fse from "fs-extra"
-import { StdioOptions } from "child_process"
+import {StdioOptions} from "child_process"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

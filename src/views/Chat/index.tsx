@@ -7,18 +7,15 @@ import { codeStreamingAtom } from "../../atoms/codeStreaming"
 import useHotkeyEvent from "../../hooks/useHotkeyEvent"
 import { showToastAtom } from "../../atoms/toastState"
 import { useTranslation } from "react-i18next"
-import { addElicitationRequestAtom, currentChatIdAtom, isChatStreamingAtom, lastMessageAtom, messagesMapAtom, chatStreamingStatusMapAtom, streamingStateMapAtom } from "../../atoms/chatState"
+import { currentChatIdAtom, isChatStreamingAtom, lastMessageAtom, messagesMapAtom, chatStreamingStatusMapAtom, streamingStateMapAtom } from "../../atoms/chatState"
 import { safeBase64Encode } from "../../util"
-import { updateOAPUsageAtom } from "../../atoms/oapState"
 import { loadHistoriesAtom } from "../../atoms/historyState"
 import { openOverlayAtom } from "../../atoms/layerState"
 import PopupConfirm from "../../components/PopupConfirm"
+import { Tool, toolsAtom } from "../../atoms/toolState"
 import { authorizeStateAtom } from "../../atoms/globalState"
 import { readLocalFile } from "../../ipc/util"
 import "../../styles/pages/_Chat.scss"
-import { forceRestartMcpConfigAtom, loadToolsAtom, Tool, toolsAtom } from "../../atoms/toolState"
-import "../../styles/pages/_Chat.scss"
-import { createPortal } from "react-dom"
 
 interface ToolCall {
   name: string
@@ -46,10 +43,6 @@ interface RawMessage {
     time_to_first_token: number
     tokens_per_second: number
     user_token: number
-    langchain_token: number
-    custom_prompt_token: number
-    system_prompt_token: number
-    mcp_tool_prompt_token: number
   }
   files: File[]
 }
@@ -77,7 +70,6 @@ const ChatWindow = () => {
   // Store streaming state per chatId
   const [streamingStateMap, setStreamingStateMap] = useAtom(streamingStateMapAtom)
   const toolKeyRef = useRef(0)
-  const updateOAPUsage = useSetAtom(updateOAPUsageAtom)
   const loadHistories = useSetAtom(loadHistoriesAtom)
   const openOverlay = useSetAtom(openOverlayAtom)
   const [showAuthorizePopup, setShowAuthorizePopup] = useState(false)
@@ -88,10 +80,6 @@ const ChatWindow = () => {
   const authorizeState = useAtomValue(authorizeStateAtom)
   const [cancelingAuthorize, setCancelingAuthorize] = useState(false)
   const [isLoadingChat, setIsLoadingChat] = useState(false)
-  const forceRestartMcpConfig = useSetAtom(forceRestartMcpConfigAtom)
-  const [isLoading, setIsLoading] = useState(false)
-  const addElicitationRequest = useSetAtom(addElicitationRequestAtom)
-  const loadTools = useSetAtom(loadToolsAtom)
 
   // Helper function to set streaming status for a specific chatId
   const setChatStreamingStatus = useCallback((targetChatId: string, isStreaming: boolean) => {
@@ -178,7 +166,11 @@ const ChatWindow = () => {
           isSent: msg.role === "user",
           timestamp: new Date(msg.createdAt).getTime(),
           files: msg.files,
-          resourceUsage: msg.resource_usage
+          inputTokens: msg.role === "user" ? msg.resource_usage?.user_token : msg.resource_usage?.total_input_tokens,
+          outputTokens: msg.resource_usage?.total_output_tokens,
+          modelName: msg.resource_usage?.model,
+          timeToFirstToken: msg.resource_usage?.time_to_first_token,
+          tokensPerSecond: msg.resource_usage?.tokens_per_second
         })
 
         let toolCallBuf: any[] = []
@@ -245,7 +237,11 @@ const ChatWindow = () => {
                     acc.push(rawToMessage({ ...msg, content: msg.content }))
                   } else if(msg.content && toolCallBuf.length === 0) {
                     acc[acc.length - 1].text += msg.content
-                    acc[acc.length - 1].resourceUsage = msg.resource_usage
+                    acc[acc.length - 1].inputTokens = msg.resource_usage?.total_input_tokens
+                    acc[acc.length - 1].outputTokens = msg.resource_usage?.total_output_tokens
+                    acc[acc.length - 1].modelName = msg.resource_usage?.model
+                    acc[acc.length - 1].timeToFirstToken = msg.resource_usage?.time_to_first_token
+                    acc[acc.length - 1].tokensPerSecond = msg.resource_usage?.tokens_per_second
                   }
 
                   toolCallBuf.push(msg.toolCalls)
@@ -256,7 +252,11 @@ const ChatWindow = () => {
                   acc.push(rawToMessage(msg))
                 } else {
                   acc[acc.length - 1].text += msg.content
-                  acc[acc.length - 1].resourceUsage = msg.resource_usage
+                  acc[acc.length - 1].inputTokens = msg.resource_usage?.total_input_tokens
+                  acc[acc.length - 1].outputTokens = msg.resource_usage?.total_output_tokens
+                  acc[acc.length - 1].modelName = msg.resource_usage?.model
+                  acc[acc.length - 1].timeToFirstToken = msg.resource_usage?.time_to_first_token
+                  acc[acc.length - 1].tokensPerSecond = msg.resource_usage?.tokens_per_second
                 }
                 break
             }
@@ -439,7 +439,7 @@ const ChatWindow = () => {
 
     const targetChatId = currentChatIdRef.current
 
-    let targetMessage = {} as Message
+    let prevMessages = {} as Message
     let editedMessageFiles: (File | string)[] | undefined
     updateMessagesForChat(targetChatId, prev => {
       let newMessages = [...prev]
@@ -450,7 +450,10 @@ const ChatWindow = () => {
 
         // Update the edited message text
         newMessages[messageIndex].text = newText
-        targetMessage = newMessages[messageIndex]
+
+        prevMessages = newMessages[messageIndex + 1]
+        prevMessages.text = ""
+        prevMessages.isError = false
         newMessages = newMessages.slice(0, messageIndex+1)
       }
       return newMessages
@@ -458,22 +461,17 @@ const ChatWindow = () => {
 
     await new Promise(resolve => setTimeout(resolve, 0))
 
-    //push empty ai response message
-    const aiMessage: Message = {
-      id: `${targetChatId}-${currentId.current++}`,
-      text: "",
-      isSent: false,
-      timestamp: Date.now()
-    }
     updateMessagesForChat(targetChatId, prev => {
-      return [...prev, aiMessage]
+      const newMessages = [...prev]
+      newMessages.push(prevMessages)
+      return newMessages
     })
     setChatStreamingStatus(targetChatId, true)
     scrollToBottom()
 
     const body = new FormData()
     body.append("chatId", currentChatIdRef.current)
-    body.append("messageId", targetMessage?.id ?? messageId)
+    body.append("messageId", prevMessages.isSent ? prevMessages.id : messageId)
     body.append("content", newText)
 
     // Convert files to File objects and append to FormData
@@ -519,9 +517,6 @@ const ChatWindow = () => {
           toolCallResults: "",
           toolResultCount: 0,
           toolResultTotal: 0,
-          agentToolCallResults: "",
-          agentToolResultCount: 0,
-          agentToolResultTotal: 0,
           chatReader: null
         })
         return newMap
@@ -621,7 +616,7 @@ const ChatWindow = () => {
                   ?.map((call: {name: string}) => call.name) || []
 
                 const uniqTools = new Set(tools)
-                const toolNameByCall = uniqTools.size === 0 ? "%name%" : Array.from(uniqTools).join(", ")
+                const toolName = uniqTools.size === 0 ? "%name%" : Array.from(uniqTools).join(", ")
 
                 let updatedToolState = { currentText: "", toolCallResults: "" }
                 setStreamingStateMap(prev => {
@@ -630,7 +625,7 @@ const ChatWindow = () => {
                   const newState = {
                     ...oldState,
                     toolResultTotal: tools.length,
-                    toolCallResults: oldState.toolCallResults + `\n<tool-call toolkey=${toolKeyRef.current} name="${toolNameByCall}">##Tool Calls:${safeBase64Encode(JSON.stringify(toolCalls))}`
+                    toolCallResults: oldState.toolCallResults + `\n<tool-call toolkey=${toolKeyRef.current} name="${toolName}">##Tool Calls:${safeBase64Encode(JSON.stringify(toolCalls))}`
                   }
                   newMap.set(targetChatId, newState)
                   updatedToolState = { currentText: newState.currentText, toolCallResults: newState.toolCallResults }
@@ -646,9 +641,6 @@ const ChatWindow = () => {
 
               case "tool_result":
                 const result = data.content as ToolResult
-                if (result.name === "add_mcp_server") {
-                  loadTools()
-                }
 
                 let updatedResultState = { currentText: "", toolCallResults: "" }
                 setStreamingStateMap(prev => {
@@ -772,39 +764,24 @@ const ChatWindow = () => {
 
               case "interactive":
                 try {
-                  const interactiveType = data.content.type
-                  const interactiveContent = data.content.content
+                  if(isAuthorizing.current)
+                    continue
 
-                  if (interactiveType === "authentication_required") {
-                    if(isAuthorizing.current) {
-                      continue
-                    }
-                    setIsLoading(true)
-                    await forceRestartMcpConfig()
-                    setIsLoading(false)
+                  isAuthorizing.current = true
 
-                    isAuthorizing.current = true
-
-                    const authUrl = new URL(interactiveContent.auth_url)
-                    const state = authUrl.searchParams.get("state")
-                    if (state) {
-                      setAuthorizeState(state)
-                      const tool = allTools.find((_tool: Tool) => _tool.name === interactiveContent.server_name)
-                      if (tool) {
-                        setCurrentTool(tool)
-                        setShowAuthorizePopup(true)
-                      } else {
-                        setShowAuthorizePopup(false)
-                      }
+                  const authUrl = new URL(data.content.content.auth_url)
+                  const state = authUrl.searchParams.get("state")
+                  if (state) {
+                    setAuthorizeState(state)
+                    const tool = allTools.find((_tool: Tool) => _tool.name === data.content.content.server_name)
+                    if (tool) {
+                      setCurrentTool(tool)
+                      setShowAuthorizePopup(true)
                     } else {
                       setShowAuthorizePopup(false)
                     }
-                  } else if (interactiveType === "elicitation_request") {
-                    addElicitationRequest({
-                      requestId: interactiveContent.request_id,
-                      message: interactiveContent.message,
-                      requestedSchema: interactiveContent.requested_schema,
-                    })
+                  } else {
+                    setShowAuthorizePopup(false)
                   }
                 } catch (error) {
                   console.warn(error)
@@ -814,17 +791,14 @@ const ChatWindow = () => {
               case "token_usage":
                 updateMessagesForChat(targetChatId, prev => {
                   const newMessages = [...prev]
-                  newMessages[newMessages.length - 1].resourceUsage = {
-                    model: data.content.modelName,
-                    total_input_tokens: data.content.inputTokens,
-                    total_output_tokens: data.content.outputTokens,
-                    user_token: data.content.userToken,
-                    custom_prompt_token: data.content.customPromptToken,
-                    system_prompt_token: data.content.systemPromptToken,
-                    time_to_first_token: data.content.timeToFirstToken,
-                    tokens_per_second: data.content.tokensPerSecond,
-                    total_run_time: 0
+                  if(newMessages[newMessages.length - 2]?.isSent) {
+                    newMessages[newMessages.length - 2].inputTokens = data.content.userToken
                   }
+                  newMessages[newMessages.length - 1].inputTokens = data.content.inputTokens
+                  newMessages[newMessages.length - 1].outputTokens = data.content.outputTokens
+                  newMessages[newMessages.length - 1].modelName = data.content.modelName
+                  newMessages[newMessages.length - 1].timeToFirstToken = data.content.timeToFirstToken
+                  newMessages[newMessages.length - 1].tokensPerSecond = data.content.tokensPerSecond
                   return newMessages
                 })
                 break
@@ -883,10 +857,9 @@ const ChatWindow = () => {
       })
       setChatStreamingStatus(targetChatId, false)
 
-      updateOAPUsage()
       loadHistories()
     }
-  }, [allTools, updateMessagesForChat, setChatStreamingStatus, scrollToBottom, updateOAPUsage, loadHistories, streamingStateMap, setStreamingStateMap, setMessagesMap, setChatStreamingStatusMap])
+  }, [allTools, updateMessagesForChat, setChatStreamingStatus, scrollToBottom, loadHistories, streamingStateMap, setStreamingStateMap, setMessagesMap, setChatStreamingStatusMap])
 
   const handleInitialMessage = useCallback(async (message: string, files?: File[]) => {
     if (files && files.length > 0) {
@@ -969,13 +942,6 @@ const ChatWindow = () => {
           onCancel={onAuthorizeCancel}
         />
       )}
-      {isLoading && (
-        createPortal(
-          <div className="global-loading-overlay">
-            <div className="loading-spinner"></div>
-          </div>,
-          document.body
-      ))}
     </div>
   )
 }

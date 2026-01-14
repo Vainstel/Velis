@@ -3,7 +3,6 @@ import { LLMGroup } from "../../../../types/model"
 import { isProviderIconNoFilter, PROVIDER_ICONS, PROVIDER_LABELS } from "../../../atoms/interfaceState"
 import { systemThemeAtom, userThemeAtom } from "../../../atoms/themeState"
 import { useAtomValue } from "jotai"
-import { isOAPUsageLimitAtom, OAPLevelAtom } from "../../../atoms/oapState"
 import Tooltip from "../../../components/Tooltip"
 import Switch from "../../../components/Switch"
 import Dropdown from "../../../components/DropDown"
@@ -25,10 +24,7 @@ const GroupItem = ({ group, onGroupToggle, onOpenModelPopup, onEditGroup, onDele
   const { t } = useTranslation()
   const userTheme = useAtomValue(userThemeAtom)
   const systemTheme = useAtomValue(systemThemeAtom)
-  const OAPLevel = useAtomValue(OAPLevelAtom)
   const allVerifiedList = useAtomValue(modelVerifyListAtom)
-  const isOAP = group.modelProvider === "oap"
-  const isOAPUsageLimit = useAtomValue(isOAPUsageLimitAtom)
 
   const activeModelCount = useMemo(() => {
     return group.models.filter(model => model.active).length
@@ -46,7 +42,7 @@ const GroupItem = ({ group, onGroupToggle, onOpenModelPopup, onEditGroup, onDele
 
   const imageClassName = isProviderIconNoFilter(group.modelProvider, userTheme, systemTheme) ? "no-filter" : ""
 
-  return (<div className={`providers-list-item ${isOAP ? "oap" : ""}`}>
+  return (<div className="providers-list-item">
       <div className="provider-col-1"></div>
       <div className="provider-col-2">
         <img
@@ -59,15 +55,9 @@ const GroupItem = ({ group, onGroupToggle, onOpenModelPopup, onEditGroup, onDele
         </div>
       </div>
       <div className="provider-col-3">
-        {isOAP ?
-          <div className="oap-level">
-            {OAPLevel}
-          </div>
-        :
-          <div>
-            {getGroupDisplayDetail(group).map((d, i) => <div key={i}>{d}</div>)}
-          </div>
-        }
+        <div>
+          {getGroupDisplayDetail(group).map((d, i) => <div key={i}>{d}</div>)}
+        </div>
       </div>
       <div className="provider-col-4">
         <div className="models-popup-btn-container">
@@ -90,10 +80,6 @@ const GroupItem = ({ group, onGroupToggle, onOpenModelPopup, onEditGroup, onDele
         </div>
       </div>
       <div className="provider-col-5">
-          {(isOAP && isOAPUsageLimit) &&
-          <div className="providers-hint-item-text">
-            {t("models.oapUsageLimit")}
-          </div>}
       </div>
       <div className="provider-col-6">
         <Switch
@@ -116,7 +102,7 @@ const GroupItem = ({ group, onGroupToggle, onOpenModelPopup, onEditGroup, onDele
                       {t("models.providerMenu1")}
                     </div>,
                   onClick: editGroup,
-                  active: !isOAP,
+                  active: true,
                 },
                 { label:
                     <div className="provider-edit-menu-item">
@@ -140,7 +126,7 @@ const GroupItem = ({ group, onGroupToggle, onOpenModelPopup, onEditGroup, onDele
                       {t("models.providerMenu3")}
                     </div>,
                   onClick: () => onDeleteGroup(group),
-                  active: !isOAP,
+                  active: true,
                 },
               ].filter(option => option.active !== undefined ? option.active : true)
             }

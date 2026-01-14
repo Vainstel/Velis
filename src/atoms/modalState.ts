@@ -1,4 +1,4 @@
-import { atom } from "jotai"
+import {atom} from "jotai"
 
 export const keymapModalVisibleAtom = atom(false)
 export const isKeymapClickedAtom = atom(false)

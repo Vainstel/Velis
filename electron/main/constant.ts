@@ -27,9 +27,10 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   : RENDERER_DIST
 
 export const envPath = envPaths(app.getName(), {suffix: ""})
+export const legacyConfigDir = envPath.config
 export const cacheDir = envPath.cache
 export const homeDir = os.homedir()
-export const appDir = path.join(homeDir, ".dive")
+export const appDir = path.join(homeDir, ".velis")
 export const scriptsDir = path.join(appDir, "scripts")
 export const configDir = app.isPackaged ? path.join(appDir, "config") : path.join(process.cwd(), ".config")
 export const hostCacheDir = path.join(appDir, "host_cache")
@@ -49,36 +50,16 @@ export const darwinPathList = [
   path.join(process.resourcesPath, "uv"),
 ]
 
-export const DEF_MCP_SERVER_NAME = "__SYSTEM_DIVE_SERVER__"
-
-export const DEF_MCP_BIN_NAME = process.platform === "win32"
-  ? "dive-mcp.exe"
-  : process.platform === "darwin"
-    ? process.arch === "arm64" ? "dive-mcp-aarch64" : "dive-mcp-x86_64"
-    : "dive-mcp"
-
-export const getDefMcpBinPath = () => {
-  if (app.isPackaged) {
-    return path.join(process.resourcesPath, "prebuilt", DEF_MCP_BIN_NAME)
-  }
-  return path.join(process.cwd(), "target", "release", DEF_MCP_BIN_NAME)
-}
-
-export const getDefMcpServerConfig = () => {
-  const defMcpBinPath = getDefMcpBinPath()
-  return {
-    "mcpServers": {
-      [DEF_MCP_SERVER_NAME]: {
-        "transport": "stdio",
-        "enabled": true,
-        "command": defMcpBinPath
-      }
-    }
-  }
-}
-
 export const DEF_MCP_SERVER_CONFIG = {
-  "mcpServers": {}
+  "mcpServers": {
+    "echo": {
+      "enabled": true,
+      "command": "node",
+      "args": [
+        path.join(scriptsDir, "echo.js")
+      ]
+    },
+  }
 }
 
 export const DEF_MODEL_CONFIG = {
@@ -87,18 +68,10 @@ export const DEF_MODEL_CONFIG = {
   "enableTools": true
 }
 
-export const DEF_PLUGIN_CONFIG = [
-  {
-    "name": "oap-platform",
-    "module": "dive_mcp_host.oap_plugin",
-    "config": {},
-    "ctx_manager": "dive_mcp_host.oap_plugin.OAPPlugin",
-    "static_callbacks": "dive_mcp_host.oap_plugin.get_static_callbacks"
-  }
-]
+export const DEF_PLUGIN_CONFIG: any[] = []
 
 const dbPath = path.join(configDir, "db.sqlite")
-export const DEF_DIVE_HTTPD_CONFIG = {
+export const DEF_VELIS_HTTPD_CONFIG = {
   "db": {
     "uri": `sqlite:///${dbPath}`,
     "pool_size": 5,

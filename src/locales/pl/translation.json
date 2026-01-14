@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "Otwórz pasek boczny",
     "closeSidebar": "Zamknij pasek boczny"
   },
@@ -33,7 +33,6 @@
     "retry": "Spróbuj ponownie",
     "noModelAlert": "Brak dostępnych modeli",
     "noModelBanner": "Brak dostępnych modeli, najpierw wybierz model",
-    "onLimit": "Osiągnięto limit użycia planu {{plan}}, modele oap nie mogą być używane",
     "modelSettings": "Ustawienia modelu",
     "copy": "Kopiuj",
     "copied": "Skopiowano",
@@ -53,24 +52,6 @@
       "enableToast": "Wywołania narzędzi włączone",
       "enable": "Włącz wywołania narzędzi"
     },
-    "reAuthorize": {
-      "title": "Błąd autoryzacji podczas wywoływania narzędzia",
-      "description": "Autoryzacja dla tego narzędzia wygasła lub została anulowana, więc narzędzie nie może być używane. Wymagana jest nowa autoryzacja, aby przywrócić pełną funkcjonalność.",
-      "confirm": "Ponownie autoryzuj",
-      "stopChange": "Autoryzacja w toku, nie modyfikuj konfiguracji"
-    },
-    "elicitation": {
-      "title": "Wymagane dane",
-      "selectOption": "Wybierz opcję",
-      "decline": "Odrzuć",
-      "submit": "Wyślij",
-      "confirmTitle": "Wymagane potwierdzenie",
-      "confirm": "Potwierdź",
-      "pendingRequests": "{{count}} oczekujących żądań",
-      "pendingRequests_one": "{{count}} oczekujące żądanie",
-      "acceptAll": "Akceptuj wszystko",
-      "declineAll": "Odrzuć wszystko"
-    },
     "tokens": {
       "tooltip": "Liczba tokenów wejściowych",
       "model": "Model",
@@ -78,13 +59,6 @@
       "output": "Wyjście",
       "count": "Liczba tokenów",
       "total": "Całkowite użycie",
-      "composition": "Struktura składu tokenów wejściowych",
-      "compositionAlt": "Ta liczba tokenów jest szacowana przez Langchain, rzeczywiste użycie może się nieznacznie różnić",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "Pierwsze opóźnienie {{time}} ms",
       "firstDelayDesc": "Pierwsze opóźnienie: Czas potrzebny AI do rozpoczęcia generowania pierwszego znaku",
       "generationRate": "{{time}} tokenów na sekundę",
@@ -92,7 +66,7 @@
     }
   },
   "welcome": {
-    "title": "Witaj w Dive AI",
+    "title": "Witaj w Velis AI",
     "subtitle": "Rozpocznij swoją konwersację z AI",
     "startChat": "Rozpocznij czat"
   },
@@ -122,7 +96,6 @@
     "models": "Ustawienia modelu",
     "system": "Ustawienia systemu",
     "manageAndSettings": "Zarządzanie i ustawienia",
-    "OAPhub": "OAPhub",
     "signOut": "Wyloguj się",
     "chat": {
       "starredChat": "Ulubione",
@@ -189,17 +162,7 @@
     "initialTimeoutError": "Proszę wprowadzić liczbę większą lub równą 10",
     "jsonDesc": "Proszę wprowadzić lub wkleić JSON serwera MCP w polu",
     "addArg": "Dodaj argument",
-    "argsTitleAlt": "Argumenty",
     "addEnv": "Dodaj zmienną środowiskową",
-    "envTitleAlt": "Zmienna środowiskowa",
-    "ignoreVerification": "Ignoruj weryfikację SSL/TLS",
-    "addHeaders": "Dodaj Headers",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "Domyślnie 600 sekund, brak maksymalnego limitu.",
-    "toolCallTimeoutPlaceholder": "Wprowadź Tool call Timeout...",
-    "toolCallTimeoutError": "Proszę wprowadzić dowolną liczbę zmiennoprzecinkową większą lub równą 0",
-    "headersKey": "Wprowadź nazwę Headers (Key)...",
-    "headersValue": "Wprowadź wartość Headers (Value)...",
     "jsonFormatError": {
       "addFormat": "Błąd formatu konfiguracji, proszę sprawdzić i poprawić format",
       "format": "Błąd formatu konfiguracji {{mcp}}, proszę sprawdzić i poprawić format",
@@ -224,9 +187,7 @@
       "initialTimeout": "Narzędzie {{mcp}}: Pole initialTimeout musi być liczbą zmiennoprzecinkową",
       "range": "Narzędzie {{mcp}}: Wartość pola {{field}} jest poza zakresem, proszę sprawdzić i poprawić wartość",
       "minRange": "Narzędzie {{mcp}}: Pole {{field}} musi być większe lub równe {{value}}",
-      "maxRange": "Narzędzie {{mcp}}: Pole {{field}} musi być mniejsze lub równe {{value}}",
-      "urlRequiredstreamable": "Narzędzie {{mcp}}: URL jest wymagany dla transportu streamable",
-      "urlRequiredsse": "Narzędzie {{mcp}}: URL jest wymagany dla transportu SSE"
+      "maxRange": "Narzędzie {{mcp}}: Pole {{field}} musi być mniejsze lub równe {{value}}"
     },
     "namePlaceholder": "Wprowadź nazwę...",
     "commandPlaceholder": "Wprowadź polecenie...",
@@ -242,18 +203,11 @@
     "logTitle": "Wykonaj polecenie UVX",
     "logProcessing": "Przetwarzanie...",
     "no_tool_title": "Brak dostępnych serwerów MCP",
-    "no_oap_tool_message": {
-      "all": "Proszę wybrać serwer MCP OAP do użycia lub dodać niestandardowy serwer MCP.",
-      "oap": "Proszę wybrać serwer MCP OAP do użycia.",
-      "custom": "Proszę dodać niestandardowy serwer MCP."
-    },
     "no_tool_message": "Proszę dodać serwer MCP.",
     "tab": {
       "all": "Wszystkie narzędzia",
-      "oap": "Narzędzia OAP",
       "custom": "Narzędzia niestandardowe"
     },
-    "oapStoreLinkAlt": "Zobacz szczegóły",
     "subToolsCount": "Włączone narzędzia: {{count}} / {{total}}",
     "disableAll": "Wyłącz wszystkie",
     "enableAll": "Włącz wszystkie",
@@ -270,28 +224,6 @@
       "headerBtn": "Przeładuj",
       "headerBtnAlt": "Przeładuj i zaktualizuj narzędzia MCP"
     },
-    "oap": {
-      "type": {
-        "all": "Wszystkie narzędzia",
-        "base": "Pokaż tylko Base",
-        "pro": "Pokaż tylko Pro",
-        "official": "Pokaż tylko Official"
-      },
-      "sort": {
-        "title": "Sortuj",
-        "popular": "Popularne",
-        "new": "Nowe"
-      },
-      "tag": "Kategoria",
-      "show_more": "Więcej",
-      "no_search_data_title": "Nie znaleziono narzędzi MCP",
-      "no_search_data": "Nie znaleziono wyników wyszukiwania, proszę wyczyścić słowo kluczowe wyszukiwania lub dostosować warunki filtrowania.",
-      "clear_filter": "Wyczyść filtr",
-      "hint": "Serwery MCP wysokiego poziomu wymagają uaktualnienia do wersji Pro w celu instalacji",
-      "high_cost_title": "Włącz serwery MCP o wysokich kosztach",
-      "high_cost_desc": "Wybrano serwery MCP, które zużywają wiele tokenów. Proszę sprawdzić, czy użycie planu jest wystarczające.",
-      "headerBtnAlt": "Dodaj / Zobacz narzędzia MCP OAP"
-    },
     "custom": {
       "headerBtn": "Dodaj / Edytuj konfigurację",
       "headerBtnAlt": "Dodaj / Edytuj narzędzia niestandardowe",
@@ -306,7 +238,7 @@
       "add": "Dodaj łącznik",
       "addTitle": "Dodaj łącznik",
       "editTitle": "Edytuj łącznik {{name}}",
-      "description": "Dive użyje autoryzacji połączenia OAuth, aby bezpiecznie połączyć Twoje konto z narzędziami i rozpocząć korzystanie z gotowych łączników.",
+      "description": "Velis AI użyje autoryzacji połączenia OAuth, aby bezpiecznie połączyć Twoje konto z narzędziami i rozpocząć korzystanie z gotowych łączników.",
       "connect": "Połącz",
       "disconnect": "Rozłącz",
       "nameTitle": "Nazwa",
@@ -439,14 +371,11 @@
     "reasoningLevelTooltip": "Niski reprezentuje szybką odpowiedź, koncentrującą się na wnioskach i bez dodatkowych szczegółów, z bezpośrednim i prostym rozumowaniem. Średni zapewnia odpowiedź z wystarczającym logicznym wyjaśnieniem, obejmującym kluczowe informacje. Wysoki oferuje głęboką odpowiedź ze strukturalną i szczegółową analizą i wyjaśnieniem.",
     "tokenBudgetDescription": "Ustaw wartość rozumowania ({{min}}~{{max}})",
     "parameterVerify": "Weryfikacja parametrów",
-    "expired": "Ten model został oficjalnie wycofany",
-    "expiredInfo": "Ten model nie znajduje się już na oficjalnej liście i jest wyświetlany tylko jako lokalna historia. Może nie działać lub aktualizować się poprawnie. Jeśli odznaczysz, zostanie usunięty i nie będzie można go odzyskać z listy.",
     "verifyErrorInfo": "Szczegóły błędu weryfikacji",
     "verifyErrorMsg": "Model nie użył żadnych narzędzi podczas weryfikacji, co może wynikać z braku wsparcia lub niewyzwolenia. Dlatego nie można potwierdzić, czy obsługuje narzędzia.",
     "verifyStatusSuccess": "Weryfikacja modelu zakończona sukcesem, włączono z oryginalną konfiguracją",
     "verifyStatusSuccessInPrompt": "Weryfikacja modelu zakończona sukcesem, włączono z MCP Prompts",
     "verifyUnexpectedFailed": "Weryfikacja modelu nie powiodła się, wystąpił nieznany błąd, proszę spróbować ponownie później",
-    "oapUsageLimit": "Osiągnięto limit użycia, tymczasowo niedostępne",
     "providerFilter": {
       "Alt": "Jeśli model, którego chcesz użyć, nie znajduje się w popularnych opcjach modelu, możesz użyć funkcji wyszukiwania, aby go znaleźć.",
       "Clear": "Wyczyść"
@@ -463,33 +392,35 @@
     "autoDownload": "Automatyczne pobieranie aktualizacji",
     "autoDownloadDescription": "Automatycznie pobierz nową wersję DIVE, gdy użytkownik uruchomi ponownie lub kliknie przycisk \"Aktualizuj\" na stronie menu, nowa wersja zostanie włączona",
     "autoLaunch": "Automatyczne uruchamianie",
-    "autoLaunchDescription": "Automatycznie uruchom Dive AI przy starcie systemu",
+    "autoLaunchDescription": "Automatycznie uruchom Velis AI przy starcie systemu",
     "minimalToTray": "Minimalizuj do zasobnika",
     "minimalToTrayDescription": "Przy zamykaniu okna program zostanie zminimalizowany do zasobnika systemowego zamiast całkowicie zakończyć",
-    "loginTitle": "Logowanie OAP",
-    "loginDescription": "Użyj OpenAgentPlatform do logowania, nie jest wymagane techniczne tło, aby łatwo łączyć LLM, agentów AI i serwery MCP — Doświadcz inteligentnych rozwiązań teraz!",
     "personalInformationTitle": "Informacje osobiste",
     "defaultSystemPrompt": "Domyślny prompt systemowy Dive",
     "defaultSystemPromptDescription": "Domyślny prompt systemowy Dive jest używany jako domyślny prompt systemowy dla czatu. Informuje LLM, że czat Dive obsługuje KaTeX / Markdown / Mermaid itp. Ta funkcja zużywa pewne tokeny, co może sprawić, że odpowiedź będzie wolniejsza niż prompt bez promptu systemowego. Z drugiej strony, jeśli jest wyłączona, jakość odpowiedzi LLM może się obniżyć",
-    "usageAnalytics": "Przejdź do strony Dashboard w OAP Hub, aby zobaczyć",
     "usageAnalyticsTitle": "Analiza użycia",
-    "userEdit": "Przejdź do strony Konto w OAP Hub, aby wprowadzić zmiany",
     "planSectionTitle": "Użycie bieżącego planu",
     "subscriptionDate": "Data subskrypcji",
     "remainingUsage": "Pozostałe użycie",
     "usageWarningTitle": "Osiągnięto limit użycia tokenów.",
-    "usageWarning": "Limit zostanie zresetowany w przyszłym miesiącu lub kup pakiet kredytowy dla większego użycia. Ograniczona dostępność podstawowych serwerów MCP.",
-    "BaseUsageWarning": "Podstawowe serwery MCP: {{mcpLimit}} wywołań na godzinę. Aby korzystać z innych serwerów MCP, przejdź do <planLink>strony płatności</planLink> i ulepsz swój plan.",
+    "usageWarning": "Limit zostanie zresetowany w przyszłym miesiącu lub kup pakiety tokenów dla większego użycia. Podstawowe modele i podstawowe MCP są nadal dostępne.",
+    "BaseUsageWarning": "Modele bazowe: {{callLimit}} wywołań na {{callUnit}} godzin | Serwery MCP bazowe: {{mcpLimit}} wywołań na godzinę. Aby używać innych modeli i MCP, zaktualizuj swój plan na <planLink>stronie planu</planLink>.",
     "customPromptDescription": "Jeśli potrzebujesz dodatkowych niestandardowych instrukcji, kliknij funkcję \"Niestandardowy prompt\" poniżej, aby ją skonfigurować.",
     "customPromptButton": "Niestandardowy prompt",
     "tokenPackageTitle": "Użycie pakietu tokenów",
     "tokenPackageHint": "Pakiety tokenów nie mają daty wygaśnięcia i będą używane tylko po wyczerpaniu miesięcznego limitu planu.",
     "tokenPackageRemainingUsage": "Pozostałe użycie",
     "tokenPackageWarningTitle": "Limit tokenów wyczerpany.",
-    "tokenPackageWarning": "Możesz uzupełnić więcej użycia tokenów na <planLink>stronie Dashboard</planLink> OAPhub.",
     "skipTlsVerifyWarning": "Ostrzeżenie bezpieczeństwa: Ignorowanie weryfikacji certyfikatu może zmniejszyć bezpieczeństwo połączenia. Zaleca się użycie w zaufanych środowiskach sieciowych.",
+    "allRateLimitReachedTitle": "Osiągnięto limit wywołań modeli i serwerów MCP.",
+    "llmRateLimitReachedTitle": "Osiągnięto limit wywołań modeli.",
     "mcpRateLimitReachedTitle": "Osiągnięto limit wywołań serwerów MCP.",
-    "rateLimitReachedDescription": "Proszę poczekać przed wykonaniem nowych żądań; limit zostanie automatycznie przywrócony."
+    "rateLimitReachedDescription": "Proszę poczekać przed wykonaniem nowych żądań; limit zostanie automatycznie przywrócony.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "Skopiowano do schowka",
@@ -524,14 +455,10 @@
     "clickToInstall": "Kliknij, aby zainstalować aktualizację"
   },
   "login": {
-    "subtitle": "Dive AI to aplikacja desktopowa open-source, która bezproblemowo integruje różne duże modele językowe obsługujące wywołania funkcji. Dzięki czystemu i intuicyjnemu interfejsowi możesz łatwo rozmawiać z najnowocześniejszą AI, od codziennych pytań po zadania zawodowe, otrzymując precyzyjne odpowiedzi i czyniąc ją swoim inteligentnym asystentem.",
+    "subtitle": "Velis AI to aplikacja desktopowa open-source, która bezproblemowo integruje różne duże modele językowe obsługujące wywołania funkcji. Dzięki czystemu i intuicyjnemu interfejsowi możesz łatwo rozmawiać z najnowocześniejszą AI, od codziennych pytań po zadania zawodowe, otrzymując precyzyjne odpowiedzi i czyniąc ją swoim inteligentnym asystentem.",
     "title1": "Użyj własnych przygotowanych modeli",
     "description1": "Odpowiednie dla zaawansowanych ekspertów AI. Jeśli masz już własną gotową konfigurację, czy to lokalne Ollama, llama.cpp, czy zdalne API LLM Openrouter, OpenAI, Anthropic lub innych firm AI, proszę użyć tej opcji.",
-    "button1": "Przejdź do ustawień modelu",
-    "title2": "Użyj OpenAgentPlatform",
-    "description2": "OAP ułatwia każdemu korzystanie z najnowocześniejszych usług AI, łącząc LLM, agentów AI i serwery MCP bez wymagania wiedzy technicznej. Odkryj nieograniczone możliwości AI i doświadcz inteligentnych rozwiązań teraz.",
-    "button2": "Zarejestruj się w OAP",
-    "button3": "Zaloguj się do OAP"
+    "button1": "Przejdź do ustawień modelu"
   },
   "InstallHostDependencies": {
     "title": "Pobieranie zależności hosta...",

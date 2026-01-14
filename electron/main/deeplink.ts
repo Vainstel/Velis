@@ -2,22 +2,13 @@ import { app, BrowserWindow } from "electron"
 import { exec } from "node:child_process"
 import path from "node:path"
 import fs from "fs-extra"
-import { oapClient } from "./oap"
-import { serviceStatus, setServiceUpCallback } from "./service"
+import { serviceStatus } from "./service"
 import { createWindow } from "."
 
-const DESKTOP_FILE_NAME = "oaphub-dive.desktop"
-type DeepLinkType = "login" | "refresh" | "mcp.install" | "mcp.oauth.redirect" | "open" | "unknown"
+const DESKTOP_FILE_NAME = "velis.desktop"
+type DeepLinkType = "mcp.install" | "mcp.oauth.redirect" | "open" | "unknown"
 
 function getDeepLinkTypeFromUrl(url: string): DeepLinkType {
-  if (url.startsWith("dive://signin/")) {
-    return "login"
-  }
-
-  if (url.includes("refresh")) {
-    return "refresh"
-  }
-
   if (url.includes("mcp.install")) {
     return "mcp.install"
   }
@@ -27,51 +18,6 @@ function getDeepLinkTypeFromUrl(url: string): DeepLinkType {
   }
 
   return "unknown"
-}
-
-export async function refreshConfig() {
-  const url = `http://${serviceStatus.ip}:${serviceStatus.port}`
-  await fetch(`${url}/api/plugins/oap-platform/config/refresh`, { method: "POST" })
-    .then((res) => res.json())
-    .then((res) => console.log("refresh config", res))
-}
-
-export function setOAPTokenToHost(token: string) {
-  const setHostToken = async (ip: string, port: number) => {
-    const url = `http://${ip}:${port}`
-    await fetch(`${url}/api/plugins/oap-platform/auth`, {
-      method: "POST",
-      body: JSON.stringify({ token }),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then((res) => res.json())
-      .then((res) => console.log("set token to host", res))
-      .then(refreshConfig)
-      .catch(console.error)
-
-    oapClient.login(token)
-  }
-
-  if (serviceStatus.port) {
-    setHostToken(serviceStatus.ip, serviceStatus.port)
-  } else {
-    setServiceUpCallback(setHostToken)
-  }
-
-  oapClient.login(token)
-}
-
-function handleLoginFromDeepLink(url: string) {
-  const token = url.split("/").pop()
-  if (!token) {
-    console.error("No token found in deep link")
-    return
-  }
-
-  console.info("login from deep link")
-  setOAPTokenToHost(token)
 }
 
 export async function deeplinkHandler(win: BrowserWindow|null, url: string) {
@@ -88,13 +34,6 @@ export async function deeplinkHandler(win: BrowserWindow|null, url: string) {
   }
 
   switch (getDeepLinkTypeFromUrl(url)) {
-    case "login":
-      handleLoginFromDeepLink(url)
-      break
-    case "refresh":
-      win?.webContents.send("refresh")
-      refreshConfig().catch(console.error)
-      break
     case "mcp.install":
       const deeplink = new URL(url)
       win?.webContents.send("mcp.install", {
@@ -139,11 +78,11 @@ export async function setupAppImageDeepLink(): Promise<void> {
     // %U allows passing the URL to the application
     // NoDisplay=true hides it from the regular application menu
     const desktopFileContent = `[Desktop Entry]
-Name=Dive
+Name=Velis AI
 Exec=${escapePathForExec(appPath)} %U
 Terminal=false
 Type=Application
-MimeType=x-scheme-handler/dive;
+MimeType=x-scheme-handler/velis;
 NoDisplay=true
 `
 

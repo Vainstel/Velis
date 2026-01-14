@@ -2,7 +2,7 @@ import { isElectron } from "./env"
 import { exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs"
 import * as path from "@tauri-apps/api/path"
 
-const MODEL_SETTINGS_PATH = ".dive/config/model_settings.json"
+const MODEL_SETTINGS_PATH = ".velis/config/model_settings.json"
 
 export async function getModelSettings() {
   if (isElectron) {

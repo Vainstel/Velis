@@ -1,6 +1,6 @@
-import { atom } from "jotai"
-import { LLMGroup, ModelGroupSetting } from "../../types/model"
-import { defaultModelGroupSetting, getGroupTerm, removeGroup, updateGroup } from "../helper/model"
+import {atom} from "jotai"
+import {LLMGroup, ModelGroupSetting} from "../../types/model"
+import {defaultModelGroupSetting, getGroupTerm, removeGroup, updateGroup} from "../helper/model"
 
 export const modelSettingsAtom = atom<ModelGroupSetting>(defaultModelGroupSetting())
 

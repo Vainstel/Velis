@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "Avaa sivupalkki",
     "closeSidebar": "Sulje sivupalkki"
   },
@@ -33,7 +33,6 @@
     "retry": "Yritä uudelleen",
     "noModelAlert": "Ei malleja saatavilla",
     "noModelBanner": "Ei malleja saatavilla, valitse ensin malli",
-    "onLimit": "Olet saavuttanut {{plan}}-suunnitelman käyttörajan, oap-malleja ei voi käyttää",
     "modelSettings": "Malliasetukset",
     "copy": "Kopioi",
     "copied": "Kopioitu",
@@ -53,24 +52,6 @@
       "enableToast": "Työkalukutsut käytössä",
       "enable": "Ota työkalukutsut käyttöön"
     },
-    "reAuthorize": {
-      "title": "Valtuutusvirhe työkalua kutsuttaessa",
-      "description": "Tämän työkalun valtuutus on vanhentunut tai peruutettu, joten työkalua ei voi käyttää. Uusi valtuutus vaaditaan täyden toiminnallisuuden palauttamiseksi.",
-      "confirm": "Valtuuta uudelleen",
-      "stopChange": "Valtuutus käynnissä, älä muuta konfiguraatiota"
-    },
-    "elicitation": {
-      "title": "Syöte vaaditaan",
-      "selectOption": "Valitse vaihtoehto",
-      "decline": "Hylkää",
-      "submit": "Lähetä",
-      "confirmTitle": "Vahvistus vaaditaan",
-      "confirm": "Vahvista",
-      "pendingRequests": "{{count}} odottavaa pyyntöä",
-      "pendingRequests_one": "{{count}} odottava pyyntö",
-      "acceptAll": "Hyväksy kaikki",
-      "declineAll": "Hylkää kaikki"
-    },
     "tokens": {
       "tooltip": "Syöttötokenien määrä",
       "model": "Model",
@@ -78,13 +59,6 @@
       "output": "Tuloste",
       "count": "Tokenien määrä",
       "total": "Kokonaiskäyttö",
-      "composition": "Syöttötokenien koostumuksen rakenne",
-      "compositionAlt": "Tämä tokenimäärä on Langchainin arvio, todellinen käyttö voi vaihdella hieman",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "Ensimmäinen viive {{time}} ms",
       "firstDelayDesc": "Ensimmäinen viive: Aika, joka tekoälyltä kuluu ensimmäisen merkin luomiseen",
       "generationRate": "{{time}} tokenia sekunnissa",
@@ -92,7 +66,7 @@
     }
   },
   "welcome": {
-    "title": "Tervetuloa Dive AI:hin",
+    "title": "Tervetuloa Velis AI:hin",
     "subtitle": "Aloita AI-keskustelusi",
     "startChat": "Aloita keskustelu"
   },
@@ -122,7 +96,6 @@
     "models": "Malliasetukset",
     "system": "Järjestelmäasetukset",
     "manageAndSettings": "Hallinta ja asetukset",
-    "OAPhub": "OAPhub",
     "signOut": "Kirjaudu ulos",
     "chat": {
       "starredChat": "Suosikit",
@@ -189,17 +162,7 @@
     "initialTimeoutError": "Syötä numero, joka on vähintään 10",
     "jsonDesc": "Syötä tai liitä MCP-palvelimen JSON kenttään",
     "addArg": "Lisää argumentti",
-    "argsTitleAlt": "Argumentit",
     "addEnv": "Lisää ympäristömuuttuja",
-    "envTitleAlt": "Ympäristömuuttuja",
-    "ignoreVerification": "Ohita SSL/TLS-varmennus",
-    "addHeaders": "Lisää Headers",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "Oletus on 600 sekuntia, ei enimmäisrajaa.",
-    "toolCallTimeoutPlaceholder": "Syötä työkalukutsun aikakatkaisu...",
-    "toolCallTimeoutError": "Syötä mikä tahansa liukuluku, joka on vähintään 0",
-    "headersKey": "Syötä Headers-nimi (Key)...",
-    "headersValue": "Syötä Headers-arvo (Value)...",
     "jsonFormatError": {
       "addFormat": "Määrityksen muotovirhe, tarkista ja korjaa muoto",
       "format": "{{mcp}} määrityksen muotovirhe, tarkista ja korjaa muoto",
@@ -224,9 +187,7 @@
       "initialTimeout": "Työkalu {{mcp}}: Kentän initialTimeout on oltava liukuluku",
       "range": "Työkalu {{mcp}}: Kentän {{field}} arvo on alueen ulkopuolella, tarkista ja korjaa arvo",
       "minRange": "Työkalu {{mcp}}: Kentän {{field}} on oltava vähintään {{value}}",
-      "maxRange": "Työkalu {{mcp}}: Kentän {{field}} on oltava enintään {{value}}",
-      "urlRequiredstreamable": "Työkalu {{mcp}}: URL vaaditaan streamable-siirrolle",
-      "urlRequiredsse": "Työkalu {{mcp}}: URL vaaditaan SSE-siirrolle"
+      "maxRange": "Työkalu {{mcp}}: Kentän {{field}} on oltava enintään {{value}}"
     },
     "namePlaceholder": "Syötä nimi...",
     "commandPlaceholder": "Syötä komento...",
@@ -242,18 +203,11 @@
     "logTitle": "Suorita UVX-komento",
     "logProcessing": "Käsitellään...",
     "no_tool_title": "Ei MCP-palvelimia saatavilla",
-    "no_oap_tool_message": {
-      "all": "Valitse käytettävä OAP MCP-palvelin tai lisää mukautettu MCP-palvelin.",
-      "oap": "Valitse käytettävä OAP MCP-palvelin.",
-      "custom": "Lisää mukautettu MCP-palvelin."
-    },
     "no_tool_message": "Lisää MCP-palvelin.",
     "tab": {
       "all": "Kaikki työkalut",
-      "oap": "OAP-työkalut",
       "custom": "Mukautetut työkalut"
     },
-    "oapStoreLinkAlt": "Näytä tiedot",
     "subToolsCount": "Työkalut käytössä: {{count}} / {{total}}",
     "disableAll": "Poista kaikki käytöstä",
     "enableAll": "Ota kaikki käyttöön",
@@ -270,28 +224,6 @@
       "headerBtn": "Lataa uudelleen",
       "headerBtnAlt": "Lataa uudelleen ja päivitä MCP-työkalut"
     },
-    "oap": {
-      "type": {
-        "all": "Kaikki työkalut",
-        "base": "Näytä vain Base",
-        "pro": "Näytä vain Pro",
-        "official": "Näytä vain Official"
-      },
-      "sort": {
-        "title": "Lajittele",
-        "popular": "Suosittu",
-        "new": "Uusi"
-      },
-      "tag": "Kategoria",
-      "show_more": "Lisää",
-      "no_search_data_title": "MCP-työkaluja ei löytynyt",
-      "no_search_data": "Hakutuloksia ei löytynyt, tyhjennä hakusana tai muuta suodatusehtoja.",
-      "clear_filter": "Tyhjennä suodatin",
-      "hint": "Korkean tason MCP-palvelimet vaativat päivitystä Pro-versioon asennusta varten",
-      "high_cost_title": "Ota käyttöön kalliit MCP-palvelimet",
-      "high_cost_desc": "Olet valinnut MCP-palvelimia, jotka kuluttavat paljon tokeneita. Tarkista, onko suunnitelmasi käyttö riittävä.",
-      "headerBtnAlt": "Lisää / Näytä OAP MCP-työkalut"
-    },
     "custom": {
       "headerBtn": "Lisää / Muokkaa määritystä",
       "headerBtnAlt": "Lisää / Muokkaa mukautettuja työkaluja",
@@ -306,7 +238,7 @@
       "add": "Lisää yhdistin",
       "addTitle": "Lisää yhdistin",
       "editTitle": "Muokkaa {{name}} yhdistintä",
-      "description": "Dive käyttää OAuth-yhteysvaltuutusta yhdistääkseen tilisi turvallisesti työkaluihin ja aloittaakseen valmiiden yhdistimien käytön.",
+      "description": "Velis AI käyttää OAuth-yhteysvaltuutusta yhdistääkseen tilisi turvallisesti työkaluihin ja aloittaakseen valmiiden yhdistimien käytön.",
       "connect": "Yhdistä",
       "disconnect": "Katkaise yhteys",
       "nameTitle": "Nimi",
@@ -439,14 +371,11 @@
     "reasoningLevelTooltip": "Matala edustaa nopeaa vastausta, keskittyen johtopäätöksiin ja ilman lisätietoja, suoralla ja yksinkertaisella päättelyllä. Keskitaso tarjoaa vastauksen riittävällä loogisella selityksellä, kattaen keskeiset tiedot. Korkea tarjoaa syvän vastauksen strukturoidulla ja yksityiskohtaisella analyysilla ja selityksellä.",
     "tokenBudgetDescription": "Aseta päättelyarvo ({{min}}~{{max}})",
     "parameterVerify": "Parametrin vahvistus",
-    "expired": "Tämä malli on virallisesti lopetettu",
-    "expiredInfo": "Tämä malli ei ole enää virallisella listalla ja näytetään vain paikallisena historiana. Se ei välttämättä toimi tai päivity oikein. Jos poistat valinnan, se poistetaan eikä sitä voi palauttaa listalta.",
     "verifyErrorInfo": "Vahvistusvirheen tiedot",
     "verifyErrorMsg": "Malli ei käyttänyt mitään työkaluja vahvistuksen aikana, mikä voi johtua tuen puutteesta tai käynnistämättä jättämisestä. Siksi ei ole mahdollista vahvistaa, tukeeko se työkaluja.",
     "verifyStatusSuccess": "Mallin vahvistus onnistui, käytössä alkuperäisellä määrityksellä",
     "verifyStatusSuccessInPrompt": "Mallin vahvistus onnistui, käytössä MCP Promptsilla",
     "verifyUnexpectedFailed": "Mallin vahvistus epäonnistui, tuntematon virhe tapahtui, yritä myöhemmin uudelleen",
-    "oapUsageLimit": "Käyttöraja saavutettu, väliaikaisesti ei saatavilla",
     "providerFilter": {
       "Alt": "Jos haluamasi malli ei ole suosituissa mallivaihtoehdoissa, voit käyttää hakutoimintoa löytääksesi sen.",
       "Clear": "Tyhjennä"
@@ -463,33 +392,35 @@
     "autoDownload": "Automaattinen päivityksen lataus",
     "autoDownloadDescription": "Lataa automaattisesti uusi DIVE-versio, kun käyttäjä käynnistää uudelleen tai napsauttaa \"Päivitä\"-painiketta valikko-sivulla, uusi versio otetaan käyttöön",
     "autoLaunch": "Automaattinen käynnistys",
-    "autoLaunchDescription": "Käynnistä Dive AI automaattisesti järjestelmän käynnistyessä",
+    "autoLaunchDescription": "Käynnistä Velis AI automaattisesti järjestelmän käynnistyessä",
     "minimalToTray": "Pienennä ilmoitusalueelle",
     "minimalToTrayDescription": "Ikkunan sulkeutuessa ohjelma pienenee järjestelmän ilmoitusalueelle sen sijaan, että se sulkeutuisi kokonaan",
-    "loginTitle": "OAP-kirjautuminen",
-    "loginDescription": "Käytä OpenAgentPlatformia kirjautuaksesi, teknistä taustaa ei tarvita LLM:ien, AI-agenttien ja MCP-palvelimien helposti yhdistämiseen — Koe älykkäät ratkaisut nyt!",
     "personalInformationTitle": "Henkilökohtaiset tiedot",
     "defaultSystemPrompt": "Diven oletusjärjestelmäkehote",
     "defaultSystemPromptDescription": "Diven oletusjärjestelmäkehotetta käytetään oletuksena järjestelmäkehotteena keskustelussa. Se kertoo LLM:lle, että Dive-keskustelu tukee KaTeX / Markdown / Mermaid jne. Tämä ominaisuus kuluttaa tiettyjä tokeneita, mikä voi tehdä vastauksesta hitaamman kuin kehotteessa ilman järjestelmäkehotetta. Toisaalta, jos se on poistettu käytöstä, LLM:n vastauksen laatu voi laskea",
-    "usageAnalytics": "Siirry OAP Hubin Dashboard-sivulle nähdäksesi",
     "usageAnalyticsTitle": "Käyttöanalytiikka",
-    "userEdit": "Siirry OAP Hubin tili-sivulle tehdäksesi muutoksia",
     "planSectionTitle": "Nykyisen suunnitelman käyttö",
     "subscriptionDate": "Tilaus päivämäärä",
     "remainingUsage": "Jäljellä oleva käyttö",
     "usageWarningTitle": "Token-käyttöraja saavutettu.",
-    "usageWarning": "Kiintiö nollautuu ensi kuussa, tai osta krediittipaketti lisäkäyttöön. Rajoitettu perus-MCP-palvelimien tarjonta.",
-    "BaseUsageWarning": "Perus-MCP-palvelimet: {{mcpLimit}} kutsua tunnissa. Jos haluat käyttää muita MCP-palvelimia, päivitä tilauksesi <planLink>laskutussivulla</planLink>.",
+    "usageWarning": "Kiintiö nollautuu ensi kuussa, tai osta token-paketteja lisäkäyttöön. Perusmallit ja perus-MCP ovat edelleen käytettävissä.",
+    "BaseUsageWarning": "Perusmallit: {{callLimit}} kutsua per {{callUnit}} tuntia | Perus-MCP-palvelimet: {{mcpLimit}} kutsua tunnissa. Käyttääksesi muita malleja ja MCP:itä, päivitä suunnitelmasi <planLink>suunnitelmasivulta</planLink>.",
     "customPromptDescription": "Jos tarvitset lisää mukautettuja ohjeita, napsauta alla olevaa \"Mukautettu kehote\" -toimintoa määrittääksesi sen.",
     "customPromptButton": "Mukautettu kehote",
     "tokenPackageTitle": "Token-paketin käyttö",
     "tokenPackageHint": "Token-paketeilla ei ole vanhentumispäivää ja niitä käytetään vasta kuukausittaisen suunnitelman kiintiön ehtymisen jälkeen.",
     "tokenPackageRemainingUsage": "Jäljellä oleva käyttö",
     "tokenPackageWarningTitle": "Token-kiintiö käytetty loppuun.",
-    "tokenPackageWarning": "Voit täydentää lisää token-käyttöä OAPhubin <planLink>Dashboard-sivulla</planLink>.",
     "skipTlsVerifyWarning": "Turvallisuusvaroitus: Sertifikaatin vahvistuksen ohittaminen voi vähentää yhteyden turvallisuutta. Suositellaan käyttämään luotetuissa verkkoympäristöissä.",
+    "allRateLimitReachedTitle": "Mallien ja MCP-palvelimien kutsuraja saavutettu.",
+    "llmRateLimitReachedTitle": "Mallien kutsuraja saavutettu.",
     "mcpRateLimitReachedTitle": "MCP-palvelimien kutsuraja saavutettu.",
-    "rateLimitReachedDescription": "Odota ennen uusien pyyntöjen tekemistä; kiintiö palautuu automaattisesti."
+    "rateLimitReachedDescription": "Odota ennen uusien pyyntöjen tekemistä; kiintiö palautuu automaattisesti.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "Kopioitu leikepöydälle",
@@ -524,14 +455,10 @@
     "clickToInstall": "Napsauta asentaaksesi päivityksen"
   },
   "login": {
-    "subtitle": "Dive AI on avoimen lähdekoodin työpöytäsovellus, joka integroi saumattomasti erilaisia suuria kielimalleja, jotka tukevat funktio kutsuja. Sen selkeän ja intuitiivisen käyttöliittymän avulla voit helposti keskustella huippuluokan AI:n kanssa, päivittäisistä kysymyksistä ammatillisiin tehtäviin, saat tarkkoja vastauksia ja teet siitä älykäs avustajan.",
+    "subtitle": "Velis AI on avoimen lähdekoodin työpöytäsovellus, joka integroi saumattomasti erilaisia suuria kielimalleja, jotka tukevat funktio kutsuja. Sen selkeän ja intuitiivisen käyttöliittymän avulla voit helposti keskustella huippuluokan AI:n kanssa, päivittäisistä kysymyksistä ammatillisiin tehtäviin, saat tarkkoja vastauksia ja teet siitä älykäs avustajan.",
     "title1": "Käytä omia valmiiksi valmistettuja malleja",
     "description1": "Sopii edistyneille AI-asiantuntijoille. Jos sinulla on jo oma määritys valmiina, olipa kyseessä paikallinen Ollama, llama.cpp tai etä-LLM-API:t Openrouter, OpenAI, Anthropic tai muut AI-yritykset, käytä tätä vaihtoehtoa.",
-    "button1": "Siirry malliasetuksiin",
-    "title2": "Käytä OpenAgentPlatformia",
-    "description2": "OAP tekee kaikille helpoksi käyttää edistyneimpiä AI-palveluita, yhdistäen LLM:t, AI-agentit ja MCP-palvelimet ilman teknistä asiantuntemusta. Tutki AI:n rajattomia mahdollisuuksia ja koe älykkäät ratkaisut nyt.",
-    "button2": "Rekisteröidy OAP:iin",
-    "button3": "Kirjaudu OAP:iin"
+    "button1": "Siirry malliasetuksiin"
   },
   "InstallHostDependencies": {
     "title": "Ladataan isännän riippuvuuksia...",

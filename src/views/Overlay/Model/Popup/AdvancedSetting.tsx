@@ -1,24 +1,19 @@
-import { useSetAtom } from "jotai"
-import { RefObject, useEffect, useLayoutEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { showToastAtom } from "../../../../atoms/toastState"
+import {useSetAtom} from "jotai"
+import {RefObject, useEffect, useLayoutEffect, useRef, useState} from "react"
+import {useTranslation} from "react-i18next"
+import {showToastAtom} from "../../../../atoms/toastState"
 import PopupConfirm from "../../../../components/PopupConfirm"
 import Select from "../../../../components/Select"
 import Tooltip from "../../../../components/Tooltip"
 import WrappedInput from "../../../../components/WrappedInput"
-import {
-  formatParametersForSave,
-  initializeAdvancedParameters,
-  Parameter,
-} from "../../../../helper/modelParameterUtils"
-import { ModelVerifyDetail, useModelVerify } from "../ModelVerify"
+import {formatParametersForSave, initializeAdvancedParameters, Parameter,} from "../../../../helper/modelParameterUtils"
+import {getVerifyStatus, ModelVerifyDetail, useModelVerify} from "../ModelVerify"
 import NonStreamingParameter from "./SpecialParameters/NonStreaming"
 import ReasoningLevelParameter from "./SpecialParameters/ReasoningLevel"
 import TokenBudgetParameter from "./SpecialParameters/TokenBudget"
-import { getVerifyStatus } from "../ModelVerify"
-import { imgPrefix } from "../../../../ipc/env"
-import { BaseModel, ModelProvider } from "../../../../../types/model"
-import { useModelsProvider } from "../ModelsProvider"
+import {imgPrefix} from "../../../../ipc/env"
+import {BaseModel, ModelProvider} from "../../../../../types/model"
+import {useModelsProvider} from "../ModelsProvider"
 import Button from "../../../../components/Button"
 import Input from "../../../../components/Input"
 

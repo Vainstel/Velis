@@ -1,6 +1,5 @@
 /// <reference types="vite/client" />
 
-import type { MCPServerSearchParam, OAPMCPServer, OAPMCPTagsResponse, OAPUser, ApiResponse, OAPModelDescription, OAPModelDescriptionParam, OAPLimiterCheck, OAPLimiterCheckParam } from "../types/oap"
 import type { ModelGroupSetting } from "../types/model"
 
 type ModelResults = {
@@ -35,18 +34,9 @@ declare global {
       onReceivePort: (callback: (port: number) => void) => void
       download: (url: string) => Promise<void>
       copyImage: (url: string|Uint8Array) => Promise<void>
-      oapLogin: (regist?: boolean) => Promise<void>
-      oapLogout: () => Promise<void>
-      oapGetToken: () => Promise<string>
-      oapSearchMCPServer: (params: MCPServerSearchParam) => Promise<ApiResponse<OAPMCPServer[]>>
-      oapModelDescription: (params?: OAPModelDescriptionParam) => Promise<ApiResponse<OAPModelDescription[]>>
-      oapApplyMCPServer: (ids: string[]) => Promise<void>
-      oapGetMCPServers: () => Promise<ApiResponse<OAPMCPServer[]>>
-      oapGetMe: () => Promise<ApiResponse<OAPUser>>
-      oapRegistEvent: (event: "login" | "logout", callback: () => void) => () => void
-      oapGetUsage: () => Promise<OAPUsage>
-      oapLimiterCheck: (params: OAPLimiterCheckParam) => Promise<ApiResponse<OAPLimiterCheck>>
-      oapGetMCPTags: () => Promise<OAPMCPTagsResponse>
+      isFirstLaunch: () => Promise<boolean>
+      markSetupCompleted: () => Promise<void>
+      resetToInitialSetup: () => Promise<{ success: boolean }>
       getModelSettings: () => Promise<ModelGroupSetting>
       setModelSettings: (settings: ModelGroupSetting) => Promise<void>
       listenRefresh: (cb: () => void) => () => void
@@ -55,8 +45,6 @@ declare global {
       onReceiveInstallHostDependenciesLog: (callback: (data: string) => void) => () => void
       getInstallHostDependenciesLog: () => Promise<string[]>
       getClientInfo: () => Promise<{ version: string, client_id: string }>
-      listenIPCElicitationRequest: (cb: (data: any) => void) => () => void
-      responsedIPCElicitation: (action: number, content: any) => Promise<void>
       checkCommandExist: (command: string) => Promise<boolean>
       readLocalFile: (filePath: string) => Promise<{ data: Buffer, name: string, mimeType: string }>
       closeWindow: () => void

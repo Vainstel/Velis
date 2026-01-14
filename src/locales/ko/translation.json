@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "채팅 목록 열기",
     "closeSidebar": "채팅 목록 닫기"
   },
@@ -33,7 +33,6 @@
     "retry": "다시 시도",
     "noModelAlert": "사용 가능한 모델이 없습니다",
     "noModelBanner": "사용 가능한 모델이 없습니다. 먼저 모델을 선택해주세요",
-    "onLimit": "{{plan}} 용량 초과로 인해 OAP 모델을 사용할 수 없습니다",
     "modelSettings": "모델 설정",
     "copy": "복사",
     "copied": "복사됨",
@@ -59,18 +58,6 @@
       "confirm": "다시 권한 부여",
       "stopChange": "권한 부여 중이므로 설정을 변경하지 마세요"
     },
-    "elicitation": {
-      "title": "입력 필요",
-      "selectOption": "옵션을 선택하세요",
-      "decline": "거부",
-      "submit": "제출",
-      "confirmTitle": "확인 필요",
-      "confirm": "확인",
-      "pendingRequests": "{{count}}개의 대기 중인 요청",
-      "pendingRequests_one": "{{count}}개의 대기 중인 요청",
-      "acceptAll": "모두 승인",
-      "declineAll": "모두 거부"
-    },
     "tokens": {
       "tooltip": "입력 토큰 수",
       "model": "Model",
@@ -78,13 +65,6 @@
       "output": "출력",
       "count": "토큰 수",
       "total": "총 사용량",
-      "composition": "입력 토큰 구성 구조",
-      "compositionAlt": "이 토큰 수는 Langchain에 의해 추정된 것이며, 실제 사용량은 약간 다를 수 있습니다",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "첫 지연 {{time}} ms",
       "firstDelayDesc": "첫 지연: AI가 첫 번째 문자를 생성하는 데 걸리는 시간",
       "generationRate": "초당 {{time}} 토큰",
@@ -92,7 +72,7 @@
     }
   },
   "welcome": {
-    "title": "Dive AI에 오신 것을 환영합니다",
+    "title": "Velis AI에 오신 것을 환영합니다",
     "subtitle": "AI와의 대화를 시작해보세요",
     "startChat": "채팅 시작"
   },
@@ -122,7 +102,6 @@
     "models": "모델 설정",
     "system": "시스템 설정",
     "manageAndSettings": "설정",
-    "OAPhub": "OAPhub",
     "signOut": "로그아웃",
     "chat": {
       "starredChat": "즐겨찾기",
@@ -194,14 +173,6 @@
     "envTitleAlt": "환경 변수",
     "addArg": "인자 추가",
     "addEnv": "환경 변수 추가",
-    "ignoreVerification": "SSL/TLS 인증 무시",
-    "addHeaders": "Headers 추가",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "기본값은 600초이며 최대 제한이 없습니다.",
-    "toolCallTimeoutPlaceholder": "Tool call Timeout 입력...",
-    "toolCallTimeoutError": "0 이상의 임의의 실수를 입력해주세요",
-    "headersKey": "Headers 이름 입력 (Key)...",
-    "headersValue": "Headers 값 입력 (Value)...",
     "jsonFormatError": {
       "addFormat": "설정 형식 오류, 형식을 확인하고 수정해주세요",
       "format": "{{mcp}} 설정 형식 오류, 형식을 확인하고 수정해주세요",
@@ -229,9 +200,8 @@
       "maxRange": "도구{{mcp}}： 필드 {{field}} 는 {{value}} 이하이어야 합니다",
       "urlError": "도구{{mcp}}： 필드 {{field}} 는 유효한 URL이어야 합니다",
       "commandOrUrlRequired": "도구{{mcp}}： command 또는 url이 필요합니다",
-      "urlRequiredstreamable": "도구{{mcp}}: streamable 전송에는 url이 필요합니다",
-      "urlRequiredsse": "도구{{mcp}}: SSE 전송에는 url이 필요합니다",
-      "urlInvalid": "도구{{mcp}}: URL 형식이 유효하지 않습니다"
+      "urlRequired": "도구{{mcp}}： streamable 전송을 위해 url이 필요합니다",
+      "urlInvalid": "도구{{mcp}}： URL 형식이 유효하지 않습니다"
     },
     "namePlaceholder": "이름을 입력하세요...",
     "commandPlaceholder": "명령어를 입력하세요...",
@@ -247,20 +217,12 @@
     "logTitle": "UVX 명령 실행",
     "logProcessing": "처리 중...",
     "no_tool_title": "현재 설정된 MCP 서버가 없습니다",
-    "no_oap_tool_message": {
-      "all": "사용할 OAP MCP 서버를 선택하거나 사용자 정의 MCP 서버를 추가하세요.",
-      "oap": "사용할 OAP MCP 서버를 선택하세요.",
-      "connector": "사용할 Connector를 선택하세요.",
-      "custom": "사용자 정의 MCP 서버를 추가하세요."
-    },
     "no_tool_message": "MCP 서버를 추가하세요.",
     "tab": {
       "all": "모든 도구",
-      "oap": "OAP 도구",
       "connector": "연결 도구",
       "custom": "사용자 정의 도구"
     },
-    "oapStoreLinkAlt": "상세 설명",
     "filter": {
       "search": "도구 검색...",
       "noResult": "도구를 찾을 수 없습니다"
@@ -270,7 +232,7 @@
     "disableAll": "모두 비활성화",
     "enableAll": "모두 활성화",
     "disabledDescription": "비활성화됨",
-    "disConnectedDescription": "연결 안 됨",
+    "disConnectedDescription": "未連接",
     "unsaved": {
       "title": "저장되지 않은 변경",
       "desc": "저장되지 않은 변경이 있습니다. 이 페이지를 벗어나면 변경이 사라집니다. 계속하시겠습니까?",
@@ -283,28 +245,6 @@
     "reload": {
       "headerBtn": "다시 불러오기",
       "headerBtnAlt": "다시 불러오기 및 MCP 도구 업데이트"
-    },
-    "oap": {
-      "type": {
-        "all": "모든 도구",
-        "base": "Base만 표시",
-        "pro": "Pro만 표시",
-        "official": "Official만 표시"
-      },
-      "sort": {
-        "title": "정렬",
-        "popular": "인기",
-        "new": "최신"
-      },
-      "tag": "카테고리",
-      "show_more": "더 보기",
-      "no_search_data_title": "MCP 도구를 찾을 수 없습니다",
-      "no_search_data": "검색 결과가 없습니다. 검색어를 지우거나 필터를 조정하세요.",
-      "clear_filter": "필터 지우기",
-      "hint": "고급 MCP 서버는 Pro 버전으로 업그레이드해야 설치할 수 있습니다",
-      "high_cost_title": "비싼 MCP 서버 활성화",
-      "high_cost_desc": "사용량이 많은 MCP 서버를 선택했습니다. 활성화하시겠습니까?",
-      "headerBtnAlt": "추가 / 편집 OAP MCP 도구"
     },
     "custom": {
       "headerBtn": "MCP Config 추가 / 편집",
@@ -456,14 +396,11 @@
     "reasoningLevelTooltip": "낮음: 빠르고 간결한 결론 중심 응답 / 중간: 논리적 설명 포함 / 높음: 구조적이고 깊이 있는 분석 응답 제공",
     "tokenBudgetDescription": "추론 값 설정 ({{min}}~{{max}})",
     "parameterVerify": "파라미터 검증",
-    "expired": "이 모델은 공식적으로 중단되었습니다",
-    "expiredInfo": "이 모델은 더 이상 공식 목록에 없으며 로컬 기록으로만 표시됩니다. 정상적으로 작동하거나 업데이트되지 않을 수 있습니다. 선택을 해제하면 제거되며 목록에서 다시 찾을 수 없습니다.",
     "verifyErrorInfo": "검증 오류 상세 정보",
     "verifyErrorMsg": "검증 중 모델이 도구를 호출하지 않았습니다. 이는 도구 미지원 또는 트리거되지 않았기 때문일 수 있습니다. 도구 지원 여부를 확인할 수 없습니다.",
     "verifyStatusSuccess": "모델 검증 성공, 기존 설정으로 활성화됨",
     "verifyStatusSuccessInPrompt": "모델 검증 성공, MCP 프롬프트로 활성화됨",
     "verifyUnexpectedFailed": "모델 검증 실패, 알 수 없는 오류가 발생했습니다. 나중에 다시 시도해주세요",
-    "oapUsageLimit": "사용량이 초과되어 일시적으로 사용할 수 없습니다",
     "providerFilter": {
       "Alt": "사용하고자 하는 모델이 인기 옵션에 없는 경우 검색 기능을 사용하여 찾을 수 있습니다.",
       "Clear": "지우기"
@@ -480,34 +417,36 @@
     "autoDownload": "자동 업데이트 다운로드",
     "autoDownloadDescription": "사용자가 메뉴에서 \"업그레이드\" 버튼을 클릭하거나 재시작할 때 새로운 버전의 DIVE를 자동으로 다운로드하고 활성화합니다.",
     "autoLaunch": "자동 실행",
-    "autoLaunchDescription": "시스템 시작 시 Dive AI를 자동으로 실행합니다.",
-    "loginTitle": "OAP 로그인",
-    "loginDescription": "OpenAgentPlatform 로그인, 기술 배경 없이도 LLMs, AI Agents 및 MCP 서버를 쉽게 연결할 수 있습니다 - 지금 똑똑한 솔루션을 경험하세요!",
+    "autoLaunchDescription": "시스템 시작 시 Velis AI를 자동으로 실행합니다.",
     "personalInformationTitle": "개인 정보",
     "minimalToTray": "트레이로 최소화",
     "minimalToTrayDescription": "창을 닫을 때 완전히 종료하지 않고 시스템 트레이로 최소화합니다.",
-    "defaultSystemPrompt": "Dive 기본 시스템 프롬프트",
-    "defaultSystemPromptDescription": "Dive 기본 시스템 프롬프트는 채팅에 기본적으로 적용되는 시스템 프롬프트입니다. LLM에게 Dive 채팅이 KaTeX / Markdown / Mermaid 등을 지원한다는 정보를 전달하며, 이 기능은 일부 토큰을 소비하여 응답이 다소 느려질 수 있습니다. 비활성화하면 응답 품질이 낮아질 수 있습니다.",
-    "usageAnalytics": "OAP Hub의 Dashboard 페이지에서 확인",
+    "defaultSystemPrompt": "Velis AI 기본 시스템 프롬프트",
+    "defaultSystemPromptDescription": "Velis AI 기본 시스템 프롬프트는 채팅에 기본적으로 적용되는 시스템 프롬프트입니다. LLM에게 Dive 채팅이 KaTeX / Markdown / Mermaid 등을 지원한다는 정보를 전달하며, 이 기능은 일부 토큰을 소비하여 응답이 다소 느려질 수 있습니다. 비활성화하면 응답 품질이 낮아질 수 있습니다.",
     "usageAnalyticsTitle": "사용 분석",
-    "userEdit": "OAP Hub의 Account 페이지에서 확인",
     "planSectionTitle": "현재 계획 사용량",
     "subscriptionDate": "구독 일자",
     "remainingUsage": "남은 크레딧",
     "usageExhausted": "사용량 한도에 도달했습니다",
     "usageWarningTitle": "현재 할당량이 소진되었습니다",
-    "usageWarning": "할당량은 다음 달에 재설정되거나 더 많은 사용을 위해 크레딧 패키지를 구매하세요. 기본 MCP 서버 제한 제공.",
-    "BaseUsageWarning": "Base MCP 서버: {{mcpLimit}}회/시간. 다른 MCP 서버를 이용하시려면 <planLink>결제 페이지</planLink>에서 플랜을 업그레이드해 주세요.",
+    "usageWarning": "할당량은 다음 달에 재설정되거나 더 많은 사용을 위해 크레딧 패키지를 구매하세요. 기본 모델 및 기본 MCP는 계속 사용 가능합니다.",
+    "BaseUsageWarning": "Base 모델: {{callLimit}}회 / {{callUnit}}시간 | Base MCP 서버: {{mcpLimit}}회/시간. 다른 모델 및 MCP를 사용하려면 <planLink>플랜 페이지</planLink>에서 플랜을 업그레이드하세요.",
     "customPromptDescription": "추가 사용자 지정 명령이 필요한 경우 아래의 \"사용자 지정 프롬프트\" 기능을 클릭하여 설정으로 이동하세요.",
     "customPromptButton": "사용자 지정 프롬프트",
     "tokenPackageTitle": "크레딧 사용량",
     "tokenPackageHint": "크레딧 패키지는 만료일이 없으며, 매월 계획 할당량이 소진된 후 사용됩니다.",
     "tokenPackageRemainingUsage": "남은 크레딧",
     "tokenPackageWarningTitle": "현재 할당량이 소진되었습니다",
-    "tokenPackageWarning": "OAPhub <planLink>Dashboard 페이지</planLink>에서 더 많은 크레딧을 충전할 수 있습니다.",
     "skipTlsVerifyWarning": "보안 경고: 인증서 검증을 무시하면 연결 보안이 감소할 수 있습니다. 신뢰할 수 있는 네트워크 환경에서 사용하는 것이 좋습니다.",
+    "allRateLimitReachedTitle": "모델 및 MCP 서버 호출 한도에 도달했습니다.",
+    "llmRateLimitReachedTitle": "모델 호출 한도에 도달했습니다.",
     "mcpRateLimitReachedTitle": "MCP 서버 호출 한도에 도달했습니다.",
-    "rateLimitReachedDescription": "새 요청을 하기 전에 잠시 기다려 주세요. 할당량이 자동으로 복원됩니다."
+    "rateLimitReachedDescription": "새 요청을 하기 전에 잠시 기다려 주세요. 할당량이 자동으로 복원됩니다.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "클립보드에 복사되었습니다",
@@ -542,14 +481,10 @@
     "clickToInstall": "업데이트 설치하려면 클릭하세요"
   },
   "login": {
-    "subtitle": "Dive AI는 개방형 소스 데스크탑 애플리케이션으로, 다양한 기능 호출을 지원하는 대형 언어 모델을 완벽하게 통합합니다. 직관적인 인터페이스를 통해 최고의 AI와 대화할 수 있습니다. 일상적인 질문부터 전문적인 작업까지, 정확한 답변을 얻고 스스로 지능형 도우미가 되세요.",
+    "subtitle": "Velis AI는 개방형 소스 데스크탑 애플리케이션으로, 다양한 기능 호출을 지원하는 대형 언어 모델을 완벽하게 통합합니다. 직관적인 인터페이스를 통해 최고의 AI와 대화할 수 있습니다. 일상적인 질문부터 전문적인 작업까지, 정확한 답변을 얻고 스스로 지능형 도우미가 되세요.",
     "title1": "사용자 정의 모델 사용",
     "description1": "고급 AI 전문가를 위한 최적의 선택입니다. 이미 준비된 설정이 있으시다면, 로컬 Ollama, llama.cpp 또는 원격 Openrouter, OpenAI, Anthropic 또는 기타 AI 회사가 제공하는 LLM API 등 어떤 것이든 사용하세요.",
-    "button1": "모델 설정으로 이동",
-    "title2": "OpenAgentPlatform 플랫폼 사용",
-    "description2": "OAP는 모든 사람이 최신 AI 서비스를 쉽게 사용할 수 있도록 설계되었습니다. LLM, AI Agent 및 MCP 서버를 쉽게 연결하고, AI의 무한 가능성을 탐험하세요.",
-    "button2": "OAP 회원가입",
-    "button3": "OAP 로그인"
+    "button1": "모델 설정으로 이동"
   },
   "InstallHostDependencies": {
     "title": "모듈 패키지 다운로드 중...",

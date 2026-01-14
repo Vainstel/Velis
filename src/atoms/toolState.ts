@@ -1,7 +1,7 @@
-import { atom } from "jotai"
+import {atom} from "jotai"
 
 export interface MCP {
-  type: "oap" | "custom"
+  type: "custom"
   plan?: string
   description: string
   icon?: string
@@ -25,8 +25,7 @@ export interface SubTool {
 
 export interface Tool {
   name: string
-  oapId?: string
-  type?: "oap" | "custom" | "connector"
+  type?: "custom" | "connector"
   description?: string
   url?: string
   icon?: string
@@ -92,27 +91,6 @@ export const loadMcpConfigAtom = atom(
     }
 
     return data
-  }
-)
-
-export const forceRestartMcpConfigAtom = atom(
-  null,
-  async (get, set) => {
-    await set(loadMcpConfigAtom)
-    const mcpConfig = get(mcpConfigAtom)
-    await fetch("/api/config/mcpserver?force=1", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(mcpConfig)
-    })
-      .then(async (response) => await response.json())
-      .catch((error) => {
-        console.error("Failed to update MCP config:", error)
-      })
-
-    return true
   }
 )
 

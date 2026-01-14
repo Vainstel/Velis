@@ -1,8 +1,8 @@
 import React from "react"
 import * as Portal from "@radix-ui/react-portal"
-import { DismissableLayer } from "@radix-ui/react-dismissable-layer"
-import { useAtom } from "jotai"
-import { sidebarVisibleAtom } from "../atoms/sidebarState"
+import {DismissableLayer} from "@radix-ui/react-dismissable-layer"
+import {useAtom} from "jotai"
+import {sidebarVisibleAtom} from "../atoms/sidebarState"
 
 export type PopupStylePorps = {
   zIndex?: number

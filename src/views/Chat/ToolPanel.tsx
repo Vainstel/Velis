@@ -1,10 +1,10 @@
-import React, { useMemo } from "react"
-import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter"
-import { tomorrow, darcula } from "react-syntax-highlighter/dist/esm/styles/prism"
-import { useAtomValue } from "jotai"
-import { themeAtom } from "../../atoms/themeState"
-import { safeBase64Decode } from "../../util"
-import { useTranslation } from "react-i18next"
+import React, {useMemo} from "react"
+import {PrismAsyncLight as SyntaxHighlighter} from "react-syntax-highlighter"
+import {darcula, tomorrow} from "react-syntax-highlighter/dist/esm/styles/prism"
+import {useAtomValue} from "jotai"
+import {themeAtom} from "../../atoms/themeState"
+import {safeBase64Decode} from "../../util"
+import {useTranslation} from "react-i18next"
 import Tooltip from "../../components/Tooltip"
 
 interface ToolPanelProps {

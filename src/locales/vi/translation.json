@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Dive AI",
+    "title": "Velis AI",
     "openSidebar": "Mở thanh bên",
     "closeSidebar": "Đóng thanh bên"
   },
@@ -33,7 +33,6 @@
     "retry": "Thử lại",
     "noModelAlert": "Không có mô hình khả dụng",
     "noModelBanner": "Không có mô hình khả dụng, vui lòng chọn mô hình trước",
-    "onLimit": "Bạn đã đạt giới hạn sử dụng gói {{plan}}, không thể sử dụng mô hình oap",
     "modelSettings": "Cài đặt mô hình",
     "copy": "Sao chép",
     "copied": "Đã sao chép",
@@ -53,24 +52,6 @@
       "enableToast": "Đã bật gọi công cụ",
       "enable": "Bật gọi công cụ"
     },
-    "reAuthorize": {
-      "title": "Lỗi ủy quyền khi gọi công cụ",
-      "description": "Ủy quyền cho công cụ này đã hết hạn hoặc bị hủy, vì vậy không thể tiếp tục sử dụng công cụ. Cần ủy quyền mới để khôi phục đầy đủ chức năng.",
-      "confirm": "Ủy quyền lại",
-      "stopChange": "Đang ủy quyền, vui lòng không thay đổi cấu hình"
-    },
-    "elicitation": {
-      "title": "Cần nhập liệu",
-      "selectOption": "Chọn một tùy chọn",
-      "decline": "Từ chối",
-      "submit": "Gửi",
-      "confirmTitle": "Cần xác nhận",
-      "confirm": "Xác nhận",
-      "pendingRequests": "{{count}} yêu cầu đang chờ",
-      "pendingRequests_one": "{{count}} yêu cầu đang chờ",
-      "acceptAll": "Chấp nhận tất cả",
-      "declineAll": "Từ chối tất cả"
-    },
     "tokens": {
       "tooltip": "Số lượng token đầu vào",
       "model": "Model",
@@ -78,13 +59,6 @@
       "output": "Đầu ra",
       "count": "Số lượng token",
       "total": "Tổng sử dụng",
-      "composition": "Cấu trúc thành phần token đầu vào",
-      "compositionAlt": "Số lượng token này được ước tính bởi Langchain, mức sử dụng thực tế có thể hơi khác",
-      "userToken": "User Token",
-      "langchainToken": "Langchain Token",
-      "customPrompt": "Custom Prompt",
-      "systemPrompt": "System Prompt",
-      "mcpToolPrompt": "MCP Tool Prompt",
       "firstDelay": "Độ trễ đầu tiên {{time}} ms",
       "firstDelayDesc": "Độ trễ đầu tiên: Thời gian để AI bắt đầu tạo ký tự đầu tiên",
       "generationRate": "{{time}} token mỗi giây",
@@ -92,7 +66,7 @@
     }
   },
   "welcome": {
-    "title": "Chào mừng đến với Dive AI",
+    "title": "Chào mừng đến với Velis AI",
     "subtitle": "Bắt đầu cuộc trò chuyện AI của bạn",
     "startChat": "Bắt đầu trò chuyện"
   },
@@ -122,7 +96,6 @@
     "models": "Cài đặt mô hình",
     "system": "Cài đặt hệ thống",
     "manageAndSettings": "Quản lý và cài đặt",
-    "OAPhub": "OAPhub",
     "signOut": "Đăng xuất",
     "chat": {
       "starredChat": "Yêu thích",
@@ -184,20 +157,12 @@
     "deleteAllTitle": "Xác nhận xóa tất cả công cụ?",
     "fieldTitle": "Trường",
     "fieldTitleAlt": "Các trường thường đáp ứng hầu hết nhu cầu, nhưng nếu cài đặt MCP của bạn yêu cầu các trường bổ sung hoặc các loại khác nhau, bạn có thể chỉnh sửa trực tiếp trong vùng văn bản JSON ở bên phải để đáp ứng yêu cầu chương trình của bạn",
-    "addHeaders": "Thêm Headers",
-    "headersTitleAlt": "Headers",
-    "toolCallTimeoutAlt": "Mặc định là 600 giây, không có giới hạn tối đa.",
-    "toolCallTimeoutPlaceholder": "Nhập Tool call Timeout...",
-    "toolCallTimeoutError": "Vui lòng nhập bất kỳ số thập phân nào lớn hơn hoặc bằng 0",
-    "headersKey": "Nhập tên Headers (Key)...",
-    "headersValue": "Nhập giá trị Headers (Value)...",
     "initialTimeoutAlt": "Thời gian chờ kết nối ban đầu được đặt mặc định là 10 giây, nhưng có thể đặt thành bất kỳ số thập phân nào từ 10 giây trở lên. Không có giới hạn số giây. Nên điều chỉnh giá trị này nếu máy chủ có kết nối chậm.",
     "initialTimeoutPlaceholder": "Nhập Thời gian chờ ban đầu...",
     "initialTimeoutError": "Vui lòng nhập số lớn hơn hoặc bằng 10",
     "jsonDesc": "Vui lòng nhập hoặc dán JSON máy chủ MCP vào trường",
     "addArg": "Thêm đối số",
     "addEnv": "Thêm biến môi trường",
-    "ignoreVerification": "Bỏ qua xác minh SSL/TLS",
     "jsonFormatError": {
       "addFormat": "Lỗi định dạng cấu hình, vui lòng kiểm tra và sửa định dạng",
       "format": "Lỗi định dạng cấu hình {{mcp}}, vui lòng kiểm tra và sửa định dạng",
@@ -222,9 +187,7 @@
       "initialTimeout": "Công cụ {{mcp}}: Trường initialTimeout phải là số thập phân",
       "range": "Công cụ {{mcp}}: Giá trị trường {{field}} nằm ngoài phạm vi, vui lòng kiểm tra và sửa giá trị",
       "minRange": "Công cụ {{mcp}}: Trường {{field}} phải lớn hơn hoặc bằng {{value}}",
-      "maxRange": "Công cụ {{mcp}}: Trường {{field}} phải nhỏ hơn hoặc bằng {{value}}",
-      "urlRequiredstreamable": "Công cụ {{mcp}}: URL là bắt buộc cho streamable transport",
-      "urlRequiredsse": "Công cụ {{mcp}}: URL là bắt buộc cho SSE transport"
+      "maxRange": "Công cụ {{mcp}}: Trường {{field}} phải nhỏ hơn hoặc bằng {{value}}"
     },
     "namePlaceholder": "Nhập tên...",
     "commandPlaceholder": "Nhập lệnh...",
@@ -240,18 +203,11 @@
     "logTitle": "Chạy lệnh UVX",
     "logProcessing": "Đang xử lý...",
     "no_tool_title": "Không có máy chủ MCP khả dụng",
-    "no_oap_tool_message": {
-      "all": "Vui lòng chọn máy chủ MCP OAP để sử dụng hoặc thêm máy chủ MCP tùy chỉnh.",
-      "oap": "Vui lòng chọn máy chủ MCP OAP để sử dụng.",
-      "custom": "Vui lòng thêm máy chủ MCP tùy chỉnh."
-    },
     "no_tool_message": "Vui lòng thêm máy chủ MCP.",
     "tab": {
       "all": "Tất cả công cụ",
-      "oap": "Công cụ OAP",
       "custom": "Công cụ tùy chỉnh"
     },
-    "oapStoreLinkAlt": "Xem chi tiết",
     "subToolsCount": "Công cụ đã bật: {{count}} / {{total}}",
     "disableAll": "Vô hiệu hóa tất cả",
     "enableAll": "Kích hoạt tất cả",
@@ -268,28 +224,6 @@
       "headerBtn": "Tải lại",
       "headerBtnAlt": "Tải lại và cập nhật công cụ MCP"
     },
-    "oap": {
-      "type": {
-        "all": "Tất cả công cụ",
-        "base": "Chỉ hiển thị Base",
-        "pro": "Chỉ hiển thị Pro",
-        "official": "Chỉ hiển thị Official"
-      },
-      "sort": {
-        "title": "Sắp xếp",
-        "popular": "Phổ biến",
-        "new": "Mới"
-      },
-      "tag": "Danh mục",
-      "show_more": "Thêm",
-      "no_search_data_title": "Không tìm thấy công cụ MCP",
-      "no_search_data": "Không tìm thấy kết quả tìm kiếm, vui lòng xóa từ khóa tìm kiếm hoặc điều chỉnh điều kiện lọc.",
-      "clear_filter": "Xóa bộ lọc",
-      "hint": "Máy chủ MCP cấp cao yêu cầu nâng cấp lên phiên bản Pro để cài đặt",
-      "high_cost_title": "Bật máy chủ MCP chi phí cao",
-      "high_cost_desc": "Bạn đã chọn máy chủ MCP tiêu tốn nhiều token. Vui lòng kiểm tra xem việc sử dụng gói của bạn có đủ không.",
-      "headerBtnAlt": "Thêm / Xem công cụ MCP OAP"
-    },
     "custom": {
       "headerBtn": "Thêm / Chỉnh sửa cấu hình",
       "headerBtnAlt": "Thêm / Chỉnh sửa công cụ tùy chỉnh",
@@ -304,7 +238,7 @@
       "add": "Thêm trình kết nối",
       "addTitle": "Thêm trình kết nối",
       "editTitle": "Chỉnh sửa trình kết nối {{name}}",
-      "description": "Dive sẽ sử dụng ủy quyền kết nối OAuth để kết nối tài khoản của bạn với các công cụ một cách an toàn và bắt đầu sử dụng các trình kết nối được xây dựng sẵn.",
+      "description": "Velis AI sẽ sử dụng ủy quyền kết nối OAuth để kết nối tài khoản của bạn với các công cụ một cách an toàn và bắt đầu sử dụng các trình kết nối được xây dựng sẵn.",
       "connect": "Kết nối",
       "disconnect": "Ngắt kết nối",
       "nameTitle": "Tên",
@@ -437,14 +371,11 @@
     "reasoningLevelTooltip": "Thấp đại diện cho phản hồi nhanh, tập trung vào kết luận và không có chi tiết bổ sung, với lý luận trực tiếp và đơn giản. Trung bình cung cấp phản hồi với giải thích logic đầy đủ, bao gồm thông tin chính. Cao cung cấp phản hồi sâu sắc với phân tích và giải thích có cấu trúc và chi tiết.",
     "tokenBudgetDescription": "Đặt giá trị lý luận ({{min}}~{{max}})",
     "parameterVerify": "Xác minh tham số",
-    "expired": "Model này đã chính thức ngừng hoạt động",
-    "expiredInfo": "Model này không còn trong danh sách chính thức và chỉ được hiển thị dưới dạng lịch sử cục bộ. Nó có thể không hoạt động hoặc cập nhật đúng cách. Nếu bạn bỏ chọn, nó sẽ bị xóa và không thể khôi phục từ danh sách.",
     "verifyErrorInfo": "Chi tiết lỗi xác minh",
     "verifyErrorMsg": "Mô hình không sử dụng bất kỳ công cụ nào trong quá trình xác minh, có thể do thiếu hỗ trợ hoặc không được kích hoạt. Do đó, không thể xác nhận liệu nó có hỗ trợ công cụ hay không.",
     "verifyStatusSuccess": "Xác minh mô hình thành công, đã bật với cấu hình gốc",
     "verifyStatusSuccessInPrompt": "Xác minh mô hình thành công, đã bật với MCP Prompts",
     "verifyUnexpectedFailed": "Xác minh mô hình thất bại, đã xảy ra lỗi không xác định, vui lòng thử lại sau",
-    "oapUsageLimit": "Đã đạt giới hạn sử dụng, tạm thời không khả dụng",
     "providerFilter": {
       "Alt": "Nếu mô hình bạn muốn sử dụng không có trong các tùy chọn mô hình phổ biến, bạn có thể sử dụng chức năng tìm kiếm để tìm nó.",
       "Clear": "Xóa"
@@ -461,33 +392,35 @@
     "autoDownload": "Tự động tải xuống cập nhật",
     "autoDownloadDescription": "Tự động tải xuống phiên bản mới của DIVE khi người dùng khởi động lại hoặc nhấp vào nút \"Nâng cấp\" trên trang menu, phiên bản mới sẽ được kích hoạt",
     "autoLaunch": "Tự động khởi chạy",
-    "autoLaunchDescription": "Tự động khởi động Dive AI khi hệ thống khởi động",
+    "autoLaunchDescription": "Tự động khởi động Velis AI khi hệ thống khởi động",
     "minimalToTray": "Thu nhỏ xuống khay",
     "minimalToTrayDescription": "Khi đóng cửa sổ, chương trình sẽ được thu nhỏ xuống khay hệ thống thay vì thoát hoàn toàn",
-    "loginTitle": "Đăng nhập OAP",
-    "loginDescription": "Sử dụng OpenAgentPlatform để đăng nhập, không cần kiến thức chuyên môn kỹ thuật để dễ dàng kết nối LLM, AI Agents và MCP Servers — Trải nghiệm các giải pháp thông minh ngay bây giờ!",
     "personalInformationTitle": "Thông tin cá nhân",
     "defaultSystemPrompt": "Lời nhắc hệ thống mặc định Dive",
     "defaultSystemPromptDescription": "Lời nhắc hệ thống mặc định Dive được sử dụng làm lời nhắc hệ thống mặc định cho trò chuyện. Nó cho LLM biết rằng trò chuyện Dive hỗ trợ KaTeX / Markdown / Mermaid, v.v. Tính năng này tiêu tốn một số token, có thể làm cho phản hồi chậm hơn so với lời nhắc không có lời nhắc hệ thống. Mặt khác, nếu bị tắt, chất lượng phản hồi của LLM có thể giảm",
-    "usageAnalytics": "Truy cập trang Dashboard trong OAP Hub để xem",
     "usageAnalyticsTitle": "Phân tích sử dụng",
-    "userEdit": "Truy cập trang Tài khoản trong OAP Hub để thực hiện thay đổi",
     "planSectionTitle": "Sử dụng gói hiện tại",
     "subscriptionDate": "Ngày đăng ký",
     "remainingUsage": "Sử dụng còn lại",
     "usageWarningTitle": "Đã đạt giới hạn sử dụng token.",
-    "usageWarning": "Hạn ngạch sẽ được đặt lại vào tháng tới, hoặc mua gói tín dụng để sử dụng nhiều hơn. Cung cấp hạn chế các máy chủ MCP cơ bản.",
-    "BaseUsageWarning": "Máy chủ MCP Base: {{mcpLimit}} lượt gọi/giờ. Để sử dụng các máy chủ MCP khác, vui lòng nâng cấp gói dịch vụ tại <planLink>trang thanh toán</planLink>.",
+    "usageWarning": "Hạn ngạch sẽ được đặt lại vào tháng tới, hoặc mua gói token để sử dụng nhiều hơn. Các mô hình cơ bản và MCP cơ bản vẫn khả dụng.",
+    "BaseUsageWarning": "Mô hình Base: {{callLimit}} lần gọi / {{callUnit}} giờ | Máy chủ MCP Base: {{mcpLimit}} lần gọi/giờ. Để sử dụng các mô hình và MCP khác, vui lòng nâng cấp gói của bạn từ <planLink>trang gói</planLink>.",
     "customPromptDescription": "Nếu bạn cần hướng dẫn tùy chỉnh bổ sung, vui lòng nhấp vào chức năng \"Lời nhắc tùy chỉnh\" bên dưới để thiết lập nó.",
     "customPromptButton": "Lời nhắc tùy chỉnh",
     "tokenPackageTitle": "Sử dụng gói token",
     "tokenPackageHint": "Gói token không có ngày hết hạn và chỉ được sử dụng sau khi hạn ngạch gói hàng tháng cạn kiệt.",
     "tokenPackageRemainingUsage": "Sử dụng còn lại",
     "tokenPackageWarningTitle": "Hạn ngạch token đã hết.",
-    "tokenPackageWarning": "Bạn có thể nạp thêm sử dụng token tại OAPhub <planLink>trang Dashboard</planLink>.",
     "skipTlsVerifyWarning": "Cảnh báo bảo mật: Bỏ qua xác minh chứng chỉ có thể giảm bảo mật kết nối. Nên sử dụng trong môi trường mạng đáng tin cậy.",
+    "allRateLimitReachedTitle": "Đã đạt giới hạn gọi mô hình và máy chủ MCP.",
+    "llmRateLimitReachedTitle": "Đã đạt giới hạn gọi mô hình.",
     "mcpRateLimitReachedTitle": "Đã đạt giới hạn gọi máy chủ MCP.",
-    "rateLimitReachedDescription": "Vui lòng đợi trước khi thực hiện yêu cầu mới; hạn ngạch sẽ được khôi phục tự động."
+    "rateLimitReachedDescription": "Vui lòng đợi trước khi thực hiện yêu cầu mới; hạn ngạch sẽ được khôi phục tự động.",
+    "resetSetup": "Reset to Initial Setup",
+    "resetSetupDescription": "This will delete all model providers, MCP servers configuration, and return to the initial setup screen",
+    "resetSetupButton": "Reset Settings",
+    "resetSetupConfirm": "Are you sure you want to reset all settings? This action cannot be undone.",
+    "resetSetupSuccess": "Settings reset successfully. Please restart the application."
   },
   "toast": {
     "copiedToClipboard": "Đã sao chép vào clipboard",
@@ -522,14 +455,10 @@
     "clickToInstall": "Nhấp để cài đặt cập nhật"
   },
   "login": {
-    "subtitle": "Dive AI là ứng dụng desktop mã nguồn mở tích hợp liền mạch các mô hình ngôn ngữ lớn khác nhau hỗ trợ gọi hàm. Thông qua giao diện sạch sẽ và trực quan, bạn có thể dễ dàng trò chuyện với AI tiên tiến, từ câu hỏi hàng ngày đến nhiệm vụ chuyên nghiệp, nhận được câu trả lời chính xác và biến nó thành trợ lý thông minh của bạn.",
+    "subtitle": "Velis AI là ứng dụng desktop mã nguồn mở tích hợp liền mạch các mô hình ngôn ngữ lớn khác nhau hỗ trợ gọi hàm. Thông qua giao diện sạch sẽ và trực quan, bạn có thể dễ dàng trò chuyện với AI tiên tiến, từ câu hỏi hàng ngày đến nhiệm vụ chuyên nghiệp, nhận được câu trả lời chính xác và biến nó thành trợ lý thông minh của bạn.",
     "title1": "Sử dụng mô hình đã chuẩn bị của riêng bạn",
     "description1": "Phù hợp cho chuyên gia AI nâng cao. Nếu bạn đã có cấu hình riêng của mình sẵn sàng, cho dù đó là Ollama cục bộ, llama.cpp hay API LLM từ xa từ Openrouter, OpenAI, Anthropic hoặc các công ty AI khác, vui lòng sử dụng tùy chọn này.",
-    "button1": "Đi đến cài đặt mô hình",
-    "title2": "Sử dụng OpenAgentPlatform",
-    "description2": "OAP giúp mọi người dễ dàng sử dụng các dịch vụ AI tiên tiến nhất, kết nối LLM, AI Agents và MCP Servers mà không cần chuyên môn kỹ thuật. Khám phá các khả năng vô hạn của AI và trải nghiệm các giải pháp thông minh ngay bây giờ.",
-    "button2": "Đăng ký OAP",
-    "button3": "Đăng nhập OAP"
+    "button1": "Đi đến cài đặt mô hình"
   },
   "InstallHostDependencies": {
     "title": "Đang tải xuống các phụ thuộc máy chủ...",

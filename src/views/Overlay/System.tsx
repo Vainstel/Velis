@@ -1,20 +1,23 @@
-import { useAtom, useAtomValue } from "jotai"
-import { useTranslation } from "react-i18next"
+import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {useTranslation} from "react-i18next"
+import {useNavigate} from "react-router-dom"
 import Select from "../../components/Select"
-import { openOverlayAtom } from "../../atoms/layerState"
-import React, { useState, useEffect } from "react"
+import {closeAllOverlaysAtom, openOverlayAtom} from "../../atoms/layerState"
+import React, {useEffect, useState} from "react"
 
 import ThemeSwitch from "../../components/ThemeSwitch"
 import Switch from "../../components/Switch"
-import { getAutoDownload, setAutoDownload as _setAutoDownload } from "../../updater"
-import { disableDiveSystemPromptAtom, updateDisableDiveSystemPromptAtom } from "../../atoms/configState"
-import { getIPCAutoLaunch, getIPCMinimalToTray, setIPCAutoLaunch, setIPCMinimalToTray } from "../../ipc/system"
-import { commonFlashAtom } from "../../atoms/globalState"
+import {getAutoDownload, setAutoDownload as _setAutoDownload} from "../../updater"
+import {disableDiveSystemPromptAtom, updateDisableDiveSystemPromptAtom} from "../../atoms/configState"
+import {getIPCAutoLaunch, getIPCMinimalToTray, setIPCAutoLaunch, setIPCMinimalToTray} from "../../ipc/system"
+import {commonFlashAtom} from "../../atoms/globalState"
+import {showToastAtom} from "../../atoms/toastState"
 import "../../styles/overlay/_System.scss"
 import Button from "../../components/Button"
 
 const System = () => {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const [language, setLanguage] = useState(i18n.language)
   const [autoDownload, setAutoDownload] = useState(false)
   const [autoLaunch, setAutoLaunch] = useState(false)
@@ -22,8 +25,9 @@ const System = () => {
   const disableDiveSystemPrompt = useAtomValue(disableDiveSystemPromptAtom)
   const [, updateDisableDiveSystemPrompt] = useAtom(updateDisableDiveSystemPromptAtom)
   const [, openOverlay] = useAtom(openOverlayAtom)
+  const closeAllOverlays = useSetAtom(closeAllOverlaysAtom)
   const [, setCommonFlash] = useAtom(commonFlashAtom)
-  const isMac = window.PLATFORM === "darwin"
+  const showToast = useSetAtom(showToastAtom)
 
   useEffect(() => {
     getIPCAutoLaunch().then(setAutoLaunch)
@@ -84,6 +88,38 @@ const System = () => {
     setCommonFlash("openPromtSetting")
   }
 
+  const handleResetSettings = async () => {
+    const confirmed = window.confirm(t("system.resetSetupConfirm"))
+    if (!confirmed) return
+
+    try {
+      if (window.ipcRenderer) {
+        await window.ipcRenderer.resetToInitialSetup()
+
+        // Close all overlays first
+        closeAllOverlays()
+
+        showToast({
+          message: t("system.resetSetupSuccess"),
+          type: "success"
+        })
+
+        // Navigate to home/welcome page after reset
+        setTimeout(() => {
+          navigate("/")
+          // Force reload to ensure Welcome component re-checks first launch status
+          window.location.reload()
+        }, 500)
+      }
+    } catch (error) {
+      console.error("Failed to reset settings:", error)
+      showToast({
+        message: "Failed to reset settings",
+        type: "error"
+      })
+    }
+  }
+
   return (
     <div className="system-page">
       <div className="system-container">
@@ -106,7 +142,7 @@ const System = () => {
           </div>
 
           {/* minimal to tray */}
-          {!isMac && <div className="system-list-section">
+          <div className="system-list-section">
             <div className="system-list-content">
               <span className="system-list-name">{t("system.minimalToTray")}</span>
               <div className="system-list-switch-container">
@@ -117,7 +153,7 @@ const System = () => {
               </div>
             </div>
             <span className="system-list-description">{t("system.minimalToTrayDescription")}</span>
-          </div>}
+          </div>
 
           {/* auto launch */}
           <div className="system-list-section">
@@ -187,6 +223,24 @@ const System = () => {
                 onClick={openPromtSetting}
               >
                 {t("system.customPromptButton")}
+              </Button>
+            </div>
+          </div>
+
+          {/* reset to initial setup */}
+          <div className="system-list-section">
+            <div className="system-list-content">
+              <span className="system-list-name">{t("system.resetSetup")}</span>
+            </div>
+            <span className="system-list-description">{t("system.resetSetupDescription")}</span>
+            <div className="custom-prompt-container">
+              <Button
+                theme="Outline"
+                color="danger"
+                size="large"
+                onClick={handleResetSettings}
+              >
+                {t("system.resetSetupButton")}
               </Button>
             </div>
           </div>

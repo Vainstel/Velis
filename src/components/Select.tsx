@@ -1,5 +1,5 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
-import { forwardRef, useLayoutEffect, useMemo, useRef, useState } from "react"
+import {forwardRef, useLayoutEffect, useMemo, useRef, useState} from "react"
 import isEqual from "lodash/isEqual"
 
 interface Props<T = string>{

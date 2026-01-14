@@ -1,7 +1,7 @@
 import React from "react"
-import { useAtomValue } from "jotai"
-import { overlaysAtom } from "../../atoms/layerState"
-import Setting, { Subtab, Tab } from "./Setting"
+import {useAtomValue} from "jotai"
+import {overlaysAtom} from "../../atoms/layerState"
+import Setting, {Subtab, Tab} from "./Setting"
 import "../../styles/overlay/_Overlay.scss"
 
 const Overlay = () => {

@@ -1,8 +1,6 @@
-import { imgPrefix } from "../ipc/env"
-import { OAP_PROXY_URL } from "../../shared/oap"
-import { ModelProvider } from "../../types/model"
-import { fetchModels } from "../ipc/llm"
-import { oapGetToken } from "../ipc"
+import {imgPrefix} from "../ipc/env"
+import {ModelProvider} from "../../types/model"
+import {fetchModels} from "../ipc/llm"
 
 export const EMPTY_PROVIDER = "none"
 
@@ -20,20 +18,7 @@ export const PROVIDERS: ModelProvider[] = [
   "groq",
   "grok",
   "nvdia",
-  "perplexity",
-  "oap",
-  "cerebras",
-] as const
-
-export const OPEAI_COMPATIBLE_PROVIDER: ModelProvider[] = [
-  "openai_compatible",
-  "lmstudio",
-  "openrouter",
-  "groq",
-  "grok",
-  "nvdia",
-  "perplexity",
-  "cerebras",
+  "perplexity"
 ] as const
 
 export const PROVIDER_LABELS: Record<ModelProvider, string> = {
@@ -50,9 +35,7 @@ export const PROVIDER_LABELS: Record<ModelProvider, string> = {
   grok: "Grok",
   nvdia: "NVIDIA",
   perplexity: "Perplexity",
-  oap: "OAP",
   azure_openai: "Azure OpenAI",
-  cerebras: "Cerebras",
   default: "Default",
 }
 
@@ -70,9 +53,7 @@ export const PROVIDER_ICONS: Record<ModelProvider, string> = {
   grok: `${imgPrefix}model_grok.svg`,
   nvdia: `${imgPrefix}model_nvdia.svg`,
   perplexity: `${imgPrefix}model_perplexity.svg`,
-  oap: `${imgPrefix}logo_oap.png`,
   azure_openai: `${imgPrefix}model_azure.svg`,
-  cerebras: `${imgPrefix}model_cerebras.svg`,
   default: "",
 }
 
@@ -189,13 +170,6 @@ export const defaultInterface: Record<ModelProvider, InterfaceDefinition> = {
     baseURL: {
       required: false,
       readonly: false,
-    }
-  }),
-  oap: openaiCompatibleTemplate(`${OAP_PROXY_URL}/v1`, {
-    apiKey: {
-      getValue: () => {
-        return oapGetToken()
-      }
     }
   }),
   ollama: {
@@ -451,13 +425,11 @@ export const defaultInterface: Record<ModelProvider, InterfaceDefinition> = {
   grok: openaiCompatibleTemplate("https://api.x.ai/v1"),
   nvdia: openaiCompatibleTemplate("https://integrate.api.nvidia.com/v1"),
   perplexity: openaiCompatibleTemplate("https://api.perplexity.ai"),
-  cerebras: openaiCompatibleTemplate("https://api.cerebras.ai/v1"),
 }
 
 export const isProviderIconNoFilter = (model: ModelProvider, userTheme: string, systemTheme: string) => {
   const isLightMode = userTheme === "system" ? systemTheme === "light" : userTheme === "light"
   switch (model) {
-    case "oap":
     case "ollama":
     case "openai_compatible":
     case "bedrock":

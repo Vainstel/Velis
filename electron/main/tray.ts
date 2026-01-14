@@ -5,10 +5,6 @@ import AppState from "./state"
 let tray: Tray | null = null
 
 export function initTray(win: BrowserWindow) {
-  if (process.platform === "darwin") {
-    return
-  }
-
   const iconPath = process.platform === "win32"
     ? path.join(process.env.VITE_PUBLIC, "icon.ico")
     : path.join(process.env.VITE_PUBLIC, "icon.png")

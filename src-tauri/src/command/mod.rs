@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::HashMap, io::Cursor, path::PathBuf, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, io::Cursor, path::PathBuf};
 
 use image::{DynamicImage, ImageBuffer, ImageReader};
 use percent_encoding::percent_decode_str;
@@ -7,14 +7,12 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 
 use crate::{
     shared::{ASSET_PROTOCOL, CLIENT_ID, VERSION},
-    state::{AppState, DownloadDependencyEvent, DownloadDependencyState, oap::OAPState},
+    state::{AppState, DownloadDependencyEvent, DownloadDependencyState},
     util::downloader::download,
 };
 
 pub mod host;
-pub mod lipc;
 pub mod llm;
-pub mod oap;
 pub mod system;
 
 #[tauri::command]
@@ -160,12 +158,10 @@ pub async fn download_file(src: String, dst: String) -> Result<(), String> {
 #[tauri::command]
 pub async fn set_host(
     state: tauri::State<'_, AppState>,
-    oap: tauri::State<'_, Arc<OAPState>>,
     host: String,
 ) -> Result<(), String> {
     log::info!("set host: {host}");
     state.mcp_host.set_hostname(host).map_err(|e| e.to_string())?;
-    oap.try_login().await.map_err(|e| e.to_string())?;
     Ok(())
 }
 
