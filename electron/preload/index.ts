@@ -76,6 +76,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   port: () => ipcRenderer.invoke("env:port"),
   getResourcesPath: (p: string) => ipcRenderer.invoke("env:getResourcesPath", p),
   isDev: () => ipcRenderer.invoke("env:isDev"),
+  getLiteLLMUrl: () => ipcRenderer.invoke("env:getLiteLLMUrl"),
 
   // deep link
   listenMcpApply: (cb: (id: string) => void) => {

@@ -19,5 +19,9 @@ export function ipcEnvHandler(_win: BrowserWindow) {
   ipcMain.handle("env:isDev", async () => {
     return !!VITE_DEV_SERVER_URL
   })
+
+  ipcMain.handle("env:getLiteLLMUrl", async () => {
+    return process.env.LITELLM_URL || "https://litellm.de-prod.cxense.com"
+  })
 }
 

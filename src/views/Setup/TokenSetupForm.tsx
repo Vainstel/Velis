@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useState, useEffect} from "react"
 import {useTranslation} from "react-i18next"
 import {useSetAtom} from "jotai"
 import {showToastAtom} from "../../atoms/toastState"
@@ -16,8 +16,6 @@ interface TokenSetupFormProps {
   onBack: () => void
 }
 
-const LITELLM_DEFAULT_URL = "https://litellm.de-prod.com"
-
 const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
   onSuccess,
   onBack,
@@ -26,6 +24,17 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
   const [token, setToken] = useState("")
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [liteLLMUrl, setLiteLLMUrl] = useState("https://litellm.de-prod.cxense.com")
+
+  useEffect(() => {
+    const loadLiteLLMUrl = async () => {
+      if (window.ipcRenderer?.getLiteLLMUrl) {
+        const url = await window.ipcRenderer.getLiteLLMUrl()
+        setLiteLLMUrl(url)
+      }
+    }
+    loadLiteLLMUrl()
+  }, [])
 
   const showToast = useSetAtom(showToastAtom)
   const saveConfig = useSetAtom(writeRawConfigAtom)
@@ -42,7 +51,7 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
 
     try {
       // LiteLLM is OpenAI-compatible, so we use openai_compatible provider
-      const results = await fetchModels("openai_compatible", token, LITELLM_DEFAULT_URL)
+      const results = await fetchModels("openai_compatible", token, liteLLMUrl)
 
       if (results.error) {
         throw new Error(results.error)
@@ -69,13 +78,13 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
       )
 
       if (availableModels.length === 0) {
-        throw new Error("No allowed models available from provider")
+        throw new Error(`No allowed models available. API returned: ${results.results.join(", ")}`)
       }
 
       // Create config using openai_compatible provider (LiteLLM is OpenAI-compatible)
       const group = fieldsToLLMGroup("openai_compatible", {
         apiKey: token,
-        baseURL: LITELLM_DEFAULT_URL,
+        baseURL: liteLLMUrl,
         active: true
       })
 
@@ -113,23 +122,15 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
 
       // Load and save default MCP config
       try {
-        console.log(`Loaded MCP fast config: ${JSON.stringify(mcpFastConfig)}`)
-
         // Save MCP config
-        const mcpSaveResponse = await fetch("/api/config/mcpserver", {
+        await fetch("/api/config/mcpserver", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(mcpFastConfig),
         })
-
-        const mcpSaveResult = await mcpSaveResponse.json()
-        console.log(`MCP config save result: ${JSON.stringify(mcpSaveResult)}`)
-
-
       } catch (mcpError) {
-        console.log(`Failed to load default MCP config: ${mcpError}`)
         // Don't fail the whole setup if MCP config fails
       }
 
@@ -149,13 +150,12 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
       }, 500)
 
     } catch (error) {
-      console.error("Token validation failed:", error)
-      // Show generic error message (no API details exposed)
+      const errorMessage = error instanceof Error ? error.message : String(error)
       showToast({
-        message: t("login.tokenInvalid"),
+        message: errorMessage || t("login.tokenInvalid"),
         type: "error"
       })
-      setError(t("login.tokenInvalid"))
+      setError(errorMessage || t("login.tokenInvalid"))
     } finally {
       setIsVerifying(false)
     }

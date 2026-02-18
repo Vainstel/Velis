@@ -47,6 +47,7 @@ declare global {
       getClientInfo: () => Promise<{ version: string, client_id: string }>
       checkCommandExist: (command: string) => Promise<boolean>
       readLocalFile: (filePath: string) => Promise<{ data: Buffer, name: string, mimeType: string }>
+      getLiteLLMUrl: () => Promise<string>
       closeWindow: () => void
       hideWindow: () => void
     }

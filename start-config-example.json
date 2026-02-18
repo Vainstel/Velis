@@ -1,0 +1,97 @@
+{
+  "version": "0.1",
+  "env": "prod",
+  "os": "all",
+
+  "appText": {
+    "newConfigVersionMessage": "New configuration version available. Please restart the application.",
+    "customerMode": {
+      "title": "Use Internal Models",
+      "description": "Quick setup with pre-configured internal models and tools using your API token"
+    },
+    "tokenPage": {
+      "title": "Enter Your API Token",
+      "description": "Please provide your API token to access internal models"
+    }
+  },
+
+  "prompts": {
+    "globalPrompt": "You are a helpful AI assistant powered by Velis AI."
+  },
+
+  "appConfig": {
+    "customerIconLink": "https://example.com/icons/customer-icon.png",
+    "needRestart": false
+  },
+
+  "commands": {
+    "defaultList": [
+      {
+        "name": "/help",
+        "description": "Show available commands",
+        "promptTemplate": "prompt template..."
+      },
+      {
+        "name": "/clear",
+        "description": "Clear chat history",
+        "promptTemplate": "prompt template..."
+      }
+    ]
+  },
+
+  "modelProviderConfig": {
+    "url": "https://api.litellm.velis.ai/v1",
+    "enabledModels": [
+      "eu-claude-sonnet-4",
+      "eu-claude-opus-4-5",
+      "claude-4-5-haiku",
+      "gpt-4o",
+      "gpt-4o-mini"
+    ],
+    "version": "1.0.0"
+  },
+
+  "mcp": {
+    "mcpServers" : {
+      "example-server": {
+        "command": "uvx",
+        "args": [
+          "mcp-server-example"
+        ],
+        "env": {
+          "SERVICE_APIKEY": "${API_EXAMPLE_KEY}",
+          "ENDPOINT": "${ENDPOINT_EXAMPLE}",
+          "ANY_OTHER_ENV_WITHOUT_REPLACMENT": "env_value"
+        },
+        "velisSettings": {
+          "version": "1.0.0",
+          "readableName": "Example MCP Server",
+          "description": "An example MCP server for demonstration",
+          "iconLink": "https://example.com/icons/example-server.png",
+          "saveMode": true,
+          "saveModeTools": [
+            "tool1",
+            "tool2"
+          ],
+          "newVersionPip": {
+            "message": "New version available with improved features",
+            "fields": [
+              {
+                "name": "apiKey",
+                "replacementCode": "API_EXAMPLE_KEY",
+                "description": "API key for authentication",
+                "mandatory": true
+              },
+              {
+                "name": "endpoint",
+                "replacementCode": "ENDPOINT_EXAMPLE",
+                "description": "Custom endpoint URL",
+                "mandatory": false
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
