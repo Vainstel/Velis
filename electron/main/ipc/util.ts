@@ -8,6 +8,7 @@ import { getInstallHostDependenciesLog } from "../service"
 import { CLIENT_ID } from "../client-id"
 import which from "which"
 import mimeTypes from "mime-types"
+import { appConfigService } from "../app-config"
 
 export function ipcUtilHandler(win: BrowserWindow) {
   ipcMain.handle("util:fillPathToConfig", async (_, _config: string) => {
@@ -213,6 +214,23 @@ export function ipcUtilHandler(win: BrowserWindow) {
   ipcMain.handle("util:saveCommands", async (_, commands) => {
     const commandsPath = path.join(configDir, "commands.json")
     return fse.writeJson(commandsPath, commands, { spaces: 2 })
+  })
+
+  // App Config handlers
+  ipcMain.handle("util:getAppConfig", async () => {
+    return appConfigService.getConfig()
+  })
+
+  ipcMain.handle("util:logUserAction", async (_, action: string, payload?: string) => {
+    await appConfigService.logUserAction(action, payload)
+  })
+
+  ipcMain.handle("util:applyCurrentConfig", async () => {
+    await appConfigService.applyCurrentConfig()
+  })
+
+  ipcMain.handle("util:restartApp", () => {
+    appConfigService.restartApp()
   })
 }
 

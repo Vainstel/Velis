@@ -9,9 +9,11 @@ import {systemThemeAtom, themeAtom} from "../atoms/themeState"
 import Overlay from "./Overlay"
 import KeymapModal from "../components/Modal/KeymapModal"
 import RenameConfirmModal from "../components/Modal/RenameConfirmModal"
+import ConfigUpdateModal from "../components/Modal/ConfigUpdateModal"
 import CodeModal from "./Chat/CodeModal"
 import {overlaysAtom} from "../atoms/layerState"
 import {loadCommandsAtom} from "../atoms/commandState"
+import {configVersionUpdateAtom} from "../atoms/appConfigState"
 
 const Layout = () => {
   const isConfigNotInitialized = useAtomValue(isConfigNotInitializedAtom)
@@ -20,6 +22,7 @@ const Layout = () => {
   const overlays = useAtomValue(overlaysAtom)
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean>(false)
   const loadCommands = useSetAtom(loadCommandsAtom)
+  const setConfigUpdate = useSetAtom(configVersionUpdateAtom)
 
   const checkFirstLaunch = () => {
     if (window.ipcRenderer) {
@@ -58,6 +61,17 @@ const Layout = () => {
     }
   }, [loadCommands])
 
+  // Listen for config version updates
+  useEffect(() => {
+    if (!window.ipcRenderer?.onAppConfigVersionUpdate) return
+
+    const unlisten = window.ipcRenderer.onAppConfigVersionUpdate((data) => {
+      setConfigUpdate(data)
+    })
+
+    return unlisten
+  }, [setConfigUpdate])
+
   return (
     <div className="app-container" data-theme={theme === "system" ? systemTheme : theme}>
       <div className="app-content">
@@ -72,6 +86,7 @@ const Layout = () => {
       <GlobalToast />
       <KeymapModal />
       <RenameConfirmModal />
+      <ConfigUpdateModal />
     </div>
   )
 }

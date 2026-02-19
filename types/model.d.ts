@@ -27,6 +27,7 @@ export interface BaseModel<E = Record<string, any>> {
   isCustomModel?: boolean
   verifyStatus?: ModelVerifyStatus
   enableTools?: boolean
+  selectedByUser?: boolean
 }
 
 export interface BaseConfigInModel {

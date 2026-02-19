@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 import type { ModelGroupSetting } from "../types/model"
+import type { AppConfig, ConfigVersionInfo } from "../types/appConfig"
 
 type ModelResults = {
   error?: string
@@ -47,7 +48,12 @@ declare global {
       getClientInfo: () => Promise<{ version: string, client_id: string }>
       checkCommandExist: (command: string) => Promise<boolean>
       readLocalFile: (filePath: string) => Promise<{ data: Buffer, name: string, mimeType: string }>
-      getLiteLLMUrl: () => Promise<string>
+      getAppConfig: () => Promise<AppConfig | null>
+      logUserAction: (action: string, payload?: string) => Promise<void>
+      applyCurrentConfig: () => Promise<void>
+      restartApp: () => void
+      onAppConfigVersionUpdate: (callback: (data: ConfigVersionInfo) => void) => () => void
+      getLiteLLMUrl: () => Promise<string | null>
       closeWindow: () => void
       hideWindow: () => void
     }

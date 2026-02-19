@@ -510,6 +510,13 @@
     "continueButton": "Continue",
     "backButton": "Back"
   },
+  "config": {
+    "updateAvailable": "New Configuration Available",
+    "currentVersion": "Current Version",
+    "newVersion": "New Version",
+    "skip": "Skip",
+    "restart": "Restart App"
+  },
   "InstallHostDependencies": {
     "title": "Downloading Host Dependencies...",
     "retry": "Retry",

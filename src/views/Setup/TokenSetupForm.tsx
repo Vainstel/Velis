@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from "react"
 import {useTranslation} from "react-i18next"
-import {useSetAtom} from "jotai"
+import {useSetAtom, useAtomValue} from "jotai"
 import {showToastAtom} from "../../atoms/toastState"
 import {writeRawConfigAtom} from "../../atoms/configState"
 import {modelSettingsAtom} from "../../atoms/modelState"
+import {loadAppConfigAtom, tokenPageDescriptionAtom} from "../../atoms/appConfigState"
 import {defaultBaseModel, fieldsToLLMGroup, intoModelConfig, intoRawModelConfig} from "../../helper/model"
 import {fetchModels} from "../../ipc/llm"
 import Input from "../../components/Input"
@@ -24,13 +25,21 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
   const [token, setToken] = useState("")
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [liteLLMUrl, setLiteLLMUrl] = useState("https://litellm.de-prod.cxense.com")
+  const [liteLLMUrl, setLiteLLMUrl] = useState("")
+
+  // Load app config on mount
+  const loadAppConfig = useSetAtom(loadAppConfigAtom)
+  useEffect(() => {
+    loadAppConfig()
+  }, [loadAppConfig])
 
   useEffect(() => {
     const loadLiteLLMUrl = async () => {
       if (window.ipcRenderer?.getLiteLLMUrl) {
         const url = await window.ipcRenderer.getLiteLLMUrl()
-        setLiteLLMUrl(url)
+        if (url) {
+          setLiteLLMUrl(url)
+        }
       }
     }
     loadLiteLLMUrl()
@@ -40,9 +49,16 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
   const saveConfig = useSetAtom(writeRawConfigAtom)
   const setSettings = useSetAtom(modelSettingsAtom)
 
+  const customTokenDescription = useAtomValue(tokenPageDescriptionAtom)
+
   const handleSubmit = async () => {
     if (!token.trim()) {
       showToast({ message: t("login.tokenRequired"), type: "error" })
+      return
+    }
+
+    if (!liteLLMUrl) {
+      showToast({ message: "LiteLLM URL not loaded from config", type: "error" })
       return
     }
 
@@ -61,26 +77,6 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
         throw new Error("No models available")
       }
 
-      // Whitelist of allowed models for quick setup
-      const allowedModels = [
-        "eu-claude-sonnet-4",
-        "eu-claude-opus-4-5",
-        "claude-4-5-haiku",
-        "claude-opus-4-5",
-        "claude-sonnet-4-5",
-        "claude-opus-4-5-20251101",
-        "claude-haiku-4-5",
-      ]
-
-      // Filter models: only those that exist in both provider response AND allowlist
-      const availableModels = allowedModels.filter(modelId =>
-        results.results.includes(modelId)
-      )
-
-      if (availableModels.length === 0) {
-        throw new Error(`No allowed models available. API returned: ${results.results.join(", ")}`)
-      }
-
       // Create config using openai_compatible provider (LiteLLM is OpenAI-compatible)
       const group = fieldsToLLMGroup("openai_compatible", {
         apiKey: token,
@@ -88,11 +84,13 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
         active: true
       })
 
-      // Create model entries for ALL filtered models - all active for selection in chat
-      const models = availableModels.map((modelId) => {
+      // Create model entries for ALL available models from provider
+      // Config filtering will be applied via applyCurrentConfig() call below
+      const models = results.results.map((modelId) => {
         const model = defaultBaseModel()
         model.model = modelId
         model.active = true // All models available for selection
+        model.selectedByUser = false // From config, not user-selected
         return model
       })
 
@@ -132,6 +130,12 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
         })
       } catch (mcpError) {
         // Don't fail the whole setup if MCP config fails
+      }
+
+      // Apply app config to filter models according to enabledModels
+      // This centralizes config application logic in one place (backend)
+      if (window.ipcRenderer?.applyCurrentConfig) {
+        await window.ipcRenderer.applyCurrentConfig()
       }
 
       // Mark setup as completed

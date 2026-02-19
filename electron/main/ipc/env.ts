@@ -2,6 +2,7 @@ import { app, ipcMain, BrowserWindow } from "electron"
 import { serviceStatus } from "../service"
 import path from "node:path"
 import { VITE_DEV_SERVER_URL } from "../constant"
+import { appConfigService } from "../app-config"
 
 export function ipcEnvHandler(_win: BrowserWindow) {
   ipcMain.handle("env:getPlatform", async () => {
@@ -21,7 +22,8 @@ export function ipcEnvHandler(_win: BrowserWindow) {
   })
 
   ipcMain.handle("env:getLiteLLMUrl", async () => {
-    return process.env.LITELLM_URL || "https://litellm.de-prod.cxense.com"
+    const config = appConfigService.getConfig()
+    return config?.modelProviderConfig?.url || null
   })
 }
 

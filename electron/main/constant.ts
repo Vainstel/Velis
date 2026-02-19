@@ -87,3 +87,8 @@ export const DEF_VELIS_HTTPD_CONFIG = {
 }
 
 export const cwd = app.isPackaged ? path.join(__dirname, "../..") : process.cwd()
+
+// App Configuration API defaults
+export const DEF_API_KEY = "BZAamio4I1hFsl3bjZUAjSX6IaiMLT9aElaAp"
+export const DEF_API_URL = "https://velis-back.vainslab.cc"
+export const DEF_CONFIG_CHECK_INTERVAL = 300000 // 5 minutes in milliseconds

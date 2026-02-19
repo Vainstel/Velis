@@ -1,6 +1,7 @@
 import { ipcRenderer, contextBridge } from "electron"
 
 import type { ModelGroupSetting } from "../../types/model"
+import type { AppConfig, ConfigVersionInfo } from "../../types/appConfig"
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -47,6 +48,17 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   getClientInfo: () => ipcRenderer.invoke("util:getClientInfo"),
   checkCommandExist: (command: string) => ipcRenderer.invoke("util:checkCommandExist", command),
   readLocalFile: (filePath: string) => ipcRenderer.invoke("util:readLocalFile", filePath),
+
+  // app config
+  getAppConfig: (): Promise<AppConfig | null> => ipcRenderer.invoke("util:getAppConfig"),
+  logUserAction: (action: string, payload?: string): Promise<void> => ipcRenderer.invoke("util:logUserAction", action, payload),
+  applyCurrentConfig: (): Promise<void> => ipcRenderer.invoke("util:applyCurrentConfig"),
+  restartApp: (): void => ipcRenderer.invoke("util:restartApp"),
+  onAppConfigVersionUpdate: (callback: (data: ConfigVersionInfo) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, value: ConfigVersionInfo) => callback(value)
+    ipcRenderer.on("app-config:version-update", listener as any)
+    return () => ipcRenderer.off("app-config:version-update", listener as any)
+  },
 
   // system
   openScriptsDir: () => ipcRenderer.invoke("system:openScriptsDir"),

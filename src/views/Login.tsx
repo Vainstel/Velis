@@ -1,7 +1,9 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import "@/styles/pages/_Login.scss"
 import { useNavigate } from "react-router-dom"
+import { useAtomValue, useSetAtom } from "jotai"
+import { loadAppConfigAtom, customerModeTitleAtom, customerModeDescriptionAtom } from "../atoms/appConfigState"
 import Button from "../components/Button"
 import TokenSetupForm from "./Setup/TokenSetupForm"
 
@@ -9,6 +11,19 @@ const Login = () => {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [showTokenForm, setShowTokenForm] = useState(false)
+
+  // Load app config on mount
+  const loadAppConfig = useSetAtom(loadAppConfigAtom)
+  useEffect(() => {
+    loadAppConfig()
+  }, [loadAppConfig])
+
+  // Get customized text (fallback to i18n)
+  const customTitle = useAtomValue(customerModeTitleAtom)
+  const customDescription = useAtomValue(customerModeDescriptionAtom)
+
+  const title2 = customTitle || t("login.title2")
+  const description2 = customDescription || t("login.description2")
 
   return (
     <div className="login-page-container">
@@ -43,9 +58,9 @@ const Login = () => {
 
           {/* Right Card - Use Internal Models */}
           <div className="option-card">
-            <h2 className="option-title">{t("login.title2")}</h2>
+            <h2 className="option-title">{title2}</h2>
             <p className="option-description">
-              {t("login.description2")}
+              {description2}
             </p>
             <div className="button-container">
               <Button

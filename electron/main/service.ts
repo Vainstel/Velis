@@ -22,6 +22,7 @@ import { EventEmitter } from "node:events"
 import { Writable } from "node:stream"
 import crypto from "node:crypto"
 import { hostCache } from "./store.js"
+import { appConfigService } from "./app-config.js"
 
 const baseConfigDir = app.isPackaged ? configDir : path.join(__dirname, "..", "..", ".config")
 
@@ -106,6 +107,18 @@ export async function initMCPClient(win: BrowserWindow) {
   ipcEventEmitter.on("ipc", handler)
 
   await initApp().catch(console.error)
+
+  // Initialize app config service BEFORE starting host
+  // This will exit the app if config cannot be fetched on first launch
+  try {
+    await appConfigService.initialize()
+    appConfigService.startPeriodicCheck(win)
+  } catch (error) {
+    console.error("Failed to initialize app config:", error)
+    // App will quit in initialize() if it's a critical error
+    return
+  }
+
   await installHostDependencies(win).catch(console.error)
   await startHostService().catch(console.error)
 }

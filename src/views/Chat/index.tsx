@@ -331,6 +331,11 @@ const ChatWindow = () => {
       return
     }
 
+    // Log user action (fire-and-forget, non-blocking)
+    if (window.ipcRenderer?.logUserAction) {
+      window.ipcRenderer.logUserAction("NEW_USER_MESSAGE").catch(() => {})
+    }
+
     // Priority: chatId (URL param) > "" (new chat)
     // Use chatId from URL to ensure we're sending to the correct chat
     const targetChatId = chatId || `${"__temp__"}${Date.now()}${Math.random()}`
