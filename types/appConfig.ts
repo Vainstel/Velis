@@ -10,6 +10,7 @@ export interface AppConfig {
     tokenPage?: {
       description?: string
     }
+    newConfigVersionMessage?: string
   }
   modelProviderConfig?: {
     url?: string

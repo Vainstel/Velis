@@ -515,7 +515,8 @@
     "currentVersion": "Current Version",
     "newVersion": "New Version",
     "skip": "Skip",
-    "restart": "Restart App"
+    "restart": "Restart App",
+    "appliedTitle": "What's New"
   },
   "InstallHostDependencies": {
     "title": "Downloading Host Dependencies...",

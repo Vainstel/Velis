@@ -52,5 +52,16 @@ export const enabledModelsAtom = atom<string[] | null>(
   }
 )
 
+// Derived atom for new config version message
+export const newConfigVersionMessageAtom = atom<string | null>(
+  (get) => {
+    const config = get(appConfigAtom)
+    return config?.appText?.newConfigVersionMessage || null
+  }
+)
+
+// Controls visibility of "what's new" modal shown on startup after config update
+export const configAppliedModalAtom = atom<boolean>(false)
+
 // Config version update info (used by update modal)
 export const configVersionUpdateAtom = atom<ConfigVersionInfo | null>(null)

@@ -236,6 +236,14 @@ export function ipcUtilHandler(win: BrowserWindow) {
   ipcMain.handle("util:setSetupMode", async (_, mode: "customer" | "custom") => {
     await appConfigService.setMode(mode)
   })
+
+  ipcMain.handle("util:getInnerSettings", async () => {
+    return appConfigService.getInnerSettings()
+  })
+
+  ipcMain.handle("util:markConfigUpdateSeen", async () => {
+    await appConfigService.markConfigUpdateSeen()
+  })
 }
 
 function getFilenameFromUrl(url: string) {

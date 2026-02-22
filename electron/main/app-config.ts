@@ -26,7 +26,7 @@ class AppConfigService {
     console.log(`[AppConfig] Cached config exists: ${hasCachedConfig} (path: ${configPath})`)
 
     try {
-      await this.fetchAndUpdate()
+      const configUpdated = await this.fetchAndUpdate()
       console.log("[AppConfig] Initialized successfully")
       console.log("[AppConfig] Current config version:", this.config?.version)
 
@@ -42,6 +42,12 @@ class AppConfigService {
 
         // Apply config only in customer mode or when mode not set
         await this.applyConfigToApp(this.config)
+
+        // If config was updated and mode is customer, mark it as unseen so frontend shows the update modal
+        if (configUpdated && innerSettings?.mode === "customer") {
+          await this.saveInnerSettings({ ...innerSettings, configUpdateSeen: false })
+          console.log("[AppConfig] New config applied - marked configUpdateSeen: false")
+        }
       }
     } catch (error) {
       console.error("[AppConfig] Initialization failed:", error)
@@ -420,6 +426,25 @@ class AppConfigService {
   async setMode(mode: "customer" | "custom"): Promise<void> {
     await this.saveInnerSettings({ mode })
     console.log(`[AppConfig] Mode set to: ${mode}`)
+  }
+
+  /**
+   * Get inner settings
+   */
+  async getInnerSettings(): Promise<InnerSettings | null> {
+    return this.loadInnerSettings()
+  }
+
+  /**
+   * Mark config update as seen by the user
+   * Called when user dismisses the "what's new" modal after a config update
+   */
+  async markConfigUpdateSeen(): Promise<void> {
+    const innerSettings = await this.loadInnerSettings()
+    if (innerSettings) {
+      await this.saveInnerSettings({ ...innerSettings, configUpdateSeen: true })
+      console.log("[AppConfig] Config update marked as seen")
+    }
   }
 
   /**

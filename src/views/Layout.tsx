@@ -10,10 +10,11 @@ import Overlay from "./Overlay"
 import KeymapModal from "../components/Modal/KeymapModal"
 import RenameConfirmModal from "../components/Modal/RenameConfirmModal"
 import ConfigUpdateModal from "../components/Modal/ConfigUpdateModal"
+import ConfigAppliedModal from "../components/Modal/ConfigAppliedModal"
 import CodeModal from "./Chat/CodeModal"
 import {overlaysAtom} from "../atoms/layerState"
 import {loadCommandsAtom} from "../atoms/commandState"
-import {configVersionUpdateAtom} from "../atoms/appConfigState"
+import {configAppliedModalAtom, configVersionUpdateAtom, loadAppConfigAtom} from "../atoms/appConfigState"
 
 const Layout = () => {
   const isConfigNotInitialized = useAtomValue(isConfigNotInitializedAtom)
@@ -23,6 +24,8 @@ const Layout = () => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean>(false)
   const loadCommands = useSetAtom(loadCommandsAtom)
   const setConfigUpdate = useSetAtom(configVersionUpdateAtom)
+  const setConfigAppliedModal = useSetAtom(configAppliedModalAtom)
+  const loadAppConfig = useSetAtom(loadAppConfigAtom)
 
   const checkFirstLaunch = () => {
     if (window.ipcRenderer) {
@@ -33,6 +36,17 @@ const Layout = () => {
   useEffect(() => {
     // Check if this is first launch
     checkFirstLaunch()
+
+    // Check if a new config was applied and user hasn't seen the "what's new" modal yet.
+    // Load app config first so the message is available when the modal renders.
+    if (window.ipcRenderer?.getInnerSettings) {
+      window.ipcRenderer.getInnerSettings().then(async innerSettings => {
+        if (innerSettings?.mode === "customer" && innerSettings?.configUpdateSeen === false) {
+          await loadAppConfig()
+          setConfigAppliedModal(true)
+        }
+      })
+    }
 
     // Load commands on mount
     loadCommands()
@@ -87,6 +101,7 @@ const Layout = () => {
       <KeymapModal />
       <RenameConfirmModal />
       <ConfigUpdateModal />
+      <ConfigAppliedModal />
     </div>
   )
 }

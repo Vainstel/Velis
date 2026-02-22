@@ -2,6 +2,7 @@
 
 import type { ModelGroupSetting } from "../types/model"
 import type { AppConfig, ConfigVersionInfo } from "../types/appConfig"
+import type { InnerSettings } from "../types/innerSettings"
 
 type ModelResults = {
   error?: string
@@ -53,6 +54,8 @@ declare global {
       applyCurrentConfig: () => Promise<void>
       restartApp: () => void
       setSetupMode: (mode: "customer" | "custom") => Promise<void>
+      getInnerSettings: () => Promise<InnerSettings | null>
+      markConfigUpdateSeen: () => Promise<void>
       onAppConfigVersionUpdate: (callback: (data: ConfigVersionInfo) => void) => () => void
       getLiteLLMUrl: () => Promise<string | null>
       closeWindow: () => void

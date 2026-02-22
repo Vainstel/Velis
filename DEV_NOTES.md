@@ -42,12 +42,25 @@ When new version detected:
 **Centralized method:** `applyConfigToApp(config)` in `electron/main/app-config.ts`
 - Updates `model_settings.json` based on `modelProviderConfig.enabledModels`
 - Updates `baseURL` from `modelProviderConfig.url`
-- Preserves user-selected models (`selectedByUser: true`)
-- Replaces config-enabled models (`selectedByUser: false`) and add new ones
+- Does NOT replace the models array — only updates the `active` flag
+- Models with `selectedByUser: true` are never modified
+- Models in `enabledModels` from backend → `active: true`
+- Models NOT in `enabledModels` → `active: false`
 
 ### Model Selection Tracking
-- `selectedByUser: true` - User manually enabled (preserved across updates)
-- `selectedByUser: false` - Config-enabled (replaced when config changes)
+`model_settings.json` contains ALL models available from the provider.
+The `active` flag controls whether a model appears in the chat model selector.
+
+- `selectedByUser: true` - User manually toggled this model in Settings → preserved across config updates
+- `selectedByUser: false` - Model state managed by backend config (default for all models)
+
+**How `selectedByUser` is set:**
+- When user checks a model checkbox in Settings → `selectedByUser: true`
+- When user unchecks a model checkbox in Settings → `selectedByUser: false`
+- On model list reload from API → `selectedByUser` is preserved from existing model state
+- On first setup (TokenSetupForm) → all models get `selectedByUser: false`
+
+**Why this matters:** Backend config can enable/disable models (`active` flag), but never overrides user's explicit choices (`selectedByUser: true`).
 
 ### Setup Modes
 
@@ -73,6 +86,51 @@ Two modes control config application behavior:
 - `appConfigService.initialize()` - Skips `applyConfigToApp()` if custom mode
 - `appConfigService.startPeriodicCheck()` - Skips update notification if custom mode
 
+### "What's New" Modal (`ConfigAppliedModal`)
+
+Shown on startup after a new config version was downloaded and applied.
+
+**Trigger flag:** `configUpdateSeen` in `inner_settings.json`
+- `false` — new config was applied, user hasn't seen the message yet
+- `true` (or absent) — nothing to show
+
+**Flow:**
+1. `initialize()` calls `fetchAndUpdate()` — returns `true` if config was updated
+2. If updated + mode is `"customer"` → saves `configUpdateSeen: false` to `inner_settings.json`
+3. On next startup, `Layout.tsx` reads `getInnerSettings()`
+4. If `mode === "customer"` and `configUpdateSeen === false`:
+   - Loads app config (to populate `newConfigVersionMessageAtom`)
+   - Shows `ConfigAppliedModal` with message from `appText.newConfigVersionMessage`
+5. User clicks OK → `markConfigUpdateSeen()` sets `configUpdateSeen: true`
+
+**Key files:**
+- `src/components/Modal/ConfigAppliedModal.tsx` — modal component
+- `src/atoms/appConfigState.ts` — `configAppliedModalAtom`, `newConfigVersionMessageAtom`
+- `src/views/Layout.tsx` — startup check logic
+- IPC: `util:getInnerSettings`, `util:markConfigUpdateSeen`
+
+### Token Counting
+
+Token usage is extracted from `ai_message.usage_metadata` after each LLM response.
+
+**OpenAI-compatible providers (LiteLLM):**
+Usage metadata is NOT included in streaming responses by default. Must explicitly enable via:
+```python
+# mcp-host/dive_mcp_host/models/__init__.py
+cleaned_kwargs["stream_options"] = {"include_usage": True}
+```
+Without this, `usage_metadata` is `None` and all token counts show as 0.
+
+**Fields sent to frontend (`token_usage` event):**
+- `inputTokens` — total input tokens for the request (includes system prompt + tools + history)
+- `outputTokens` — tokens in the AI response
+- `userToken` — tokens in the user's message only (approximate)
+- `timeToFirstToken` — seconds to first response chunk
+- `tokensPerSecond` — output generation speed
+- `modelName` — model name from response metadata
+
+**Note:** `inputTokens` in AI response includes system prompt + all MCP tool definitions + conversation history, so it will be much larger than just the user's message. The user message token count is shown separately via `userToken`.
+
 ### User Action Monitoring
 Fire-and-forget async calls to backend for analytics:
 - `NEW_USER_MESSAGE` - User sends chat message
@@ -93,12 +151,15 @@ See `ENV_DOC.md` for details:
 - Methods: `getRunConfig()`, `getConfigVersion()`, `logAction()`
 
 **Config Service** (`electron/main/app-config.ts`):
-- `initialize()` - Load config on startup
-- `fetchAndUpdate()` - Fetch and update if version changed
+- `initialize()` - Load config on startup, sets `configUpdateSeen: false` if updated in customer mode
+- `fetchAndUpdate()` - Fetch and update if version changed, returns `true` if config was updated
 - `applyConfigToApp(config)` - Apply config to system
 - `applyCurrentConfig()` - Apply current config (called after token setup)
 - `restartApp()` - Restart application
 - `startPeriodicCheck()` - Check for updates periodically
+- `setMode(mode)` - Save customer/custom mode to `inner_settings.json`
+- `getInnerSettings()` - Read `inner_settings.json`
+- `markConfigUpdateSeen()` - Set `configUpdateSeen: true` in `inner_settings.json`
 
 **Frontend State** (`src/atoms/appConfigState.ts`):
 - Jotai atoms for config access
@@ -109,4 +170,7 @@ See `ENV_DOC.md` for details:
 - `electron/main/app-config.ts` - Config service
 - `src/atoms/appConfigState.ts` - Frontend state
 - `types/appConfig.ts` - Type definitions
+- `types/innerSettings.ts` - Inner settings type (`mode`, `configUpdateSeen`)
 - `electron/main/constant.ts` - Default values
+- `src/components/Modal/ConfigAppliedModal.tsx` - "What's New" modal
+- `src/components/Modal/ConfigUpdateModal.tsx` - Version update modal (restart prompt)
