@@ -52,6 +52,7 @@ declare global {
       logUserAction: (action: string, payload?: string) => Promise<void>
       applyCurrentConfig: () => Promise<void>
       restartApp: () => void
+      setSetupMode: (mode: "customer" | "custom") => Promise<void>
       onAppConfigVersionUpdate: (callback: (data: ConfigVersionInfo) => void) => () => void
       getLiteLLMUrl: () => Promise<string | null>
       closeWindow: () => void

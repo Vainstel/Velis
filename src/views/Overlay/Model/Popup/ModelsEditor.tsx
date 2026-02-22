@@ -203,7 +203,8 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
           return {
             ...m,
             active: existModel?.active ?? false,
-            verifyStatus: existModel?.verifyStatus ?? "unVerified"
+            verifyStatus: existModel?.verifyStatus ?? "unVerified",
+            selectedByUser: existModel?.selectedByUser ?? false,
           }
         }),
       ]
@@ -226,7 +227,11 @@ const ModelPopup = ({ onClose, onSuccess }: Props) => {
   const checkedModel = (modelName: string) => {
     setInnerModelBuffer(model => {
       const ms = model.map(m => {
-        return { ...m, active: m.model === modelName ? !m.active : m.active }
+        if (m.model === modelName) {
+          const newActive = !m.active
+          return { ...m, active: newActive, selectedByUser: newActive }
+        }
+        return m
       })
       updateCheckboxState(ms)
       return ms

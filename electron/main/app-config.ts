@@ -4,6 +4,7 @@ import path from "path"
 import { configDir, DEF_CONFIG_CHECK_INTERVAL } from "./constant"
 import type { AppConfig, ConfigVersionInfo } from "../../types/appConfig"
 import type { ModelGroupSetting } from "../../types/model"
+import type { InnerSettings } from "../../types/innerSettings"
 import { apiClient } from "./api-client"
 
 const CONFIG_FILE_NAME = "app_conf_run.json"
@@ -31,6 +32,15 @@ class AppConfigService {
 
       // Apply config to app (update model_settings.json, etc.)
       if (this.config) {
+        // Check mode before applying config
+        const innerSettings = await this.loadInnerSettings()
+
+        if (innerSettings?.mode === "custom") {
+          console.log("[AppConfig] Custom mode detected - skipping config application")
+          return
+        }
+
+        // Apply config only in customer mode or when mode not set
         await this.applyConfigToApp(this.config)
       }
     } catch (error) {
@@ -89,6 +99,9 @@ class AppConfigService {
         console.error(`[AppConfig] Exiting application...`)
         process.exit(1)
       }
+
+      // Cached config loaded - no need to apply as it was already applied on previous launch
+      console.log("[AppConfig] Using cached config without re-applying (already applied on previous launch)")
     }
   }
 
@@ -194,6 +207,31 @@ class AppConfigService {
   }
 
   /**
+   * Load inner settings (mode tracking)
+   */
+  private async loadInnerSettings(): Promise<InnerSettings | null> {
+    try {
+      const settingsPath = path.join(configDir, "inner_settings.json")
+      if (await fse.pathExists(settingsPath)) {
+        return await fse.readJson(settingsPath)
+      }
+    } catch (error) {
+      console.error("[AppConfig] Failed to load inner settings:", error)
+    }
+    return null
+  }
+
+  /**
+   * Save inner settings (mode tracking)
+   */
+  private async saveInnerSettings(settings: InnerSettings): Promise<void> {
+    const settingsPath = path.join(configDir, "inner_settings.json")
+    await fse.ensureDir(configDir)
+    await fse.writeJson(settingsPath, settings, { spaces: 2 })
+    console.log(`[AppConfig] Saved inner settings to ${settingsPath}`)
+  }
+
+  /**
    * Apply app config to system - update model_settings.json and other configs
    * This is the centralized place for applying config changes
    */
@@ -239,7 +277,7 @@ class AppConfigService {
         return
       }
 
-      const enabledModels = modelProviderConfig.enabledModels || []
+      const enabledModels = new Set(modelProviderConfig.enabledModels || [])
       const baseURL = modelProviderConfig.url
 
       // Update models and baseURL in each group
@@ -250,28 +288,27 @@ class AppConfigService {
           console.log(`[AppConfig] Updated ${group.modelProvider} baseURL to: ${baseURL}`)
         }
 
-        // Keep ONLY user-selected models (selectedByUser: true)
-        const userSelectedModels = group.models.filter(m => m.selectedByUser === true)
+        // Update active flag based on enabledModels from backend config.
+        // Don't touch models with selectedByUser: true - user explicitly chose them.
+        // All other models: active = true only if they are in enabledModels from backend.
+        let updatedCount = 0
+        for (const model of group.models) {
+          if (model.selectedByUser === true) {
+            continue // User-selected models are not modified
+          }
+          const shouldBeActive = enabledModels.has(model.model)
+          if (model.active !== shouldBeActive) {
+            model.active = shouldBeActive
+            updatedCount++
+          }
+        }
 
-        // Create ALL config-enabled models (this REPLACES old config models)
-        const configModels = enabledModels.map(modelId => ({
-          disableStreaming: false,
-          active: true,
-          toolsInPrompt: false,
-          extra: {},
-          model: modelId,
-          selectedByUser: false, // From config, not user
-        }))
-
-        // Combine: user-selected + ALL config-enabled models
-        group.models = [...userSelectedModels, ...configModels]
-
-        console.log(`[AppConfig] Updated ${group.modelProvider} group: ${userSelectedModels.length} user-selected, ${configModels.length} config-enabled`)
+        console.log(`[AppConfig] Updated ${updatedCount} models' active status in ${group.modelProvider} group`)
       }
 
       // Save updated settings
       await fse.writeJson(modelSettingsPath, settings, { spaces: 2 })
-      console.log("[AppConfig] Updated model_settings.json with enabled models and baseURL")
+      console.log("[AppConfig] Updated model_settings.json with active flags from backend config")
     } catch (error) {
       console.error("[AppConfig] Failed to update model_settings.json:", error)
       // Non-critical error - don't throw
@@ -320,9 +357,30 @@ class AppConfigService {
     this.checkInterval = setInterval(async () => {
       try {
         const result = await this.checkVersion()
-        if (result.hasUpdate && this.win && !this.win.isDestroyed()) {
-          console.log(`[AppConfig] New version available: ${result.oldVersion} -> ${result.newVersion}`)
-          this.win.webContents.send("app-config:version-update", result)
+
+        // Log version check
+        const payload = JSON.stringify({
+          appVersion: app.getVersion(),
+          currentConfigVersion: result.oldVersion,
+          newConfigVersion: result.newVersion,
+          hasUpdate: result.hasUpdate
+        })
+        await this.logUserAction("CHECK_CONFIG_VERSION", payload)
+
+        if (result.hasUpdate) {
+          // Check mode before notifying user
+          const innerSettings = await this.loadInnerSettings()
+
+          if (innerSettings?.mode === "custom") {
+            console.log("[AppConfig] Custom mode - skipping update notification")
+            return
+          }
+
+          // Notify only in customer mode
+          if (this.win && !this.win.isDestroyed()) {
+            console.log(`[AppConfig] New version available: ${result.oldVersion} -> ${result.newVersion}`)
+            this.win.webContents.send("app-config:version-update", result)
+          }
         }
       } catch (error) {
         console.error("[AppConfig] Periodic check error:", error)
@@ -353,6 +411,15 @@ class AppConfigService {
     }
 
     await this.applyConfigToApp(this.config)
+  }
+
+  /**
+   * Set setup mode (customer or custom)
+   * Called after initial setup to track which setup path was chosen
+   */
+  async setMode(mode: "customer" | "custom"): Promise<void> {
+    await this.saveInnerSettings({ mode })
+    console.log(`[AppConfig] Mode set to: ${mode}`)
   }
 
   /**

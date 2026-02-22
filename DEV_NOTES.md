@@ -49,6 +49,30 @@ When new version detected:
 - `selectedByUser: true` - User manually enabled (preserved across updates)
 - `selectedByUser: false` - Config-enabled (replaced when config changes)
 
+### Setup Modes
+
+Two modes control config application behavior:
+
+**Customer Mode** (`mode: "customer"`):
+- User chose "Use Internal Models" and entered token
+- Backend config is applied on startup (models, LiteLLM URL)
+- Update notifications shown when new config version available
+- File: `inner_settings.json` with `{"mode": "customer"}`
+
+**Custom Mode** (`mode: "custom"`):
+- User chose "Use Your Own Prepared Models" and configured provider manually
+- Backend config is NOT applied on startup
+- Update notifications are NOT shown
+- File: `inner_settings.json` with `{"mode": "custom"}`
+
+**Mode is set**:
+- TokenSetupForm → `setSetupMode("customer")`
+- ModelConfigForm → `setSetupMode("custom")`
+
+**Mode is checked**:
+- `appConfigService.initialize()` - Skips `applyConfigToApp()` if custom mode
+- `appConfigService.startPeriodicCheck()` - Skips update notification if custom mode
+
 ### User Action Monitoring
 Fire-and-forget async calls to backend for analytics:
 - `NEW_USER_MESSAGE` - User sends chat message

@@ -54,6 +54,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   logUserAction: (action: string, payload?: string): Promise<void> => ipcRenderer.invoke("util:logUserAction", action, payload),
   applyCurrentConfig: (): Promise<void> => ipcRenderer.invoke("util:applyCurrentConfig"),
   restartApp: (): void => ipcRenderer.invoke("util:restartApp"),
+  setSetupMode: (mode: "customer" | "custom"): Promise<void> => ipcRenderer.invoke("util:setSetupMode", mode),
   onAppConfigVersionUpdate: (callback: (data: ConfigVersionInfo) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, value: ConfigVersionInfo) => callback(value)
     ipcRenderer.on("app-config:version-update", listener as any)

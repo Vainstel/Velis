@@ -232,6 +232,10 @@ export function ipcUtilHandler(win: BrowserWindow) {
   ipcMain.handle("util:restartApp", () => {
     appConfigService.restartApp()
   })
+
+  ipcMain.handle("util:setSetupMode", async (_, mode: "customer" | "custom") => {
+    await appConfigService.setMode(mode)
+  })
 }
 
 function getFilenameFromUrl(url: string) {

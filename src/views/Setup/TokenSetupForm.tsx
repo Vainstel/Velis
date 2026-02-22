@@ -141,6 +141,11 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
       // Mark setup as completed
       if (window.ipcRenderer) {
         await window.ipcRenderer.markSetupCompleted()
+
+        // Set mode to customer (using internal models)
+        if (window.ipcRenderer.setSetupMode) {
+          await window.ipcRenderer.setSetupMode("customer")
+        }
       }
 
       // Show success and navigate

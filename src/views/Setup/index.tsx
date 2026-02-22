@@ -23,6 +23,11 @@ const Setup = () => {
         // Mark setup as completed
         if (window.ipcRenderer) {
           await window.ipcRenderer.markSetupCompleted()
+
+          // Set mode to custom (using own provider)
+          if (window.ipcRenderer.setSetupMode) {
+            await window.ipcRenderer.setSetupMode("custom")
+          }
         }
 
         showToast({
