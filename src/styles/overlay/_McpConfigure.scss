@@ -1,0 +1,86 @@
+@use "../_variables" as *;
+
+.mcp-configure-dialog {
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    min-width: 620px;
+    max-width: 780px;
+    width: 100%;
+  }
+}
+
+.mcp-configure-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--stroke-gray-medium);
+
+  .mcp-configure-header-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+}
+
+.mcp-configure-body {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mcp-configure-description {
+  font-size: 17px;
+  color: var(--text-weak);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.mcp-configure-no-fields {
+  font-size: 17px;
+  color: var(--text-weak);
+  margin: 0;
+}
+
+.mcp-configure-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mcp-configure-field-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mcp-configure-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mcp-configure-field-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-strong);
+
+  .mcp-configure-field-required {
+    color: var(--color-danger, #e53e3e);
+  }
+}
+
+.mcp-configure-field-desc {
+  font-size: 15px;
+  color: var(--text-weak);
+  line-height: 1.4;
+}
+
+.mcp-configure-field-error {
+  font-size: 13px;
+  color: var(--color-danger, #e53e3e);
+}

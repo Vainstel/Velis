@@ -55,6 +55,13 @@ export const successToolsAtom = atom<Tool[]>(
   }
 )
 
+export const failedToolsAtom = atom<Tool[]>(
+  (get) => {
+    const tools = get(toolsAtom)
+    return tools.filter((tool) => tool.enabled && (!!tool.error || tool.disabled || tool.status === "failed"))
+  }
+)
+
 export const loadToolsAtom = atom(
   null,
   async (get, set) => {

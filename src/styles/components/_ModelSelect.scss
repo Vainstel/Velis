@@ -129,4 +129,32 @@ $select-button-width: 475px;
       filter: none;
     }
   }
+
+  .failed-mcp-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .failed-mcp-count {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ef4444 !important;
+      line-height: 1;
+    }
+
+    .failed-mcp-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ef4444 !important;
+      line-height: 1;
+    }
+  }
 }

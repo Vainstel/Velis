@@ -7,6 +7,7 @@ import { useAtomValue, useSetAtom } from "jotai"
 import { configAtom, writeRawConfigAtom } from "../atoms/configState"
 import { openOverlayAtom } from "../atoms/layerState"
 import { showToastAtom } from "../atoms/toastState"
+import { failedToolsAtom } from "../atoms/toolState"
 import Tooltip from "./Tooltip"
 import { systemThemeAtom, userThemeAtom } from "../atoms/themeState"
 import { modelSettingsAtom } from "../atoms/modelState"
@@ -25,6 +26,8 @@ const ModelSelect = () => {
   const systemTheme = useAtomValue(systemThemeAtom)
   const userTheme = useAtomValue(userThemeAtom)
   const settings = useAtomValue(modelSettingsAtom)
+  const failedTools = useAtomValue(failedToolsAtom)
+  const failedCount = failedTools.length
 
   const getModelNamePrefix = (group: GroupTerm) => {
     switch (group.modelProvider) {
@@ -150,7 +153,7 @@ const ModelSelect = () => {
       >
         <button
           className="model-select-add-btn"
-          onClick={() => openOverlay({ page: "Setting", tab: "Model" })}
+          onClick={() => openOverlay({ page: "Setting", tab: "Tools" })}
         >
           <svg width="20px" height="20px" viewBox="0 0 20 20">
             <g id="surface1">
@@ -159,6 +162,16 @@ const ModelSelect = () => {
           </svg>
         </button>
       </Tooltip>
+      {failedCount > 0 && (
+        <div
+          className="failed-mcp-indicator"
+          onClick={() => openOverlay({ page: "Setting", tab: "Tools" })}
+          style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer", padding: "2px 8px", borderRadius: 6 }}
+        >
+          <span style={{ fontSize: 14, fontWeight: 600, color: "#ef4444", lineHeight: 1 }}>{failedCount}</span>
+          <span style={{ fontSize: 12, fontWeight: 400, color: "#ef4444", whiteSpace: "nowrap" }}>Failed MCP</span>
+        </div>
+      )}
     </div>
   )
 }

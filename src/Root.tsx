@@ -8,11 +8,13 @@ import { modelSettingsAtom } from "./atoms/modelState"
 import { fromRawConfigToModelGroupSetting } from "./helper/model"
 import { initFetch } from "./ipc"
 import { getModelSettings, setModelSettings } from "./ipc/config"
+import { loadToolsAtom } from "./atoms/toolState"
 
 function Root() {
   const loadConfig = useSetAtom(loadConfigAtom)
   const loadHotkeyMap = useSetAtom(loadHotkeyMapAtom)
   const setModelSetting = useSetAtom(modelSettingsAtom)
+  const loadTools = useSetAtom(loadToolsAtom)
   const [loading, setLoading] = useState(true)
   const [downloading, setDownloading] = useState(window.PLATFORM !== "darwin")
   const init = useRef(false)
@@ -45,14 +47,13 @@ function Root() {
         const existsSetting = await getModelSettings()
         if (existsSetting) {
           setModelSetting(existsSetting)
-          return
-        }
-
-        if (res) {
+        } else if (res) {
           const settings = fromRawConfigToModelGroupSetting(res)
           setModelSetting(settings)
-          return setModelSettings(settings)
+          await setModelSettings(settings)
         }
+        // Load tools so failedToolsAtom is populated from the first render
+        loadTools()
       })
       .finally(() => {
         setDownloading(false)

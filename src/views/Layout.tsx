@@ -37,16 +37,18 @@ const Layout = () => {
     // Check if this is first launch
     checkFirstLaunch()
 
-    // Check if a new config was applied and user hasn't seen the "what's new" modal yet.
-    // Load app config first so the message is available when the modal renders.
-    if (window.ipcRenderer?.getInnerSettings) {
-      window.ipcRenderer.getInnerSettings().then(async innerSettings => {
-        if (innerSettings?.mode === "customer" && innerSettings?.configUpdateSeen === false) {
-          await loadAppConfig()
-          setConfigAppliedModal(true)
-        }
-      })
-    }
+    // Always load app config on mount so appConfigAtom is available to all components
+    // (e.g. Tools page uses it to read backend MCP templates)
+    loadAppConfig().then(() => {
+      // After loading, check if a new config was applied and user hasn't seen the modal yet
+      if (window.ipcRenderer?.getInnerSettings) {
+        window.ipcRenderer.getInnerSettings().then(innerSettings => {
+          if (innerSettings?.mode === "customer" && innerSettings?.configUpdateSeen === false) {
+            setConfigAppliedModal(true)
+          }
+        })
+      }
+    })
 
     // Load commands on mount
     loadCommands()

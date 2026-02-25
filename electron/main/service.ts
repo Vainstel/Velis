@@ -237,7 +237,7 @@ async function startHostService() {
 
   const httpdEnv: any = {
     ...process.env,
-    VELIS_CONFIG_DIR: baseConfigDir,
+    DIVE_CONFIG_DIR: baseConfigDir,
     RESOURCE_DIR: hostCacheDir,
   }
 

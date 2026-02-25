@@ -4,12 +4,11 @@ import {useSetAtom, useAtomValue} from "jotai"
 import {showToastAtom} from "../../atoms/toastState"
 import {writeRawConfigAtom} from "../../atoms/configState"
 import {modelSettingsAtom} from "../../atoms/modelState"
-import {loadAppConfigAtom, tokenPageDescriptionAtom} from "../../atoms/appConfigState"
+import {loadAppConfigAtom, tokenPageDescriptionAtom, appConfigAtom} from "../../atoms/appConfigState"
 import {defaultBaseModel, fieldsToLLMGroup, intoModelConfig, intoRawModelConfig} from "../../helper/model"
 import {fetchModels} from "../../ipc/llm"
 import Input from "../../components/Input"
 import Button from "../../components/Button"
-import mcpFastConfig from "../../../public/mcp_fast_config.json"
 import "../../styles/components/_Setup.scss"
 
 interface TokenSetupFormProps {
@@ -48,6 +47,7 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
   const showToast = useSetAtom(showToastAtom)
   const saveConfig = useSetAtom(writeRawConfigAtom)
   const setSettings = useSetAtom(modelSettingsAtom)
+  const appConfig = useAtomValue(appConfigAtom)
 
   const customTokenDescription = useAtomValue(tokenPageDescriptionAtom)
 
@@ -118,16 +118,23 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
         await saveConfig(rawConfig)
       }
 
-      // Load and save default MCP config
+      // Load and save default MCP config - only include MCPs that don't need credentials
       try {
-        // Save MCP config
-        await fetch("/api/config/mcpserver", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(mcpFastConfig),
-        })
+        const templateServers = appConfig?.mcp?.mcpServers ?? {}
+        const autoMcpServers: Record<string, any> = {}
+        for (const [key, template] of Object.entries(templateServers)) {
+          const hasFields = !!(template.velisSettings?.newVersionPip?.fields?.length)
+          if (!hasFields) {
+            autoMcpServers[key] = { ...template, enabled: true }
+          }
+        }
+        if (Object.keys(autoMcpServers).length > 0) {
+          await fetch("/api/config/mcpserver", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mcpServers: autoMcpServers }),
+          })
+        }
       } catch (mcpError) {
         // Don't fail the whole setup if MCP config fails
       }

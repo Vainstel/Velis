@@ -140,6 +140,32 @@
 
           .tool-header-content-icon {
             color: var(--text-weak);
+
+            &.tool-icon-img {
+              object-fit: contain;
+              border-radius: 4px;
+            }
+          }
+
+          .tool-description-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-gray-medium);
+            color: var(--text-strong);
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            cursor: default;
+            user-select: none;
+
+            &:hover {
+              background: var(--bg-gray-strong);
+            }
           }
 
           .tool-name {
@@ -269,10 +295,12 @@
 
         &.danger {
           color: var(--text-danger);
+          padding-bottom: 10px;
         }
 
         &.warning {
           color: var(--text-warning);
+          padding-bottom: 10px;
         }
       }
     }

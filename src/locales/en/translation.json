@@ -166,6 +166,7 @@
       "edit": "Edit",
       "reload": "Reload",
       "connect": "Connect",
+      "reconnect": "Reconnect",
       "disconnect": "Disconnect",
       "detail": "View Details"
     },
@@ -291,6 +292,16 @@
       "disconnectFailed": "Failed to disconnect {{connector}}, please try again later",
       "noNeedCredential": "No Authorization Needed",
       "listTooltip": "Authorize access by connecting through OAuth"
+    },
+    "configure": {
+      "btn": "Configure",
+      "title": "Configure {{name}}",
+      "save": "Save",
+      "mandatory": "This field is required",
+      "noFields": "No configuration fields required",
+      "notConfigured": "Not configured",
+      "noDescription": "No description available",
+      "noLongerSupported": "No longer supported"
     }
   },
   "modelConfig": {

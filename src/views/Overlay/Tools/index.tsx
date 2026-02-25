@@ -4,6 +4,9 @@ import { useTranslation } from "react-i18next"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import Switch from "../../../components/Switch"
 import { loadingToolsAtom, loadMcpConfigAtom, loadToolsAtom, MCPConfig, mcpConfigAtom, Tool, toolsAtom, installToolBufferAtom } from "../../../atoms/toolState"
+import McpConfigureDialog from "./Popup/McpConfigureDialog"
+import type { McpServerTemplate } from "../../../../types/appConfig"
+import { appConfigAtom } from "../../../atoms/appConfigState"
 import Tooltip from "../../../components/Tooltip"
 import PopupConfirm from "../../../components/PopupConfirm"
 import Dropdown from "../../../components/DropDown"
@@ -93,6 +96,57 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
   const [installToolBuffer, setInstallToolBuffer] = useAtom(installToolBufferAtom)
   const [authorizeState, setAuthorizeState] = useAtom(authorizeStateAtom)
   const closeAllOverlays = useSetAtom(closeAllOverlaysAtom)
+  // Backend MCP templates from app_conf_run.json (via appConfigAtom)
+  const appConfig = useAtomValue(appConfigAtom)
+  const [mcpTemplates, setMcpTemplates] = useState<Record<string, McpServerTemplate>>({})
+  // Configure dialog
+  const [showConfigureDialog, setShowConfigureDialog] = useState(false)
+  const [configureMcpKey, setConfigureMcpKey] = useState<string>("")
+  // Icon load error tracking
+  const [iconErrors, setIconErrors] = useState<Record<string, boolean>>({})
+  // Sync backend MCP templates from appConfigAtom whenever it updates
+  useEffect(() => {
+    const templates = appConfig?.mcp?.mcpServers ?? {}
+    setMcpTemplates(templates)
+  }, [appConfig])
+
+  // Auto-add backend MCPs that have no newVersionPip (no credentials needed) and aren't yet in mcp_config
+  useEffect(() => {
+    if (Object.keys(mcpTemplates).length === 0) return
+    ;(async () => {
+      // Fetch directly from API to avoid race condition with React state loading
+      let currentConfig: {mcpServers: MCPConfig} = { mcpServers: {} as MCPConfig }
+      try {
+        const res = await fetch("/api/config/mcpserver")
+        const data = await res.json()
+        if (data.success && data.config) {
+          currentConfig = data.config
+        }
+      } catch (_e) {
+        console.warn("[Tools] Auto-add: failed to fetch current mcpConfig, skipping")
+        return
+      }
+      const toAdd: Record<string, any> = {}
+      for (const [key, template] of Object.entries(mcpTemplates)) {
+        const hasNewVersionPip = !!template.velisSettings?.newVersionPip?.fields?.length
+        const alreadyInConfig = key in (currentConfig.mcpServers ?? {})
+        if (!hasNewVersionPip && !alreadyInConfig) {
+          toAdd[key] = { ...template, enabled: true }
+        }
+      }
+      if (Object.keys(toAdd).length > 0) {
+        const merged = {
+          ...currentConfig,
+          mcpServers: { ...currentConfig.mcpServers, ...toAdd },
+        }
+        await updateMCPConfigNoAbort(merged)
+        setMcpConfig(merged as {mcpServers: MCPConfig})
+        await loadMcpConfig()
+      }
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mcpTemplates])
+
   const getMcpConfig = () => new Promise((resolve) => {
     setMcpConfig(prevConfig => {
       resolve(prevConfig)
@@ -883,6 +937,70 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
   }
   // SubTool end //
 
+  // Open configure dialog. Orphaned MCPs (removed from backend) cannot be reconfigured.
+  const handleOpenConfigure = (mcpKey: string) => {
+    if (!(mcpKey in mcpTemplates)) {
+      return
+    }
+    setConfigureMcpKey(mcpKey)
+    setShowConfigureDialog(true)
+  }
+
+  // Called when McpConfigureDialog saves the form
+  const handleConfigureSave = async (mcpKey: string, finalEntry: McpServerTemplate) => {
+    setIsLoading(true)
+    try {
+      const currentConfig = await getMcpConfig() as {mcpServers: MCPConfig}
+      const merged = {
+        ...currentConfig,
+        mcpServers: {
+          ...currentConfig.mcpServers,
+          [mcpKey]: finalEntry as any,
+        },
+      }
+      const data = await updateMCPConfig(merged, false, true)
+      if (data?.success) {
+        setMcpConfig(merged as {mcpServers: MCPConfig})
+        setShowConfigureDialog(false)
+        setConfigureMcpKey("")
+        await loadMcpConfig()
+        await updateToolsCache()
+        setIsResort(true)
+      }
+    } catch (err) {
+      console.error("[Tools] Failed to save configure:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Connect button: if backend MCP and not yet configured + has fields → open configure first
+  const handleConnectMcp = (mcpKey: string) => {
+    const template = mcpTemplates[mcpKey]
+    const isConfigured = mcpKey in (mcpConfig.mcpServers ?? {})
+    const hasFields = !!template?.velisSettings?.newVersionPip?.fields?.length
+    if (template && !isConfigured && hasFields) {
+      handleOpenConfigure(mcpKey)
+      return
+    }
+    // Use existing toggle logic to enable and connect
+    const toolObj = tools.find(t => t.name === mcpKey)
+    if (toolObj) {
+      toggleTool(toolObj)
+    } else if (isConfigured) {
+      // Not in tools list yet (pending), just enable in config
+      const newConfig = JSON.parse(JSON.stringify(mcpConfig))
+      if (newConfig.mcpServers[mcpKey]) {
+        newConfig.mcpServers[mcpKey].enabled = true
+        updateMCPConfig(newConfig, false, true).then(() => {
+          setMcpConfig(newConfig)
+          loadMcpConfig()
+          updateToolsCache()
+        })
+      }
+    }
+  }
+
   const handleReloadMCPServers = async (type: "all" | "connector" = "all") => {
     try{
       // Connector type: has its own loading UI
@@ -902,7 +1020,14 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
   }
 
   const sortedTools = useMemo(() => {
-    const configOrder = mcpConfig.mcpServers ? Object.keys(mcpConfig.mcpServers) : []
+    // Include backend MCPs not yet in mcp_config.json (shown as unconfigured)
+    const templateOnlyKeys = Object.keys(mcpTemplates).filter(
+      k => !(k in (mcpConfig.mcpServers ?? {}))
+    )
+    const configOrder = [
+      ...(mcpConfig.mcpServers ? Object.keys(mcpConfig.mcpServers) : []),
+      ...templateOnlyKeys,
+    ]
     const toolSort = (a: string, b: string) => {
       const aEnabled = tools.find(tool => tool.name === a)?.enabled
       const bEnabled = tools.find(tool => tool.name === b)?.enabled
@@ -995,8 +1120,58 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
       }
     })
 
-    return [...configTools].filter(tool => toolType === "all" || toolType === tool.sourceType)
-  }, [tools, mcpConfig.mcpServers, toolType, loadingTools, commandExistsMap])
+    // Enrich with backend template metadata and unconfigured entries
+    const enriched = configTools.map(tool => {
+      const template = mcpTemplates[tool.name]
+      const isBackendMcp = !!template
+      const isConfigured = tool.name in (mcpConfig.mcpServers ?? {})
+      const savedEntry = (mcpConfig.mcpServers as Record<string, any>)?.[tool.name]
+      // Orphan: was a backend MCP (has velisSettings saved) but no longer in templates
+      const isOrphaned = !isBackendMcp && !!savedEntry?.velisSettings
+      const velisSettings = template?.velisSettings ?? (isOrphaned ? savedEntry?.velisSettings : undefined)
+      return {
+        ...tool,
+        isBackendMcp,
+        isConfigured,
+        isOrphaned,
+        readableName: velisSettings?.readableName ?? tool.name,
+        iconLink: velisSettings?.iconLink,
+        mcpDescription: velisSettings?.description,
+        hasConfigFields: !!(velisSettings?.newVersionPip?.fields?.length),
+      }
+    })
+
+    // Add unconfigured backend MCPs (not yet in mcp_config)
+    const unconfiguredEntries = templateOnlyKeys.map(name => {
+      const template = mcpTemplates[name]
+      const velisSettings = template?.velisSettings
+      const toolLoadingKey = `Tool[${name}]`
+      const toolLoading = loadingTools[toolLoadingKey]
+      return {
+        name,
+        description: "",
+        enabled: toolLoading ? toolLoading.enabled : false,
+        disabled: false,
+        toolType: "tool" as const,
+        sourceType: "custom" as const,
+        commandExists: true,
+        command: template?.command,
+        isBackendMcp: true,
+        isConfigured: false,
+        readableName: velisSettings?.readableName ?? name,
+        iconLink: velisSettings?.iconLink,
+        mcpDescription: velisSettings?.description,
+        hasConfigFields: !!(velisSettings?.newVersionPip?.fields?.length),
+      }
+    })
+
+    const allTools = [
+      ...enriched.filter(t => !templateOnlyKeys.includes(t.name)),
+      ...unconfiguredEntries,
+    ]
+
+    return allTools.filter(tool => toolType === "all" || toolType === tool.sourceType)
+  }, [tools, mcpConfig.mcpServers, mcpTemplates, toolType, loadingTools, commandExistsMap])
 
   const toolMenu = (tool: Tool & { type: string }) => {
     return {
@@ -1034,6 +1209,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
               setCurrentTool(tool.name)
               setShowCustomEditPopup(true)
             },
+            disabled: !!(tool.isBackendMcp && !tool.isConfigured),
             active: true
           },
           { label:
@@ -1225,10 +1401,34 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
                           </>
                         }
                       </div>
-                      <svg className="tool-header-content-icon" width="20" height="20" viewBox="0 0 24 24">
-                        <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
-                      </svg>
-                      <span className="tool-name">{displayTool.name}</span>
+                      {/* Icon: from iconLink (backend/orphaned MCPs) or fallback to wrench */}
+                      {displayTool.iconLink && !iconErrors[displayTool.name] ? (
+                        <img
+                          className="tool-header-content-icon tool-icon-img"
+                          src={displayTool.iconLink}
+                          alt=""
+                          width="20"
+                          height="20"
+                          onError={() => setIconErrors(prev => ({ ...prev, [displayTool.name]: true }))}
+                        />
+                      ) : (
+                        <svg className="tool-header-content-icon" width="20" height="20" viewBox="0 0 24 24">
+                          <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                        </svg>
+                      )}
+                      <span className="tool-name">{displayTool.readableName ?? displayTool.name}</span>
+                      {/* Description tooltip */}
+                      {(displayTool.isBackendMcp || displayTool.isOrphaned) && (
+                        <Tooltip
+                          content={displayTool.mcpDescription || t("tools.configure.noDescription")}
+                          side="top"
+                        >
+                          <span
+                            className="tool-description-badge"
+                            onClick={e => e.stopPropagation()}
+                          >?</span>
+                        </Tooltip>
+                      )}
                       {displayTool.toolType === "connector" &&
                         <Tooltip content={t("tools.tag_oauth")}>
                           <div className={`tool-tag ${(!displayTool.hasCredential && displayTool.status === "running") ? "success" : ""}`}>
@@ -1266,35 +1466,98 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
                         </Tooltip>
                     )}
                     {displayTool.disabled && !displayTool.enabled && <div className="tool-disabled-label">{t("tools.installFailed")}</div>}
-                    {displayTool.disabled && displayTool.enabled && displayTool.status === "unauthorized" &&
+                    {/* Connect — first time, no credentials yet */}
+                    {displayTool.disabled && displayTool.enabled &&
+                      displayTool.status === "unauthorized" &&
+                      !displayTool.has_credential &&
                       <Button
                         theme="Color"
-                        color="neutralGray"
+                        color="primary"
                         size="medium"
                         onClick={(e) => {
                           e.stopPropagation()
-                          onConnector(tool)
+                          onConnector(displayTool)
                         }}
                       >
                         {t("tools.toolMenu.connect")}
                       </Button>
                     }
+                    {/* Reconnect — after OAuth, replaces Connect (works for sse/streamable/any OAuth tool) */}
+                    {displayTool.has_credential &&
+                      <Button
+                        theme="Color"
+                        color="primary"
+                        size="medium"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onConnector(displayTool)
+                        }}
+                      >
+                        {t("tools.toolMenu.reconnect")}
+                      </Button>
+                    }
+                    {/* Configure button — backend MCPs with credential fields, not orphaned */}
+                    {displayTool.isBackendMcp && displayTool.hasConfigFields && !displayTool.isOrphaned && (
+                      <Button
+                        theme="Color"
+                        color="success"
+                        size="medium"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleOpenConfigure(displayTool.name)
+                        }}
+                      >
+                        {t("tools.configure.btn")}
+                      </Button>
+                    )}
+                    {/* Connect button — backend MCP not yet configured */}
+                    {displayTool.isBackendMcp && !displayTool.isConfigured && (
+                      <Button
+                        theme="Color"
+                        color="primary"
+                        size="medium"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleConnectMcp(displayTool.name)
+                        }}
+                      >
+                        {t("tools.toolMenu.connect")}
+                      </Button>
+                    )}
                     <div className="tool-switch-container">
                       <Switch
                         color={(displayTool.disabled && displayTool.status !== "unauthorized") ? "danger" : "primary"}
                         checked={displayTool.enabled}
-                        onChange={() => toggleTool(displayTool)}
+                        onChange={() => {
+                          if (displayTool.isBackendMcp && !displayTool.isConfigured && displayTool.hasConfigFields) {
+                            handleOpenConfigure(displayTool.name)
+                          } else {
+                            toggleTool(displayTool)
+                          }
+                        }}
                       />
                     </div>
                     <span className="tool-toggle">
                       {(displayTool.description || (displayTool.tools?.length ?? 0) > 0 || displayTool.error) && "▼"}
                     </span>
                   </div>
-                  {!displayTool.enabled &&
-                    <div className="tool-content-sub-title">
-                      {t("tools.disabledDescription")}
+                  {displayTool.isOrphaned && (
+                    <div className="tool-content-sub-title warning">
+                      {t("tools.configure.noLongerSupported")}
                     </div>
-                  }
+                  )}
+                  {displayTool.isBackendMcp && !displayTool.isConfigured && !displayTool.isOrphaned && (
+                    <div className="tool-content-sub-title warning">
+                      {t("tools.configure.notConfigured")}
+                    </div>
+                  )}
+                  {!displayTool.isBackendMcp || displayTool.isConfigured ? (
+                    !displayTool.enabled && (
+                      <div className="tool-content-sub-title">
+                        {t("tools.disabledDescription")}
+                      </div>
+                    )
+                  ) : null}
                   {displayTool.enabled && displayTool.toolType !== "connector" &&
                     (displayTool.status === "running" ?
                       (displayTool.tools && displayTool.tools.length > 0 ?
@@ -1536,6 +1799,21 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
           </div>
         </PopupConfirm>
       )}
+
+      {/* Configure dialog for backend MCPs */}
+      {showConfigureDialog && configureMcpKey && mcpTemplates[configureMcpKey] && (
+        <McpConfigureDialog
+          mcpKey={configureMcpKey}
+          template={mcpTemplates[configureMcpKey]}
+          existingEntry={(mcpConfig.mcpServers as Record<string, any>)?.[configureMcpKey]}
+          onSave={handleConfigureSave}
+          onCancel={() => {
+            setShowConfigureDialog(false)
+            setConfigureMcpKey("")
+          }}
+        />
+      )}
+
     </div>
   )
 }
