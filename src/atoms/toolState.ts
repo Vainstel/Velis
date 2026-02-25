@@ -104,3 +104,71 @@ export const loadMcpConfigAtom = atom(
 export const installToolBufferAtom = atom<{name: string, config: Record<string, MCP>}[]>([])
 
 export const loadingToolsAtom = atom<Record<string, { enabled: boolean }>>({})
+
+export const saveModeAtom = atom<boolean>(false)
+
+export const saveModeBackupAtom = atom<Record<string, string[]>>({})
+
+export const toggleSaveModeAtom = atom(
+  null,
+  async (get, set) => {
+    const isSaveMode = get(saveModeAtom)
+    const mcpConfig = get(mcpConfigAtom)
+    const tools = get(toolsAtom)
+
+    if (!isSaveMode) {
+      // ─── Turning ON ───
+      const backup: Record<string, string[]> = {}
+      const newMcpServers = { ...mcpConfig.mcpServers }
+
+      for (const [key, server] of Object.entries(mcpConfig.mcpServers)) {
+        if (!(server as any).velisSettings) continue
+
+        backup[key] = server.exclude_tools ?? []
+
+        const saveModeTools: string[] = (server as any).velisSettings?.saveModeTools ?? []
+        const allToolNames = tools.find(t => t.name === key)?.tools?.map(t => t.name) ?? []
+
+        newMcpServers[key] = {
+          ...server,
+          exclude_tools: saveModeTools.length > 0
+            ? allToolNames.filter(name => !saveModeTools.includes(name))
+            : allToolNames,
+        }
+      }
+
+      set(saveModeBackupAtom, backup)
+      set(saveModeAtom, true)
+      set(mcpConfigAtom, { mcpServers: newMcpServers })
+
+      await fetch("/api/config/mcpserver", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mcpServers: newMcpServers }),
+      })
+      await set(loadToolsAtom)
+
+    } else {
+      // ─── Turning OFF ───
+      const backup = get(saveModeBackupAtom)
+      const newMcpServers = { ...mcpConfig.mcpServers }
+
+      for (const [key, originalExclude] of Object.entries(backup)) {
+        if (newMcpServers[key]) {
+          newMcpServers[key] = { ...newMcpServers[key], exclude_tools: originalExclude }
+        }
+      }
+
+      set(saveModeAtom, false)
+      set(saveModeBackupAtom, {})
+      set(mcpConfigAtom, { mcpServers: newMcpServers })
+
+      await fetch("/api/config/mcpserver", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mcpServers: newMcpServers }),
+      })
+      await set(loadToolsAtom)
+    }
+  }
+)

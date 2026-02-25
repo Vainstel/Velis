@@ -123,7 +123,7 @@
     justify-content: space-between;
     gap: 10px;
 
-    button:not(.custom-button) {
+    button:not(.custom-button):not(.save-mode-btn) {
       background: none;
       border: none;
       cursor: pointer;
@@ -172,6 +172,39 @@
         font-size: 1em;
         cursor: pointer;
         border: none;
+      }
+
+      .save-mode-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-weak);
+        border-radius: 8px;
+        padding: 4px;
+        height: auto;
+        width: auto;
+        transition: color $transition-fast, background $transition-fast;
+
+        svg {
+          fill: currentColor;
+        }
+
+        &:hover {
+          color: var(--text-strong);
+          background: var(--bg-gray-medium);
+        }
+
+        &.active {
+          color: var(--text-success);
+        }
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
       }
     }
   }

@@ -15,7 +15,7 @@ import {
     isConfigActiveAtom,
     writeRawConfigAtom
 } from "../atoms/configState"
-import {loadToolsAtom, type SubTool, type Tool, toolsAtom} from "../atoms/toolState"
+import {loadToolsAtom, saveModeAtom, toggleSaveModeAtom, type SubTool, type Tool, toolsAtom} from "../atoms/toolState"
 import {useNavigate} from "react-router-dom"
 import {showToastAtom} from "../atoms/toastState"
 import {getTermFromModelConfig, queryGroup, queryModel, updateGroup, updateModel} from "../helper/model"
@@ -67,6 +67,8 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
   const currentChatId = useAtomValue(currentChatIdAtom)
   const histories = useAtomValue(historiesAtom)
   const tools = useAtomValue(toolsAtom)
+  const isSaveMode = useAtomValue(saveModeAtom)
+  const toggleSaveMode = useSetAtom(toggleSaveModeAtom)
   const commands = useAtomValue(commandsAtom)
   const loadCommands = useSetAtom(loadCommandsAtom)
 
@@ -1233,6 +1235,17 @@ const ChatInput: React.FC<Props> = ({ page, onSendMessage, disabled, onAbort }) 
           </Tooltip>
           <div className="chat-input-tools-container">
             <ToolDropDown />
+            <Tooltip type="controls" content={isSaveMode ? t("chat.saveModeOff") : t("chat.saveModeOn")}>
+              <button
+                className={`save-mode-btn${isSaveMode ? " active" : ""}`}
+                onClick={toggleSaveMode}
+                disabled={messageDisabled}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                </svg>
+              </button>
+            </Tooltip>
             {(disabled && !isAborting) ? (
               <Tooltip type="controls" content={<>{t("chat.abort")}<span className="key">Esc</span></>}>
                 <button

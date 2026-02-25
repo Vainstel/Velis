@@ -30,6 +30,8 @@
       "enableAll": "Enable All"
     },
     "abort": "Stop Generating",
+    "saveModeOn": "Enable Safe Mode",
+    "saveModeOff": "Disable Safe Mode",
     "retry": "Retry",
     "noModelAlert": "No models available",
     "noModelBanner": "No models available, please select a model first",
