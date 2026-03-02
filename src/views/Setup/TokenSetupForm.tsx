@@ -125,7 +125,7 @@ const TokenSetupForm: React.FC<TokenSetupFormProps> = ({
         for (const [key, template] of Object.entries(templateServers)) {
           const hasFields = !!(template.velisSettings?.newVersionPip?.fields?.length)
           if (!hasFields) {
-            autoMcpServers[key] = { ...template, enabled: true }
+            autoMcpServers[key] = { ...template, enabled: template.enabled === true }
           }
         }
         if (Object.keys(autoMcpServers).length > 0) {

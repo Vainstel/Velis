@@ -131,7 +131,7 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
         const hasNewVersionPip = !!template.velisSettings?.newVersionPip?.fields?.length
         const alreadyInConfig = key in (currentConfig.mcpServers ?? {})
         if (!hasNewVersionPip && !alreadyInConfig) {
-          toAdd[key] = { ...template, enabled: true }
+          toAdd[key] = { ...template, enabled: template.enabled === true }
         }
       }
       if (Object.keys(toAdd).length > 0) {
@@ -702,7 +702,15 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
     setLoadingTools(prev => ({ ...prev, [toolLoadingKey]: { enabled: !tool.enabled } }))
     try {
       if(!mcpConfigRef.current) {
-        mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
+        try {
+          const freshResponse = await fetch("/api/config/mcpserver")
+          const freshData = await freshResponse.json()
+          mcpConfigRef.current = (freshData.success && freshData.config)
+            ? freshData.config
+            : JSON.parse(JSON.stringify(mcpConfig))
+        } catch {
+          mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
+        }
       }
 
       const currentEnabled = tool.enabled
@@ -876,7 +884,15 @@ const Tools = ({ _subtab, _tabdata }: { _subtab?: Subtab, _tabdata?: any }) => {
       setShowUnsavedSubtoolsPopup(false)
 
       if(!mcpConfigRef.current) {
-        mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
+        try {
+          const freshResponse = await fetch("/api/config/mcpserver")
+          const freshData = await freshResponse.json()
+          mcpConfigRef.current = (freshData.success && freshData.config)
+            ? freshData.config
+            : JSON.parse(JSON.stringify(mcpConfig))
+        } catch {
+          mcpConfigRef.current = JSON.parse(JSON.stringify(mcpConfig))
+        }
       }
       const newConfig = JSON.parse(JSON.stringify(mcpConfigRef.current))
       const _tool = changingToolRef.current

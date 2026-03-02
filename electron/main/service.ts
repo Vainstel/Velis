@@ -1,9 +1,11 @@
 import { app, BrowserWindow } from "electron"
 import path from "node:path"
 import fse, { mkdirp } from "fs-extra"
+import unzipper from "unzipper"
 import { compareFilesAndReplace, npmInstall } from "./util.js"
 import {
   scriptsDir,
+  mcpBundledDir,
   configDir,
   DEF_MCP_SERVER_CONFIG,
   cwd,
@@ -48,6 +50,7 @@ async function initApp() {
   await fse.mkdir(baseConfigDir, { recursive: true })
 
   await migratePrebuiltScripts().catch(console.error)
+  await migrateBundledMcps().catch(console.error)
   await migrateLegacyConfig().catch(console.error)
 
   // create config file if not exists
@@ -195,6 +198,21 @@ async function migrateLegacyConfig() {
   }, {} as any)
 
   await fse.writeJSON(modelConfigPath, modelConfig)
+}
+
+async function migrateBundledMcps() {
+  if (!app.isPackaged) return
+
+  const zipPath = path.join(process.resourcesPath, "mcp", "mcps.zip")
+  if (!(await fse.pathExists(zipPath))) return
+
+  if (await fse.pathExists(mcpBundledDir)) return
+
+  console.log("extracting bundled mcps to", mcpBundledDir)
+  await fse.mkdir(mcpBundledDir, { recursive: true })
+  await fse.createReadStream(zipPath)
+    .pipe(unzipper.Extract({ path: mcpBundledDir }))
+    .promise()
 }
 
 async function migratePrebuiltScripts() {

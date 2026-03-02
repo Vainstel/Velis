@@ -32,6 +32,7 @@ export const cacheDir = envPath.cache
 export const homeDir = os.homedir()
 export const appDir = path.join(homeDir, ".velis")
 export const scriptsDir = path.join(appDir, "scripts")
+export const mcpBundledDir = path.join(appDir, "mcp")
 export const configDir = app.isPackaged ? path.join(appDir, "config") : path.join(process.cwd(), ".config")
 export const hostCacheDir = path.join(appDir, "host_cache")
 export const logDir = path.join(appDir, "log")

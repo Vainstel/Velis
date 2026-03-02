@@ -53,7 +53,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   getAppConfig: (): Promise<AppConfig | null> => ipcRenderer.invoke("util:getAppConfig"),
   logUserAction: (action: string, payload?: string): Promise<void> => ipcRenderer.invoke("util:logUserAction", action, payload),
   applyCurrentConfig: (): Promise<void> => ipcRenderer.invoke("util:applyCurrentConfig"),
-  restartApp: (): void => ipcRenderer.invoke("util:restartApp"),
+  restartApp: (): Promise<void> => ipcRenderer.invoke("util:restartApp"),
   setSetupMode: (mode: "customer" | "custom"): Promise<void> => ipcRenderer.invoke("util:setSetupMode", mode),
   getInnerSettings: (): Promise<any> => ipcRenderer.invoke("util:getInnerSettings"),
   markConfigUpdateSeen: (): Promise<void> => ipcRenderer.invoke("util:markConfigUpdateSeen"),
